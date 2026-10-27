@@ -1,4 +1,5 @@
 import './pdf-previews.css';
+import './page-cards.css';
 // Each view owns its render task, PDF documents and object URLs.
 // Replacing/removing files or leaving the tool disposes the previous view.
 let disposeCurrent = () => {};
@@ -20,7 +21,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
   heading.textContent = split ? 'Choose your pages' : 'Preview merge order';
   const help = document.createElement('p');
   help.className = 'preview-help';
-  help.textContent = 'Use Earlier and Later to change page positions. ' + (split ? 'Select the pages to extract; the range below shows their output order.' : 'Pages can move between files. Changing the file list resets the page order.');
+  help.textContent = 'Drag the grip to reorder pages, or use the arrow buttons. ' + (split ? 'Select the pages to extract; the range below shows their output order.' : 'Pages can move between files. Changing the file list resets the page order.');
   const status = document.createElement('p');
   status.className = 'preview-help';
   status.setAttribute('role', 'status');
@@ -31,17 +32,18 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
   function updateOrder() {
     cards.forEach((entry, i) => {
       grid.append(entry.card);
-      entry.position.textContent = `Position ${i+1}`;
+      entry.position.textContent = `${i+1} / ${cards.length}`;
       entry.earlier.disabled = !ready || i === 0;
       entry.later.disabled = !ready || i === cards.length-1;
     });
     if (!split && ready && !failed) mergeOrder = cards;
   }
-  function move(entry, offset) {
+  function move(entry, offset, focus = true) {
     if (!ready || isBusy()) return;
     const i = cards.indexOf(entry), next = i+offset;
     if (next < 0 || next >= cards.length) return;
-    [cards[i],cards[next]] = [cards[next],cards[i]];
+    cards.splice(i, 1);
+    cards.splice(next, 0, entry);
     updateOrder();
     if (input) {
       input.value = cards.filter(c => c.checkbox.checked).map(c => c.index+1).join(', ');
@@ -50,7 +52,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       keepVisualOrder = false;
     }
     status.textContent = `Moved page ${entry.index+1} to position ${next+1}.`;
-    (offset<0 ? entry.earlier : entry.later).focus();
+    if (focus) (offset<0 ? entry.earlier : entry.later).focus();
   }
 
   function syncSelection() {
@@ -96,7 +98,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
         for (let n = 1; n <= doc.numPages; n++) {
           const card = document.createElement('figure');
           card.className = 'page-thumbnail';
-          const caption = document.createElement(split ? 'label' : 'span');
+          const caption = document.createElement('div');
           caption.className = 'page-caption';
           const entry = {card, file, index:n-1};
           if (split) {
@@ -113,24 +115,28 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
               input.dispatchEvent(new Event('input', {bubbles:true}));
               keepVisualOrder = false;
             };
-            caption.append(checkbox);
+            const selection = document.createElement('label');
+            selection.className = 'page-select';
+            selection.append(checkbox);
+            caption.append(selection);
             entry.checkbox = checkbox;
           }
-          caption.append(`Page ${n}`);
+          const number = document.createElement('span');
+          number.className = 'page-number';
+          number.textContent = `Page ${n}`;
+          caption.prepend(number);
           const placeholder = document.createElement('div');
           placeholder.className = 'thumbnail-image';
           placeholder.textContent = 'Loading preview…';
-          card.append(placeholder, caption);
-          const source = document.createElement('small');
-          source.className = 'page-source';
-          source.textContent = file.name;
+          card.append(caption, placeholder);
           const position = document.createElement('small');
           const controls = document.createElement('div');
           controls.className = 'page-move-controls';
           for (const [key, text, offset] of [['earlier','Earlier',-1],['later','Later',1]]) {
             const button = document.createElement('button');
             button.type = 'button'; button.className = 'secondary';
-            button.textContent = `${offset<0?'←':'→'} ${text}`;
+            button.textContent = offset<0?'←':'→';
+            button.title = `Move ${text.toLowerCase()}`;
             button.setAttribute('aria-label', `Move ${file.name} page ${n} ${text.toLowerCase()}`);
             button.disabled = true;
             button.onclick = () => move(entry, offset);
@@ -138,7 +144,44 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
           }
           entry.position = position;
           cards.push(entry); fileCards.push(entry);
-          card.append(source, position, controls);
+          const grip = document.createElement('button');
+          grip.type = 'button';
+          grip.className = 'page-grip';
+          grip.textContent = '⠿';
+          grip.title = 'Drag to reorder';
+          grip.setAttribute('aria-label', `Drag ${file.name} page ${n} to reorder; use arrow buttons for keyboard control`);
+          controls.insertBefore(position, entry.later);
+          controls.insertBefore(grip, entry.later);
+          card.title = `${file.name}, page ${n}`;
+          card.append(controls);
+          let dragging = false, target;
+          const endDrag = event => {
+            if (!dragging) return;
+            dragging = false;
+            card.classList.remove('dragging');
+            target?.card.classList.remove('drop-target');
+            if (event.type === 'pointerup' && target) move(entry, cards.indexOf(target)-cards.indexOf(entry), false);
+            target = null;
+          };
+          grip.onpointerdown = event => {
+            if (!ready || isBusy() || event.button !== 0) return;
+            dragging = true;
+            grip.setPointerCapture(event.pointerId);
+            card.classList.add('dragging');
+            event.preventDefault();
+          };
+          grip.onpointermove = event => {
+            if (!dragging) return;
+            const hit = document.elementFromPoint(event.clientX, event.clientY)?.closest('.page-thumbnail');
+            target?.card.classList.remove('drop-target');
+            target = cards.find(c => c.card === hit && c !== entry);
+            target?.card.classList.add('drop-target');
+            if (event.clientY > window.innerHeight-70) window.scrollBy(0, 16);
+            else if (event.clientY < 70) window.scrollBy(0, -16);
+          };
+          grip.onpointerup = endDrag;
+          grip.onpointercancel = endDrag;
+          grip.onlostpointercapture = endDrag;
           grid.append(card);
         }
         syncSelection();

@@ -1,0 +1,17 @@
+.pdf-previews .page-thumbnails{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-top:10px}
+.pdf-previews .page-thumbnail{padding:6px;gap:4px;position:relative}
+.pdf-previews .page-caption{display:flex;justify-content:space-between;align-items:center;min-height:34px;font-size:11px}
+.pdf-previews .page-number{font-weight:700;padding-left:4px}
+.pdf-previews .page-select{display:flex;align-items:center;justify-content:center;width:40px;height:34px;cursor:pointer}
+.pdf-previews .page-select input{width:20px;height:20px;margin:0}
+.pdf-previews .thumbnail-image{height:150px}
+.pdf-previews .page-move-controls{display:flex;align-items:center;gap:0;justify-content:space-between}
+.pdf-previews .page-move-controls button{width:34px;min-width:34px;height:36px;min-height:36px;padding:0;border:0;background:transparent;font-size:18px;color:#185c46;border-radius:5px}
+.pdf-previews .page-move-controls button:hover{background:#e1ecd9}
+.pdf-previews .page-move-controls button:disabled{opacity:.3}
+.pdf-previews .page-move-controls small{font-size:10px;color:#61735c;white-space:nowrap}
+.pdf-previews .page-grip{touch-action:none;cursor:grab}
+.pdf-previews .page-thumbnail.dragging{opacity:.55;border-style:dashed}
+.pdf-previews .page-thumbnail.drop-target{outline:3px solid #397554;outline-offset:2px;background:#dcebd6}
+@media(pointer:coarse){.pdf-previews .page-move-controls button{width:44px;min-width:44px;height:44px;min-height:44px}.pdf-previews .page-select{height:44px;width:44px}}
+@media(max-width:480px){.pdf-previews .page-thumbnails{grid-template-columns:repeat(2,minmax(0,1fr))}.pdf-previews .thumbnail-image{height:135px}.pdf-previews .page-move-controls small{display:none}}

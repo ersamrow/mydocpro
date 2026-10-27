@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build && node scripts/build-pwa.mjs",
+    "build": "vite build && node scripts/build-pages.mjs && node scripts/build-pwa.mjs",
     "check": "node --check src/app.js && node --check src/pdf-previews.js && node --check src/pwa.js && node --check src/pdf-editor.js && node --check src/download-name.js",
     "preview": "vite preview --host 127.0.0.1"
   },

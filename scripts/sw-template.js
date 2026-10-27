@@ -9,7 +9,10 @@ self.addEventListener('install', event => {
       // Sequential caching limits memory spikes on lower-end phones.
       for (const url of PRECACHE) {
         const response = await fetch(new Request(url, {cache:'reload', credentials:'same-origin'}));
-        if (!response.ok || response.redirected) throw Error('Asset unavailable: '+url);
+        // Static hosts may canonicalize /index.html to /. Accept only that
+        // same-origin shell redirect, then verify the app marker below.
+        const shellRedirect = url === '/index.html' && new URL(response.url).origin === self.location.origin;
+        if (!response.ok || (response.redirected && !shellRedirect)) throw Error('Asset unavailable: '+url);
         const type = response.headers.get('content-type') || '';
         if (url === '/index.html') {
           if (!(await response.clone().text()).includes('name="application-name" content="MyDocPro"')) throw Error('App shell unavailable');

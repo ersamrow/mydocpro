@@ -7,7 +7,7 @@ const dist=new URL('../dist/',import.meta.url);
 const script=await readFile(new URL('sw.js',dist),'utf8');
 const manifest=JSON.parse(await readFile(new URL('manifest.webmanifest',dist),'utf8'));
 
-function worker({badAsset}={}){
+function worker({badAsset,redirectShell=false}={}){
   let online=true,claimCount=0,skipCount=0;
   const handlers={},stores=new Map([['other-app',new Map()],['mydocpro-old',new Map()]]);
   const caches={
@@ -25,7 +25,10 @@ function worker({badAsset}={}){
     const pathname=new URL(typeof request==='string'?request:request.url,'https://example.test').pathname;
     if(pathname===badAsset)return new Response('<h1>Sign in</h1>',{headers:{'content-type':'text/html'}});
     const bytes=await readFile(new URL(pathname.slice(1)||'index.html',dist));
-    return new Response(bytes,{headers:{'content-type':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
+    const response=new Response(bytes,{headers:{'content-type':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
+    Object.defineProperty(response,'url',{value:'https://example.test'+(redirectShell&&pathname==='/index.html'?'/':pathname)});
+    if(redirectShell&&pathname==='/index.html')Object.defineProperty(response,'redirected',{value:true});
+    return response;
   };
   const self={location:{origin:'https://example.test'},clients:{claim:async()=>{claimCount++}},skipWaiting:()=>{skipCount++},addEventListener:(name,fn)=>handlers[name]=fn};
   vm.runInNewContext(script,{self,caches,fetch,Request:LocalRequest,URL,Set,Promise,Error});
@@ -89,4 +92,12 @@ test('login HTML in place of an asset aborts installation without removing old c
   const w=worker({badAsset:'/manifest.webmanifest'});
   await assert.rejects(w.event('install'),/Expected application asset/);
   assert.deepEqual([...w.stores.keys()].sort(),['mydocpro-old','other-app']);
+});
+
+test('hosting redirects from index.html to the app root are accepted',async()=>{
+  const w=worker({redirectShell:true});
+  await w.event('install');
+  let report;
+  await w.event('message',{data:{type:'OFFLINE_STATUS'},ports:[{postMessage:r=>report=r}]});
+  assert.equal(report.ready,true);
 });

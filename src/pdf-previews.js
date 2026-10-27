@@ -1,5 +1,6 @@
 import './pdf-previews.css';
 import './page-cards.css';
+import {setupPdfEditor} from './pdf-editor.js';
 // Each view owns its render task, PDF documents and object URLs.
 // Replacing/removing files or leaving the tool disposes the previous view.
 let disposeCurrent = () => {};
@@ -29,6 +30,14 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
   const grid = document.createElement('div');
   grid.className = 'page-thumbnails';
   host.append(grid);
+  let editor;
+  function setSelection() {
+    if (!input) return;
+    input.value = cards.filter(c => c.checkbox.checked).map(c => c.index+1).join(', ');
+    keepVisualOrder = true;
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+    keepVisualOrder = false;
+  }
   function updateOrder() {
     cards.forEach((entry, i) => {
       grid.append(entry.card);
@@ -37,11 +46,13 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       entry.later.disabled = !ready || i === cards.length-1;
     });
     if (!split && ready && !failed) mergeOrder = cards;
+    editor?.refresh();
   }
   function move(entry, offset, focus = true) {
     if (!ready || isBusy()) return;
     const i = cards.indexOf(entry), next = i+offset;
-    if (next < 0 || next >= cards.length) return;
+    if (next < 0 || next >= cards.length || next === i) return;
+    editor.remember();
     cards.splice(i, 1);
     cards.splice(next, 0, entry);
     updateOrder();
@@ -52,24 +63,30 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       keepVisualOrder = false;
     }
     status.textContent = `Moved page ${entry.index+1} to position ${next+1}.`;
-    if (focus) (offset<0 ? entry.earlier : entry.later).focus();
+    editor.refresh();
+    if (focus) entry.position.focus();
   }
 
-  function syncSelection() {
+  function syncSelection(preserveOrder = false) {
     if (!input || disposed) return;
     let selected = new Set();
     try { selected = new Set(parsePages(input.value, pageCount)); } catch { /* Invalid ranges stay editable. */ }
     for (const {checkbox, index} of cards) checkbox.checked = selected.has(index);
-    if (selected.size && !keepVisualOrder) {
+    if (selected.size && !keepVisualOrder && preserveOrder !== true) {
       const rank = new Map([...selected].map((index,i)=>[index,i]));
       cards.sort((a,b)=>(rank.get(a.index)??Infinity)-(rank.get(b.index)??Infinity));
       updateOrder();
     }
     status.textContent = `${selected.size} of ${pageCount} pages selected`;
+    editor?.refresh();
   }
+  editor = setupPdfEditor({host, grid, cards, split, input, parsePages, isBusy,
+    isReady:()=>ready && !failed, hasFailed:()=>failed, updateOrder, syncSelection, setSelection, move, openPdf, status});
+  editor.refresh();
   input?.addEventListener('input', syncSelection);
   disposeCurrent = () => {
     disposed = true;
+    editor.dispose();
     renderTask?.cancel();
     input?.removeEventListener('input', syncSelection);
     urls.forEach(URL.revokeObjectURL);
@@ -83,6 +100,8 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       group.className = 'preview-group';
       const title = document.createElement('h3');
       title.textContent = `${fileIndex + 1}. ${file.name}`;
+      group.style.setProperty('--file-color', ['#1e6b52','#3559a5','#8d4a87','#93651a','#247884','#a44839'][fileIndex % 6]);
+      group.classList.add('file-legend');
       group.append(title);
       host.insertBefore(group, grid);
       const fileCards = [];
@@ -100,13 +119,15 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
           card.className = 'page-thumbnail';
           const caption = document.createElement('div');
           caption.className = 'page-caption';
-          const entry = {card, file, index:n-1};
+          const entry = {card, file, fileIndex, index:n-1, original:cards.length};
+          card.style.setProperty('--file-color', group.style.getPropertyValue('--file-color'));
           if (split) {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.setAttribute('aria-label', `Select page ${n}`);
             checkbox.onchange = () => {
               if (isBusy()) { syncSelection(); return; }
+              editor.remember();
               let selected;
               try { selected = new Set(parsePages(input.value, pageCount)); } catch { selected = new Set(); }
               if (checkbox.checked) selected.add(n - 1); else selected.delete(n - 1);
@@ -125,11 +146,25 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
           number.className = 'page-number';
           number.textContent = `Page ${n}`;
           caption.prepend(number);
-          const placeholder = document.createElement('div');
+          if (!split) {
+            const badge = document.createElement('span');
+            badge.className = 'file-badge'; badge.textContent = 'F'+(fileIndex+1);
+            badge.title = file.name; badge.setAttribute('aria-label', 'File '+(fileIndex+1)+': '+file.name);
+            caption.append(badge);
+          }
+          const placeholder = document.createElement('button');
+          placeholder.type = 'button';
+          placeholder.setAttribute('aria-label', `Zoom ${file.name} page ${n}`);
+          placeholder.onclick = () => editor.zoom(entry);
+          entry.zoom = placeholder;
           placeholder.className = 'thumbnail-image';
           placeholder.textContent = 'Loading preview…';
           card.append(caption, placeholder);
-          const position = document.createElement('small');
+          const position = document.createElement('button');
+          position.type = 'button'; position.className = 'page-position';
+          position.title = 'Move to position';
+          position.setAttribute('aria-label', `Move ${file.name} page ${n} to position`);
+          position.onclick = () => editor.moveTo(entry);
           const controls = document.createElement('div');
           controls.className = 'page-move-controls';
           for (const [key, text, offset] of [['earlier','Earlier',-1],['later','Later',1]]) {
@@ -145,6 +180,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
           entry.position = position;
           cards.push(entry); fileCards.push(entry);
           const grip = document.createElement('button');
+          entry.grip = grip;
           grip.type = 'button';
           grip.className = 'page-grip';
           grip.textContent = '⠿';

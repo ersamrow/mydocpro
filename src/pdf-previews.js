@@ -2,30 +2,65 @@ import './pdf-previews.css';
 // Each view owns its render task, PDF documents and object URLs.
 // Replacing/removing files or leaving the tool disposes the previous view.
 let disposeCurrent = () => {};
-export function clearPdfPreviews() { disposeCurrent(); disposeCurrent = () => {}; }
+let mergeOrder = null;
+export function getMergePageOrder() {
+  if (!mergeOrder) throw Error('Wait for all page previews to load before merging.');
+  return mergeOrder.map(({file, index}) => ({file, index}));
+}
+export function clearPdfPreviews() { disposeCurrent(); disposeCurrent = () => {}; mergeOrder = null; }
 
 export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy}) {
   clearPdfPreviews();
   host.replaceChildren();
   if (!files.length) return;
-  let disposed = false, renderTask, pageCount = 0;
+  let disposed = false, renderTask, pageCount = 0, ready = false, failed = false;
   const urls = [], cards = [];
   const input = split ? document.getElementById('pages') : null;
   const heading = document.createElement('h2');
   heading.textContent = split ? 'Choose your pages' : 'Preview merge order';
   const help = document.createElement('p');
   help.className = 'preview-help';
-  help.textContent = split ? 'Select thumbnails or enter a page range below.' : 'Files are merged in the order above. Use the arrows to change their order.';
+  help.textContent = 'Use Earlier and Later to change page positions. ' + (split ? 'Select the pages to extract; the range below shows their output order.' : 'Pages can move between files. Changing the file list resets the page order.');
   const status = document.createElement('p');
   status.className = 'preview-help';
   status.setAttribute('role', 'status');
   host.append(heading, help, status);
+  const grid = document.createElement('div');
+  grid.className = 'page-thumbnails';
+  host.append(grid);
+  function updateOrder() {
+    cards.forEach((entry, i) => {
+      grid.append(entry.card);
+      entry.position.textContent = `Position ${i+1}`;
+      entry.earlier.disabled = !ready || i === 0;
+      entry.later.disabled = !ready || i === cards.length-1;
+    });
+    if (!split && ready && !failed) mergeOrder = cards;
+  }
+  function move(entry, offset) {
+    if (!ready || isBusy()) return;
+    const i = cards.indexOf(entry), next = i+offset;
+    if (next < 0 || next >= cards.length) return;
+    [cards[i],cards[next]] = [cards[next],cards[i]];
+    updateOrder();
+    if (input) {
+      input.value = cards.filter(c => c.checkbox.checked).map(c => c.index+1).join(', ');
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+    status.textContent = `Moved page ${entry.index+1} to position ${next+1}.`;
+    (offset<0 ? entry.earlier : entry.later).focus();
+  }
 
   function syncSelection() {
     if (!input || disposed) return;
     let selected = new Set();
     try { selected = new Set(parsePages(input.value, pageCount)); } catch { /* Invalid ranges stay editable. */ }
     for (const {checkbox, index} of cards) checkbox.checked = selected.has(index);
+    if (selected.size) {
+      const rank = new Map([...selected].map((index,i)=>[index,i]));
+      cards.sort((a,b)=>(rank.get(a.index)??Infinity)-(rank.get(b.index)??Infinity));
+      updateOrder();
+    }
     status.textContent = `${selected.size} of ${pageCount} pages selected`;
   }
   input?.addEventListener('input', syncSelection);
@@ -44,10 +79,9 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       group.className = 'preview-group';
       const title = document.createElement('h3');
       title.textContent = `${fileIndex + 1}. ${file.name}`;
-      const grid = document.createElement('div');
-      grid.className = 'page-thumbnails';
-      group.append(title, grid);
-      host.append(group);
+      group.append(title);
+      host.insertBefore(group, grid);
+      const fileCards = [];
       let doc;
       try {
         status.textContent = `Loading ${file.name}…`;
@@ -58,10 +92,11 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
         pageCount = doc.numPages;
         title.textContent += ` · ${doc.numPages} ${doc.numPages === 1 ? 'page' : 'pages'}`;
         for (let n = 1; n <= doc.numPages; n++) {
-          const card = document.createElement(split ? 'label' : 'figure');
+          const card = document.createElement('figure');
           card.className = 'page-thumbnail';
-          const caption = document.createElement('span');
+          const caption = document.createElement(split ? 'label' : 'span');
           caption.className = 'page-caption';
+          const entry = {card, file, index:n-1};
           if (split) {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -71,24 +106,42 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
               let selected;
               try { selected = new Set(parsePages(input.value, pageCount)); } catch { selected = new Set(); }
               if (checkbox.checked) selected.add(n - 1); else selected.delete(n - 1);
-              input.value = [...selected].sort((a,b) => a-b).map(i => i+1).join(', ');
+              input.value = cards.filter(c => selected.has(c.index)).map(c => c.index+1).join(', ');
               input.dispatchEvent(new Event('input', {bubbles:true}));
             };
             caption.append(checkbox);
-            cards.push({checkbox, index:n-1});
+            entry.checkbox = checkbox;
           }
           caption.append(`Page ${n}`);
           const placeholder = document.createElement('div');
           placeholder.className = 'thumbnail-image';
           placeholder.textContent = 'Loading preview…';
           card.append(placeholder, caption);
+          const source = document.createElement('small');
+          source.className = 'page-source';
+          source.textContent = file.name;
+          const position = document.createElement('small');
+          const controls = document.createElement('div');
+          controls.className = 'page-move-controls';
+          for (const [key, text, offset] of [['earlier','Earlier',-1],['later','Later',1]]) {
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = 'secondary';
+            button.textContent = `${offset<0?'←':'→'} ${text}`;
+            button.setAttribute('aria-label', `Move ${file.name} page ${n} ${text.toLowerCase()}`);
+            button.disabled = true;
+            button.onclick = () => move(entry, offset);
+            entry[key] = button; controls.append(button);
+          }
+          entry.position = position;
+          cards.push(entry); fileCards.push(entry);
+          card.append(source, position, controls);
           grid.append(card);
         }
         syncSelection();
         // Render one small page at a time instead of retaining full-size canvases.
         for (let n = 1; n <= doc.numPages; n++) {
           if (disposed) return;
-          const placeholder = grid.children[n-1].querySelector('.thumbnail-image');
+          const placeholder = fileCards[n-1].card.querySelector('.thumbnail-image');
           const page = await doc.getPage(n);
           if (disposed) return;
           const natural = page.getViewport({scale:1});
@@ -120,6 +173,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
         }
       } catch (error) {
         if (disposed) return;
+        failed = true;
         const message = document.createElement('p');
         message.className = 'notice';
         message.textContent = `Could not preview ${file.name}: ${error.message || 'Invalid or protected PDF.'}`;
@@ -129,6 +183,8 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       }
     }
     if (!disposed) {
+      ready = true;
+      updateOrder();
       if (split) syncSelection();
       else status.textContent = `${total} pages across ${files.length} PDFs`;
     }

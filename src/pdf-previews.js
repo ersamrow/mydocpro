@@ -13,7 +13,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
   clearPdfPreviews();
   host.replaceChildren();
   if (!files.length) return;
-  let disposed = false, renderTask, pageCount = 0, ready = false, failed = false;
+  let disposed = false, renderTask, pageCount = 0, ready = false, failed = false, keepVisualOrder = false;
   const urls = [], cards = [];
   const input = split ? document.getElementById('pages') : null;
   const heading = document.createElement('h2');
@@ -45,7 +45,9 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
     updateOrder();
     if (input) {
       input.value = cards.filter(c => c.checkbox.checked).map(c => c.index+1).join(', ');
+      keepVisualOrder = true;
       input.dispatchEvent(new Event('input', {bubbles:true}));
+      keepVisualOrder = false;
     }
     status.textContent = `Moved page ${entry.index+1} to position ${next+1}.`;
     (offset<0 ? entry.earlier : entry.later).focus();
@@ -56,7 +58,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
     let selected = new Set();
     try { selected = new Set(parsePages(input.value, pageCount)); } catch { /* Invalid ranges stay editable. */ }
     for (const {checkbox, index} of cards) checkbox.checked = selected.has(index);
-    if (selected.size) {
+    if (selected.size && !keepVisualOrder) {
       const rank = new Map([...selected].map((index,i)=>[index,i]));
       cards.sort((a,b)=>(rank.get(a.index)??Infinity)-(rank.get(b.index)??Infinity));
       updateOrder();
@@ -107,7 +109,9 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
               try { selected = new Set(parsePages(input.value, pageCount)); } catch { selected = new Set(); }
               if (checkbox.checked) selected.add(n - 1); else selected.delete(n - 1);
               input.value = cards.filter(c => selected.has(c.index)).map(c => c.index+1).join(', ');
+              keepVisualOrder = true;
               input.dispatchEvent(new Event('input', {bubbles:true}));
+              keepVisualOrder = false;
             };
             caption.append(checkbox);
             entry.checkbox = checkbox;

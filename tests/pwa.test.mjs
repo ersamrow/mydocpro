@@ -1,0 +1,92 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile,readdir} from 'node:fs/promises';
+import vm from 'node:vm';
+
+const dist=new URL('../dist/',import.meta.url);
+const script=await readFile(new URL('sw.js',dist),'utf8');
+const manifest=JSON.parse(await readFile(new URL('manifest.webmanifest',dist),'utf8'));
+
+function worker({badAsset}={}){
+  let online=true,claimCount=0,skipCount=0;
+  const handlers={},stores=new Map([['other-app',new Map()],['mydocpro-old',new Map()]]);
+  const caches={
+    keys:async()=>[...stores.keys()],
+    delete:async name=>stores.delete(name),
+    open:async name=>{
+      if(!stores.has(name))stores.set(name,new Map());
+      const data=stores.get(name);
+      return {put:async(key,response)=>data.set(key,response.clone()),match:async key=>data.get(key)?.clone()};
+    }
+  };
+  class LocalRequest extends Request {constructor(url,options){super(new URL(url,'https://example.test'),options)}}
+  const fetch=async request=>{
+    if(!online)throw Error('Offline');
+    const pathname=new URL(typeof request==='string'?request:request.url,'https://example.test').pathname;
+    if(pathname===badAsset)return new Response('<h1>Sign in</h1>',{headers:{'content-type':'text/html'}});
+    const bytes=await readFile(new URL(pathname.slice(1)||'index.html',dist));
+    return new Response(bytes,{headers:{'content-type':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
+  };
+  const self={location:{origin:'https://example.test'},clients:{claim:async()=>{claimCount++}},skipWaiting:()=>{skipCount++},addEventListener:(name,fn)=>handlers[name]=fn};
+  vm.runInNewContext(script,{self,caches,fetch,Request:LocalRequest,URL,Set,Promise,Error});
+  const event=async(type,extra={})=>{
+    let result;
+    handlers[type]({...extra,waitUntil:p=>result=p,respondWith:p=>result=p});
+    return result;
+  };
+  return {event,stores,offline:()=>online=false,claimCount:()=>claimCount,skipCount:()=>skipCount};
+}
+
+test('manifest includes standalone launch, home-screen icon sizes and maskable icon',async()=>{
+  assert.equal(manifest.display,'standalone');
+  assert.equal(manifest.scope,'/');
+  assert.equal(manifest.start_url,'/');
+  for(const icon of manifest.icons){
+    const png=await readFile(new URL(icon.src.slice(1),dist));
+    const expected=Number(icon.sizes.split('x')[0]);
+    assert.equal(png.readUInt32BE(16),expected);
+    assert.equal(png.readUInt32BE(20),expected);
+  }
+  assert.ok(manifest.icons.some(icon=>icon.purpose==='maskable'));
+});
+
+test('complete offline installation serves every tool and lazy PDF library without network',async()=>{
+  const w=worker();
+  await w.event('install');
+  assert.equal(w.skipCount(),0,'updates must not interrupt existing work');
+  await w.event('activate');
+  assert.equal(w.claimCount(),1);
+  assert.ok(w.stores.has('other-app'));
+  assert.ok(!w.stores.has('mydocpro-old'));
+  let report;
+  await w.event('message',{data:{type:'OFFLINE_STATUS'},ports:[{postMessage:r=>report=r}]});
+  assert.equal(report.ready,true);
+  w.offline();
+  const routes=['/','/compress-image?kb=20','/resize-image','/convert-image','/crop-image','/merge-pdf','/split-pdf','/compress-pdf','/jpg-to-pdf','/exam-photo','/signature','/passport-sheet','/pdf-to-image','/organize-pdf','/name-date','/join-images','/white-background','/privacy','/about'];
+  for(const route of routes){
+    const response=await w.event('fetch',{request:{url:'https://example.test'+route,method:'GET',mode:'navigate'}});
+    assert.ok((await response.text()).includes('name="application-name" content="MyDocPro"'),route);
+  }
+  const assets=await readdir(new URL('assets/',dist));
+  assert.ok(assets.some(name=>name.startsWith('pdf.worker')&&name.endsWith('.mjs')));
+  for(const name of assets){
+    const response=await w.event('fetch',{request:{url:'https://example.test/assets/'+name,method:'GET',mode:'cors'}});
+    assert.ok((await response.arrayBuffer()).byteLength>0,name);
+  }
+});
+
+test('auth, external, unknown and uploaded files are never handled or cached',async()=>{
+  const w=worker();await w.event('install');
+  for(const request of [
+    {url:'https://example.test/signin-with-chatgpt',method:'GET',mode:'navigate'},
+    {url:'https://outside.test/photo.jpg',method:'GET',mode:'cors'},
+    {url:'https://example.test/private.pdf',method:'GET',mode:'cors'},
+    {url:'https://example.test/merge-pdf',method:'POST',mode:'cors'},
+  ])assert.equal(await w.event('fetch',{request}),undefined);
+});
+
+test('login HTML in place of an asset aborts installation without removing old cache',async()=>{
+  const w=worker({badAsset:'/manifest.webmanifest'});
+  await assert.rejects(w.event('install'),/Expected application asset/);
+  assert.deepEqual([...w.stores.keys()].sort(),['mydocpro-old','other-app']);
+});

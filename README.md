@@ -28,4 +28,14 @@ Generic photo presets are not official exam specifications. Compression produces
 
 ## Remaining specification work
 
-Official-source verification and dated exam presets; HEIC input; interactive crop handles and PDF thumbnail editor; Web Worker orchestration for image and PDF editing; installable offline PWA; per-tool static SEO pages and structured data; Hindi/localization; AdSense approval and configuration. No claims are made that these are implemented.
+Official-source verification and dated exam presets; HEIC input; interactive crop handles; Web Worker orchestration for image and PDF editing; per-tool static SEO pages and structured data; Hindi/localization; AdSense approval and configuration. No claims are made that these are implemented.
+
+## Mobile and offline app
+
+All tool layouts support narrow screens, touch-sized controls, safe areas, and reduced motion. PDF thumbnails support selection and page ordering.
+
+The production build generates `sw.js` with a content-versioned list of all bundled assets, including PDF rendering workers. Use `npm run build` then `npm run preview` to test PWA behavior; development mode deliberately does not register a service worker. HTTPS or localhost is required. The manifest provides home-screen icons and tool shortcuts; use **Install app** for browser-specific guidance.
+
+Wait for **Ready offline** before disconnecting. All 16 tools then load from the local app cache, including those not previously opened. The service worker handles only known app routes and built application assets; user files, blob downloads, authentication routes, and third-party requests are excluded. Fonts use local system fallbacks so there are no external font requests. Browser storage eviction can remove offline availability; reopen online to restore it.
+
+Updates wait for all open MyDocPro windows to close. The current version is never forcibly reloaded while processing files. On private hosting, first sign-in/setup needs internet; the cached local tools remain usable offline after setup. Installation and private-host routing should also be tested on physical Android/iOS browsers before public launch.

@@ -1,0 +1,23 @@
+{
+  "id": "/",
+  "name": "MyDocPro — PDF & Image Tools",
+  "short_name": "MyDocPro",
+  "description": "Private image and PDF tools that work on your device, online or offline.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafbf8",
+  "theme_color": "#185c46",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"/icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Compress image","url":"/compress-image","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"Merge PDF","url":"/merge-pdf","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"Split PDF","url":"/split-pdf","icons":[{"src":"/icons/icon-192.png","sizes":"192x192"}]}
+  ]
+}

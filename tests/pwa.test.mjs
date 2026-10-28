@@ -27,11 +27,19 @@ function worker({badAsset,redirectShell=false}={}){
     const bytes=await readFile(new URL(pathname.slice(1)||'index.html',dist));
     const response=new Response(bytes,{headers:{'content-type':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
     Object.defineProperty(response,'url',{value:'https://example.test'+(redirectShell&&pathname==='/index.html'?'/':pathname)});
-    if(redirectShell&&pathname==='/index.html')Object.defineProperty(response,'redirected',{value:true});
+    if(redirectShell&&pathname==='/index.html'){
+      const markRedirect = r => {
+        Object.defineProperty(r,'redirected',{value:true});
+        const clone=r.clone.bind(r);
+        r.clone=()=>markRedirect(clone());
+        return r;
+      };
+      markRedirect(response);
+    }
     return response;
   };
   const self={location:{origin:'https://example.test'},clients:{claim:async()=>{claimCount++}},skipWaiting:()=>{skipCount++},addEventListener:(name,fn)=>handlers[name]=fn};
-  vm.runInNewContext(script,{self,caches,fetch,Request:LocalRequest,URL,Set,Promise,Error});
+  vm.runInNewContext(script,{self,caches,fetch,Request:LocalRequest,Response,URL,Set,Promise,Error});
   const event=async(type,extra={})=>{
     let result;
     handlers[type]({...extra,waitUntil:p=>result=p,respondWith:p=>result=p});
@@ -101,4 +109,20 @@ test('hosting redirects from index.html to the app root are accepted',async()=>{
   let report;
   await w.event('message',{data:{type:'OFFLINE_STATUS'},ports:[{postMessage:r=>report=r}]});
   assert.equal(report.ready,true);
+});
+
+
+test('redirected shell is safe for normal address-bar navigation, online and offline',async()=>{
+  const w=worker({redirectShell:true});
+  await w.event('install');
+  for(const offline of [false,true]){
+    if(offline)w.offline();
+    for(const path of ['/','/crop-image']){
+      const response=await w.event('fetch',{request:{url:'https://example.test'+path,method:'GET',mode:'navigate',redirect:'manual'}});
+      assert.equal(response.redirected,false,'manual navigation must not receive a followed redirect');
+      assert.equal(response.status,200);
+      assert.match(response.headers.get('content-type'),/text\/html/);
+      assert.ok((await response.text()).includes('name="application-name" content="MyDocPro"'));
+    }
+  }
 });

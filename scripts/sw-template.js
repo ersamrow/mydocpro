@@ -17,7 +17,13 @@ self.addEventListener('install', event => {
         if (url === '/index.html') {
           if (!(await response.clone().text()).includes('name="application-name" content="MyDocPro"')) throw Error('App shell unavailable');
         } else if (type.includes('text/html')) throw Error('Expected application asset: '+url);
-        await cache.put(url,response);
+        // Navigation requests use redirect:'manual'. A followed redirect response
+        // cannot be returned to them by respondWith (even with status 200).
+        // Store a fresh shell response without the network redirect metadata.
+        const cached = url === '/index.html'
+          ? new Response(await response.arrayBuffer(), {status:response.status, statusText:response.statusText, headers:response.headers})
+          : response;
+        await cache.put(url,cached);
       }
     } catch (error) {
       await caches.delete(CACHE);

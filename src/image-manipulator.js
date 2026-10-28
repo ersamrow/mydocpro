@@ -6,7 +6,7 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   const settings = host.parentElement.querySelector('.settings');
   const get = id => settings.querySelector('#'+id);
   const panel = document.createElement('section'); panel.className='image-manipulator';
-  const help=document.createElement('p'); help.textContent=kind==='crop-image'?'Drag inside the box to move it. Drag a corner to crop. Mouse and touch supported.':'Drag the corner or use the size slider. Exact dimensions remain available below.';
+  const help=document.createElement('p'); help.textContent=kind==='crop-image'?'Drag inside the box to move it. Drag any edge or corner to crop. Mouse and touch supported.':'Drag the corner or use the size slider. Exact dimensions remain available below.';
   const board=document.createElement('div');board.className='manipulator-board';
   const surface=document.createElement('div');surface.className='manipulator-surface';
   const canvas=document.createElement('canvas'); canvas.setAttribute('aria-label','Image editing surface');
@@ -16,14 +16,14 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   const hidden=[];
   if(kind==='crop-image')for(const key of ['x','y','w','h']){const input=document.createElement('input');input.type='hidden';input.id='crop-'+key;settings.append(input);hidden.push(input);}
   const url=URL.createObjectURL(file);
-  const handles=kind==='crop-image'?['nw','ne','sw','se']:['se'];
+  const handles=kind==='crop-image'?['nw','ne','sw','se','n','s','e','w']:['se'];
   for(const handle of handles){const button=document.createElement('button');button.type='button';button.className='image-handle '+handle;button.dataset.handle=handle;button.setAttribute('aria-label',(kind==='crop-image'?'Crop ':'Resize ')+handle+' corner; use arrow keys for precision');box.append(button);}
   const bar=document.createElement('div');bar.className='manipulator-toolbar';
   const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent=kind==='crop-image'?'Reset crop':'Original size';
   const info=document.createElement('span');info.setAttribute('role','status');bar.append(reset,info);panel.append(bar);
   let lock,slider;
   if(kind==='resize-image'){
-    const label=document.createElement('label');lock=document.createElement('input');lock.type='checkbox';lock.checked=true;label.append(lock,' Keep proportions');
+    const label=document.createElement('label');lock=document.createElement('input');lock.type='checkbox';lock.checked=false;label.append(lock,' Keep proportions');
     const scaleLabel=document.createElement('label');scaleLabel.textContent='Size (% of original width)';slider=document.createElement('input');slider.type='range';slider.min=5;slider.max=200;slider.step=1;slider.setAttribute('aria-label','Resize scale');scaleLabel.append(slider);bar.prepend(label,scaleLabel);
     slider.oninput=()=>{if(isBusy())return;const size=dimensions(),w=width*Number(slider.value)/100;setDimensions(w,lock.checked?w*size.h/size.w:size.h);};
   }
@@ -31,7 +31,7 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   function dimensions(){return {w:Number(get('width').value)*factor(),h:Number(get('height').value)*factor()};}
   function setDimensions(w,h){
     const scale=Math.min(1,12000/Math.max(w,h),Math.sqrt(25000000/(w*h)));
-    w=Math.max(.1*factor(),w*scale);h=Math.max(.1*factor(),h*scale);
+    w=Math.max(1,.1*factor(),w*scale);h=Math.max(1,.1*factor(),h*scale);
     get('width').value=(w/factor()).toFixed(get('unit').value==='px'?0:3);
     get('height').value=(h/factor()).toFixed(get('unit').value==='px'?0:3);
     paint();onChange();
@@ -39,6 +39,7 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   function paint(){
     if(!image||dead)return;
     if(kind==='crop-image'){
+      box.dataset.free = String(get('ratio').value==='free');
       Object.assign(box.style,{left:rect.x*100+'%',top:rect.y*100+'%',width:rect.w*100+'%',height:rect.h*100+'%'});
       hidden.forEach(el=>el.value=rect[el.id.slice(5)]);
       info.textContent=`Crop: ${Math.round(rect.w*width)} × ${Math.round(rect.h*height)} px`;
@@ -92,7 +93,7 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
     if(!image||isBusy()||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();
     const dx=(e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0)*(e.shiftKey?10:1),dy=(e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0)*(e.shiftKey?10:1);
     if(kind==='crop-image'){rect=dragCrop(rect,e.target.dataset.handle||'move',dx/width,dy/height,normalizedRatio());paint();onChange();}
-    else{const s=dimensions(),w=Math.max(1,s.w+dx+dy);setDimensions(w,lock.checked?w*s.h/s.w:Math.max(1,s.h+dy));}
+    else{const s=dimensions(),w=Math.max(1,s.w+dx+(lock.checked?dy:0));setDimensions(w,lock.checked?w*s.h/s.w:Math.max(1,s.h+dy));}
   };
   const loading=new Image();loading.src=url;loading.decode().then(()=>{if(dead)return;image=loading;redraw();}).catch(()=>{if(!dead)help.textContent='Unable to load editing controls for this image.';});
   panel.classList.add(kind==='crop-image'?'crop-manipulator':'resize-manipulator');

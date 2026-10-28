@@ -12,6 +12,8 @@ export function dragCrop(start, handle, dx, dy, ratio = null) {
   const maxW = left ? ax : 1-ax, maxH = top ? ay : 1-ay;
   let w = clamp(start.w + (left ? -dx : dx), Math.min(.025,maxW), maxW);
   let h = clamp(start.h + (top ? -dy : dy), Math.min(.025,maxH), maxH);
+  if (handle === 'n' || handle === 's') w = start.w;
+  if (handle === 'e' || handle === 'w') h = start.h;
   if (ratio) { w = Math.min(w,maxH*ratio); h = w/ratio; }
   return {x:left?ax-w:ax,y:top?ay-h:ay,w,h};
 }

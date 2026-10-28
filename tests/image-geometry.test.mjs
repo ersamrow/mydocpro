@@ -17,3 +17,12 @@ test('free crop allows independent width and height',()=>{
  const r=dragCrop({x:0,y:0,w:.5,h:.5},'se',.2,-.1);
  assert.equal(r.w,.7);assert.equal(r.h,.4);
 });
+test('edge handles change only one dimension even with diagonal dragging',()=>{
+ const s={x:.2,y:.2,w:.5,h:.5};
+ const north=dragCrop(s,'n',.1,.1);
+ assert.equal(north.w,s.w);assert.equal(north.x,s.x);
+ assert.ok(Math.abs(north.y+north.h-.7)<1e-9);
+ const east=dragCrop(s,'e',.1,.2);
+ assert.equal(east.h,s.h);assert.equal(east.y,s.y);
+ assert.equal(east.w,.6);
+});

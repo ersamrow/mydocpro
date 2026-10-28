@@ -1,0 +1,24 @@
+/* Keep navigation available without taking space from the editing canvas. */
+html:root{scroll-padding-top:80px}
+.site-header{position:sticky;top:0;z-index:30;max-width:none;height:68px;padding:8px max(24px,calc((100% - 1176px)/2));gap:24px;background:#fafbf8f5;backdrop-filter:blur(14px);border-bottom:1px solid #dce5de;box-shadow:0 3px 14px #233c3408}
+.site-header .brand{font-size:22px;gap:9px;white-space:nowrap}
+.site-header .brand .brand-logo{width:40px;height:40px}
+.site-header nav{gap:4px}
+.site-header nav a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 13px;border-radius:9px;white-space:nowrap;font-size:13px}
+.site-header nav a:hover,.site-header nav a:focus-visible{background:#eaf1e7;color:var(--green)}
+.site-header .app-status:empty{display:none}
+.site-header .app-status{margin-top:2px;line-height:1.2}
+@media(max-width:800px){
+  html:root{scroll-padding-top:124px}
+  .site-header{height:auto;grid-template-columns:minmax(0,1fr) auto;padding:8px 16px 4px;gap:4px 12px}
+  .site-header .brand{font-size:21px}
+  .site-header .brand .brand-logo{width:36px;height:36px}
+  .site-header nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0;gap:2px}
+  .site-header nav a,.site-header nav a:last-child{display:flex;min-height:44px;padding:6px 3px;font-size:12px}
+  .site-header .install-button{min-height:36px;padding:7px 10px}
+}
+@media(max-width:359px){
+  .site-header{padding-left:10px;padding-right:10px}
+  .site-header nav a,.site-header nav a:last-child{font-size:11px}
+}
+

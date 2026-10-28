@@ -24,7 +24,7 @@ Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/Li
 
 Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.co.in, with `index.html`, `.htaccess`, `assets/`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
 
-After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that support@mydocpro.pro receives mail; it intentionally differs from the website's .in domain.
+After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that support@mydocpro.co.in receives mail; it intentionally differs from the website's .in domain.
 
 Submit `https://mydocpro.co.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release includes the AdSense loading script; it does not guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
 

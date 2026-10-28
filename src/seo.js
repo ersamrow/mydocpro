@@ -30,7 +30,7 @@ export function pageSeo(id='') {
  const description=tool?toolSearch[id][1]:page?page.description:known?'Free image and PDF tools that process files in your browser. Resize photos, compress images, merge PDFs and prepare signatures without uploading documents.':'This address does not match a MyDocPro page. Browse the image and PDF tools to find what you need.';
  const url=siteOrigin+'/'+id;
  const graph=known?[
-  {'@type':'Organization','@id':siteOrigin+'/#organization',name:'MyDocPro',url:siteOrigin+'/',logo:siteOrigin+'/brand/mydocpro-1024.png',email:'support@mydocpro.pro'},
+  {'@type':'Organization','@id':siteOrigin+'/#organization',name:'MyDocPro',url:siteOrigin+'/',logo:siteOrigin+'/brand/mydocpro-1024.png',email:'support@mydocpro.co.in'},
   {'@type':'WebSite','@id':siteOrigin+'/#website',name:'MyDocPro',url:siteOrigin+'/',publisher:{'@id':siteOrigin+'/#organization'},inLanguage:'en'},
   {'@type':id==='about'?'AboutPage':id==='contact'?'ContactPage':'WebPage','@id':url+'#webpage',url,name,description,inLanguage:'en',isPartOf:{'@id':siteOrigin+'/#website'},...(id?{breadcrumb:{'@id':url+'#breadcrumb'}}:{})},
   ...(id?[{'@type':'BreadcrumbList','@id':url+'#breadcrumb',itemListElement:[{'@type':'ListItem',position:1,name:'MyDocPro',item:siteOrigin+'/'},{'@type':'ListItem',position:2,name:tool?tool[1]:page.title,item:url}]}]:[])

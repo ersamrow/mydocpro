@@ -10,7 +10,7 @@ async function walk(dir, prefix='') {
   }
   return paths.sort();
 }
-const files = (await walk(root)).filter(f => f === 'index.html' || (!f.endsWith('.html') && !['.htaccess','robots.txt','sitemap.xml'].includes(f)));
+const files = (await walk(root)).filter(f => f === 'index.html' || (!f.startsWith('api/') && !f.endsWith('.php') && !f.endsWith('.html') && !['.htaccess','robots.txt','sitemap.xml'].includes(f)));
 const hash = createHash('sha256');
 for (const file of files) hash.update(file).update(await readFile(new URL(file,root)));
 const template = await readFile(new URL('./sw-template.js',import.meta.url),'utf8');

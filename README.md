@@ -14,6 +14,7 @@ npm run dev
 ## Build
 
 ```sh
+composer install --no-dev
 npm run check
 npm run build
 ```
@@ -24,7 +25,7 @@ Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/Li
 
 Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.co.in, with `index.html`, `.htaccess`, `assets/`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
 
-After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that support@mydocpro.co.in receives mail; it intentionally differs from the website's .in domain.
+After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that info@mydocpro.co.in receives mail; it intentionally differs from the website's .in domain.
 
 Submit `https://mydocpro.co.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release includes the AdSense loading script; it does not guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
 
@@ -63,3 +64,17 @@ Updates wait for all open MyDocPro windows to close. The current version is neve
 The shared HTML head loads AdSense asynchronously for publisher `ca-pub-4905030687832208`. The build includes this script on every generated page and publishes `public/ads.txt` at `/ads.txt`.
 
 Deploy `dist/`, verify `/ads.txt` on the public domain, then complete site approval and enable Auto ads in your AdSense account. Configure applicable consent messages in AdSense Privacy & messaging before serving ads to audiences that require them. Manual ad units require real slot IDs from AdSense; none are fabricated here.
+
+## Contact form email delivery
+
+`/contact` submits to `public/api/contact.php`, copied to `dist/api/contact.php` by the build. Deploy to PHP-enabled Hostinger hosting (PHP 8.1+). Vite and static-only previews do not execute PHP. The form also works without JavaScript on PHP hosting.
+
+Email uses PHPMailer with authenticated SMTP. Set `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `CONTACT_FROM_EMAIL`, and `CONTACT_ADMIN_EMAIL` in the PHP server environment. Set `SMTP_ENCRYPTION=tls` with `SMTP_PORT=587` for STARTTLS, or `SMTP_ENCRYPTION=ssl` with `SMTP_PORT=465` for implicit TLS, as required by your provider. TLS certificate verification remains enabled. Missing or invalid settings fail safely; there is no fallback to PHP mail().
+
+See `.env.example` for sample values. It is a reference only: PHP does not automatically load `.env`. Configure these values through your hosting environment/PHP process configuration. Never use `VITE_` prefixes or put passwords in `public/`, `dist/`, or Git. Use an authorized sender and configure the domain's SPF/DKIM.
+
+Run `composer install --no-dev` before `npm run build`. The build packages the locked PHP dependencies into `dist/api/vendor/` and blocks direct HTTP access with `.htaccess`. Upload the complete `dist/` directory contents, including those dependencies. SMTP traffic requires outbound access from the PHP host.
+
+The admin notification includes the submitted details and uses the user's address as Reply-To. The user receives a fixed acknowledgement. If admin submission fails, the form reports an error; if only acknowledgement fails, it tells the user not to resubmit. Mail transport acceptance does not guarantee inbox delivery. After deployment, submit a test using an inbox you control and check both inboxes and spam folders.
+
+Server validation, a hidden spam field, and locked per-IP/per-recipient limits (5 per hour, plus 100 total per hour) protect the endpoint. Hashed identifiers and timestamps are kept in the host's temporary directory; expired entries are removed on the next submission. The PHP process must be able to write there. Contact data is transmitted for support; image/PDF tool files still stay local. The endpoint is excluded from offline caching.

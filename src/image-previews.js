@@ -3,7 +3,7 @@ import {attachImageManipulator} from './image-manipulator.js';
 let dispose = () => {};
 export function clearImagePreviews() { dispose(); dispose = () => {}; }
 export function showImagePreviews(host, files, {render, isBusy, sourceOnly = false, compression = false, kind = ''}) {
-  clearImagePreviews(); host.replaceChildren();
+  clearImagePreviews(); host.replaceChildren();host.classList.remove('crop-editor-layout');
   if (!files.length) return;
   let dead = false, revision = 0, timer, running = false, pending = false, resultUrl;
   const urls = [];
@@ -20,8 +20,11 @@ export function showImagePreviews(host, files, {render, isBusy, sourceOnly = fal
   const stage = document.createElement('div'); stage.className = 'image-edit-stage';
   const initial = document.createElement('img'); initial.src = urls[0]; initial.alt = 'Original image while preview loads'; stage.append(initial);
   const note = document.createElement('p'); note.className = 'image-preview-note'; note.setAttribute('role','status');
-  host.append(title, original);
-  if (!sourceOnly) host.append(stage, note);
+  const result=document.createElement('section');result.className='image-result-panel';
+  result.append(title,original);
+  if (!sourceOnly) result.append(stage,note);
+  host.append(result);
+  if(kind==='crop-image')host.classList.add('crop-editor-layout');
   const settings = host.parentElement.querySelector('.settings');
   async function update() {
     if (dead || sourceOnly) return;

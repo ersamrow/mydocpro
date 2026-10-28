@@ -21,6 +21,17 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   const bar=document.createElement('div');bar.className='manipulator-toolbar';
   const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent=kind==='crop-image'?'Reset crop':'Original size';
   const info=document.createElement('span');info.setAttribute('role','status');bar.append(reset,info);panel.append(bar);
+  if(kind==='crop-image'){
+    const rotationBar=document.createElement('div');rotationBar.className='crop-rotation-bar';
+    for(const [label,delta] of [['↶ Rotate left',-90],['↷ Rotate right',90]]){
+      const button=document.createElement('button');button.type='button';button.className='secondary';button.textContent=label;
+      button.setAttribute('aria-label',delta<0?'Rotate image left 90 degrees':'Rotate image right 90 degrees');
+      button.onclick=()=>{if(!image||isBusy())return;get('rotation').value=(Number(get('rotation').value)+delta+360)%360;redraw();};
+      rotationBar.append(button);
+    }
+    rotationBar.append(reset);panel.insertBefore(rotationBar,board);
+    help.textContent='Drag edges to crop freely. Use the arrows to rotate 90°. Rotating resets the crop selection.';
+  }
   let lock,slider;
   if(kind==='resize-image'){
     const label=document.createElement('label');lock=document.createElement('input');lock.type='checkbox';lock.checked=false;label.append(lock,' Keep proportions');
@@ -42,7 +53,7 @@ export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
       box.dataset.free = String(get('ratio').value==='free');
       Object.assign(box.style,{left:rect.x*100+'%',top:rect.y*100+'%',width:rect.w*100+'%',height:rect.h*100+'%'});
       hidden.forEach(el=>el.value=rect[el.id.slice(5)]);
-      info.textContent=`Crop: ${Math.round(rect.w*width)} × ${Math.round(rect.h*height)} px`;
+      info.textContent=`${get('rotation').value}° rotation · Crop: ${Math.round(rect.w*width)} × ${Math.round(rect.h*height)} px`;
     }else{
       const size=dimensions();if(!(size.w>0&&size.h>0))return;
       const scale=Math.min(1,size.w/width), aspect=size.w/size.h;

@@ -1,3 +1,4 @@
+import {tools} from './tools.js';
 // Guidance describes the implemented tools, not official application requirements.
 export const guides = {
  'compress-image': ['Fit a photo into an upload limit', 'Choose a JPG, PNG or WebP image, enter the maximum KB and set the maximum width. The output is JPG. Start with the dimensions required by your form instead of immediately choosing a very small size.', 'For a 50 KB limit, try 49 KB to leave a little room for portals that count KB differently. This tool counts 1 KB as 1,024 bytes. It searches JPEG quality first and reduces dimensions if necessary. Check both pixel dimensions and facial detail after downloading.', 'Why is my photo blurry?', 'A very low size target can require heavy compression or fewer pixels. Use a larger limit if permitted. If exact dimensions are mandatory, use Photo presets, which reports an error rather than shrinking those dimensions.', 'exam-photo'],
@@ -20,5 +21,7 @@ export const guides = {
 export const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function guideHtml(id) {
  const g=guides[id]; if(!g)return '';
- return `<section class="tool-guide" aria-label="Tool guidance"><h2>${escapeHtml(g[0])}</h2><p>${escapeHtml(g[1])}</p><h3>Worked example and checks</h3><p>${escapeHtml(g[2])}</p><h3>${escapeHtml(g[3])}</h3><p>${escapeHtml(g[4])}</p><p><a href="/${g[5]}">Continue with ${g[5].replaceAll('-',' ')}</a> · <a href="/help">Troubleshooting and file privacy</a></p></section>`;
+ const tool=tools.find(t=>t[0]===id);
+ const related=[tools.find(t=>t[0]===g[5]),...tools.filter(t=>t[3]===tool[3]&&t[0]!==id&&t[0]!==g[5]).slice(0,2)];
+ return `<section class="tool-guide" aria-label="Tool guidance"><h2>${escapeHtml(g[0])}</h2><p>${escapeHtml(g[1])}</p><h3>Worked example and checks</h3><p>${escapeHtml(g[2])}</p><h3>${escapeHtml(g[3])}</h3><p>${escapeHtml(g[4])}</p><h3>Related tools</h3><ul class="related-tools">${related.map(t=>`<li><a href="/${t[0]}">${escapeHtml(t[1])}</a></li>`).join('')}</ul><p><a href="/help">Troubleshooting and file privacy</a></p></section>`;
 }

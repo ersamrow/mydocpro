@@ -70,7 +70,7 @@ test('complete offline installation serves every tool and lazy PDF library witho
     const response=await w.event('fetch',{request:{url:'https://example.test'+route,method:'GET',mode:'navigate'}});
     assert.ok((await response.text()).includes('name="application-name" content="MyDocPro"'),route);
   }
-  const assets=await readdir(new URL('assets/',dist));
+  const assets=(await readdir(new URL('assets/',dist))).filter(name=>!name.startsWith('.'));
   assert.ok(assets.some(name=>name.startsWith('pdf.worker')&&name.endsWith('.mjs')));
   for(const name of assets){
     const response=await w.event('fetch',{request:{url:'https://example.test/assets/'+name,method:'GET',mode:'cors'}});
@@ -81,6 +81,7 @@ test('complete offline installation serves every tool and lazy PDF library witho
 test('auth, external, unknown and uploaded files are never handled or cached',async()=>{
   const w=worker();await w.event('install');
   for(const request of [
+    {url:'https://example.test/assets/.htaccess',method:'GET',mode:'cors'},
     {url:'https://example.test/signin-with-chatgpt',method:'GET',mode:'navigate'},
     {url:'https://outside.test/photo.jpg',method:'GET',mode:'cors'},
     {url:'https://example.test/private.pdf',method:'GET',mode:'cors'},

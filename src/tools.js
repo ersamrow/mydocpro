@@ -1,9 +1,9 @@
 export const tools = [
- ['compress-image','Compress image','Get the right file size, without losing the details.','image','minimize-2','POPULAR'],
+ ['compress-image','Compress image','Reduce a photo to a target KB size and check the result.','image','minimize-2',''],
  ['resize-image','Resize image','The perfect fit. Resize in pixels, cm, mm or inches.','image','expand',''],
  ['convert-image','Convert image','Switch between JPG, PNG and WebP in seconds.','image','replace',''],
  ['crop-image','Crop & rotate','Keep what matters. Crop and rotate your photos.','image','crop',''],
- ['merge-pdf','Merge PDF','Bring your documents together in one tidy PDF.','pdf','files','POPULAR'],
+ ['merge-pdf','Merge PDF','Combine PDFs and arrange their pages in one document.','pdf','files',''],
  ['split-pdf','Split PDF','Extract exactly the pages you need from a PDF.','pdf','scissors',''],
  ['compress-pdf','Compress PDF','A smaller PDF, ready for that upload limit.','pdf','file-down',''],
  ['jpg-to-pdf','Image to PDF','Turn photos and scans into a shareable PDF.','pdf','file-image',''],

@@ -6,7 +6,7 @@ async function walk(dir, prefix='') {
   for (const entry of await readdir(dir, {withFileTypes:true})) {
     const name = prefix+entry.name;
     if (entry.isDirectory()) paths.push(...await walk(new URL(entry.name+'/',dir),name+'/'));
-    else if (entry.name !== 'sw.js' && !entry.name.endsWith('.map')) paths.push(name);
+    else if (!entry.name.startsWith('.') && entry.name !== 'sw.js' && !entry.name.endsWith('.map')) paths.push(name);
   }
   return paths.sort();
 }

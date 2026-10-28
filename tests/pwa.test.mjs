@@ -7,7 +7,7 @@ const dist=new URL('../dist/',import.meta.url);
 const script=await readFile(new URL('sw.js',dist),'utf8');
 const manifest=JSON.parse(await readFile(new URL('manifest.webmanifest',dist),'utf8'));
 
-function worker({badAsset,redirectShell=false}={}){
+function worker({badAsset,badMime,redirectShell=false}={}){
   let online=true,claimCount=0,skipCount=0;
   const handlers={},stores=new Map([['other-app',new Map()],['mydocpro-old',new Map()]]);
   const caches={
@@ -25,7 +25,7 @@ function worker({badAsset,redirectShell=false}={}){
     const pathname=new URL(typeof request==='string'?request:request.url,'https://example.test').pathname;
     if(pathname===badAsset)return new Response('<h1>Sign in</h1>',{headers:{'content-type':'text/html'}});
     const bytes=await readFile(new URL(pathname.slice(1)||'index.html',dist));
-    const response=new Response(bytes,{headers:{'content-type':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
+    const response=new Response(bytes,{headers:{'content-type':pathname===badMime?'text/plain':pathname.endsWith('.html')?'text/html':pathname.endsWith('.js')||pathname.endsWith('.mjs')?'text/javascript':'application/octet-stream'}});
     Object.defineProperty(response,'url',{value:'https://example.test'+(redirectShell&&pathname==='/index.html'?'/':pathname)});
     if(redirectShell&&pathname==='/index.html'){
       const markRedirect = r => {
@@ -125,4 +125,13 @@ test('redirected shell is safe for normal address-bar navigation, online and off
       assert.ok((await response.text()).includes('name="application-name" content="MyDocPro"'));
     }
   }
+});
+
+
+test('plain-text PDF workers cannot be marked ready offline',async()=>{
+  const assets=await readdir(new URL('assets/',dist));
+  const workerPath='/assets/'+assets.find(name=>name.startsWith('pdf.worker')&&name.endsWith('.mjs'));
+  const w=worker({badMime:workerPath});
+  await assert.rejects(w.event('install'),/Expected JavaScript content type/);
+  assert.deepEqual([...w.stores.keys()].sort(),['mydocpro-old','other-app']);
 });

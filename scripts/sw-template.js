@@ -14,6 +14,9 @@ self.addEventListener('install', event => {
         const shellRedirect = url === '/index.html' && new URL(response.url).origin === self.location.origin;
         if (!response.ok || (response.redirected && !shellRedirect)) throw Error('Asset unavailable: '+url);
         const type = response.headers.get('content-type') || '';
+        if (/\.(m?js)$/.test(url) && !/^(text|application)\/javascript(?:;|$)/i.test(type)) {
+          throw Error('Expected JavaScript content type: '+url);
+        }
         if (url === '/index.html') {
           if (!(await response.clone().text()).includes('name="application-name" content="MyDocPro"')) throw Error('App shell unavailable');
         } else if (type.includes('text/html')) throw Error('Expected application asset: '+url);

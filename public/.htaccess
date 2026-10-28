@@ -1,6 +1,9 @@
 # Apache/LiteSpeed (Hostinger): known pages have HTML; unknown paths return 404.
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
+<IfModule mod_mime.c>
+AddType text/javascript .js .mjs
+</IfModule>
 <IfModule mod_rewrite.c>
 RewriteEngine On
 # Only canonicalize production domains; localhost and private previews stay usable.

@@ -18,7 +18,7 @@ npm run check
 npm run build
 ```
 
-Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/LiteSpeed hosting, include the generated `.htaccess`: it serves the static HTML for each known route and returns HTTP 404 for unknown routes. Do not add a catch-all SPA rewrite ahead of these rules. PDF dependencies are lazy loaded. No backend, account, analytics or advertising configuration is required.
+Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/LiteSpeed hosting, include the generated `.htaccess`: it serves the static HTML for each known route and returns HTTP 404 for unknown routes. Do not add a catch-all SPA rewrite ahead of these rules. PDF dependencies are lazy loaded. The tools require no backend or user account. AdSense setup is described below.
 
 ## Hostinger publication
 
@@ -26,7 +26,7 @@ Back up the existing web root before updating. Extract the Hostinger ZIP into th
 
 After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that support@mydocpro.pro receives mail; it intentionally differs from the website's .in domain.
 
-Submit `https://mydocpro.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release does not add advertising scripts or guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
+Submit `https://mydocpro.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release includes the AdSense loading script; it does not guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
 
 ## Search metadata and performance
 
@@ -46,7 +46,7 @@ Generic photo presets are not official exam specifications. Compression produces
 
 ## Remaining specification work
 
-Official-source verification and dated exam presets; HEIC input; interactive crop handles; Web Worker orchestration for image and PDF editing; structured data; Hindi/localization; AdSense approval and configuration. No claims are made that these are implemented. Static tool pages and tool-specific guidance are generated from shared source content during the build.
+Official-source verification and dated exam presets; HEIC input; interactive crop handles; Web Worker orchestration for image and PDF editing; structured data; Hindi/localization; AdSense account approval and Auto ads configuration. No claims are made that these are implemented. Static tool pages and tool-specific guidance are generated from shared source content during the build.
 
 ## Mobile and offline app
 
@@ -57,3 +57,9 @@ The production build generates `sw.js` with a content-versioned list of all bund
 Wait for **Ready offline** before disconnecting. All 16 tools then load from the local app cache, including those not previously opened. The service worker handles only known app routes and built application assets; user files, blob downloads, authentication routes, and third-party requests are excluded. Fonts use local system fallbacks so there are no external font requests. Browser storage eviction can remove offline availability; reopen online to restore it.
 
 Updates wait for all open MyDocPro windows to close. The current version is never forcibly reloaded while processing files. On private hosting, first sign-in/setup needs internet; the cached local tools remain usable offline after setup. Installation and private-host routing should also be tested on physical Android/iOS browsers before public launch.
+
+## Google AdSense
+
+The shared HTML head loads AdSense asynchronously for publisher `ca-pub-4905030687832208`. The build includes this script on every generated page and publishes `public/ads.txt` at `/ads.txt`.
+
+Deploy `dist/`, verify `/ads.txt` on the public domain, then complete site approval and enable Auto ads in your AdSense account. Configure applicable consent messages in AdSense Privacy & messaging before serving ads to audiences that require them. Manual ad units require real slot IDs from AdSense; none are fabricated here.

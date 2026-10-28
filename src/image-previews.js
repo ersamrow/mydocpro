@@ -1,12 +1,13 @@
 import './image-previews.css';
+import {attachImageManipulator} from './image-manipulator.js';
 let dispose = () => {};
 export function clearImagePreviews() { dispose(); dispose = () => {}; }
-export function showImagePreviews(host, files, {render, isBusy, sourceOnly = false, compression = false}) {
+export function showImagePreviews(host, files, {render, isBusy, sourceOnly = false, compression = false, kind = ''}) {
   clearImagePreviews(); host.replaceChildren();
   if (!files.length) return;
   let dead = false, revision = 0, timer, running = false, pending = false, resultUrl;
   const urls = [];
-  const title = document.createElement('h2'); title.textContent = 'Image preview';
+  const title = document.createElement('h2'); title.textContent = ['crop-image','resize-image'].includes(kind) ? 'Result preview' : 'Image preview';
   const sources = document.createElement('div'); sources.className = 'image-originals';
   for (const file of files) {
     const figure = document.createElement('figure'), image = document.createElement('img'), caption = document.createElement('figcaption');
@@ -52,10 +53,11 @@ export function showImagePreviews(host, files, {render, isBusy, sourceOnly = fal
     revision++; pending = true; clearTimeout(timer); timer = setTimeout(update, 250);
   }
   function processing() { if (!isBusy() && pending) schedule(); }
+  const removeManipulator = attachImageManipulator(host, files[0], {kind,isBusy,onChange:()=>schedule()});
   settings.addEventListener('input', schedule); settings.addEventListener('change', schedule);
   window.addEventListener('mydocpro:processing', processing);
   dispose = () => {
-    dead = true; revision++; clearTimeout(timer); urls.forEach(URL.revokeObjectURL);
+    dead = true; removeManipulator(); revision++; clearTimeout(timer); urls.forEach(URL.revokeObjectURL);
     settings.removeEventListener('input', schedule); settings.removeEventListener('change', schedule);
     window.removeEventListener('mydocpro:processing', processing);
   };

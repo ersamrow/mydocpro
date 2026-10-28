@@ -12,6 +12,7 @@ const cases=[
  ['convert-image',{format:'image/png',quality:90},900,1200],
  ['crop-image',{ratio:1,rotation:0,zoom:200},450,450],
  ['crop-image',{ratio:'original',rotation:90,zoom:100},1200,900],
+ ['crop-image',{ratio:'free',rotation:0,zoom:100,'crop-x':.2,'crop-y':.1,'crop-w':.4,'crop-h':.5},360,600],
  ['exam-photo',{preset:'35,45',dpi:300,target:50},413,531],
  ['signature',{threshold:170,format:'image/png'},900,1200],
  ['white-background',{threshold:225,format:'image/png'},900,1200],
@@ -27,5 +28,6 @@ for(const [id,values,w,h] of cases){
 }
 const displaySample=new File([await (await fetch('/brand/mydocpro-500.png')).arrayBuffer()],'MyDocPro-logo.png',{type:'image/png'});
 fields({ratio:1,rotation:0,zoom:100});
-showImagePreviews(document.getElementById('image-preview'),[displaySample],{render:()=>processImage('crop-image',true,[displaySample]),isBusy:()=>false});
+showImagePreviews(document.getElementById('image-preview'),[displaySample],{render:()=>processImage('crop-image',true,[displaySample]),isBusy:()=>false,kind:'crop-image'});
+const switcher=document.createElement('button');switcher.type='button';switcher.textContent='Test resize controls';document.querySelector('.workspace').prepend(switcher);switcher.onclick=()=>{fields({width:500,height:500,unit:'px',dpi:300,fit:'contain',format:'image/png'});showImagePreviews(document.getElementById('image-preview'),[displaySample],{render:()=>processImage('resize-image',true,[displaySample]),isBusy:()=>false,kind:'resize-image'});};
 </script></body></html>

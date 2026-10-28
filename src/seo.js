@@ -2,7 +2,7 @@ import {tools} from './tools.js';
 import {sitePages} from './site-content.js';
 import {escapeHtml as esc} from './tool-guides.js';
 
-export const siteOrigin='https://mydocpro.in';
+export const siteOrigin='https://mydocpro.co.in';
 // Descriptions explain real functionality; no invented ratings or acceptance claims.
 export const toolSearch = {
  'compress-image':['Compress Image to a KB Limit Online','Compress JPG, PNG or WebP images to a target KB size. Download a JPG, check the final dimensions and keep your photo processing on your device.'],

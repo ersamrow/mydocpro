@@ -22,17 +22,17 @@ Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/Li
 
 ## Hostinger publication
 
-Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.in, with `index.html`, `.htaccess`, `assets/`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
+Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.co.in, with `index.html`, `.htaccess`, `assets/`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
 
 After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that support@mydocpro.pro receives mail; it intentionally differs from the website's .in domain.
 
-Submit `https://mydocpro.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release includes the AdSense loading script; it does not guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
+Submit `https://mydocpro.co.in/sitemap.xml` to Search Console and inspect representative tool URLs after publication. Request AdSense review only after verifying the public deployment. This release includes the AdSense loading script; it does not guarantee approval, indexing or traffic. Ongoing maintenance and genuine user engagement require continued work outside the codebase.
 
 ## Search metadata and performance
 
 `src/seo.js` is the shared source for static and client-side titles, descriptions, canonical URLs, social cards and JSON-LD. It describes the actual site through Organization, WebSite, WebPage and BreadcrumbList data; no review scores, fake authors or unsupported rich-result promises are included. New routes must be added to the sitemap builder, routing and offline route allowlist as well as the metadata source.
 
-Hostinger rules redirect www and HTTP production URLs to `https://mydocpro.in`, preserve query parameters used by the tools and canonicalize variants to the clean path. Confirm redirects on the real host, especially when a CDN or host-level HTTPS redirect is enabled. Query parameters such as `?kb=20` remain usable but share the tool's canonical URL. Do not block these variants in robots.txt: crawlers need access to read the canonical.
+Hostinger rules redirect www and HTTP production URLs to `https://mydocpro.co.in`, preserve query parameters used by the tools and canonicalize variants to the clean path. Confirm redirects on the real host, especially when a CDN or host-level HTTPS redirect is enabled. Query parameters such as `?kb=20` remain usable but share the tool's canonical URL. Do not block these variants in robots.txt: crawlers need access to read the canonical.
 
 Hashed assets receive long-lived cache headers; HTML and the service worker revalidate. Apache configuration files are excluded from the offline cache. Check the deployed pages with Search Console URL Inspection, Google Rich Results Test (breadcrumbs) and PageSpeed Insights on mobile. No Search Console verification token has been invented or added. Submit the sitemap only for the public Hostinger domain, not the private Sites copy.
 

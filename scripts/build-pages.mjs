@@ -5,7 +5,7 @@ import {sitePages,pageHtml,contentLinks} from '../src/site-content.js';
 import {seoHead,pageSeo,breadcrumbHtml} from '../src/seo.js';
 const root=new URL('../dist/',import.meta.url);
 const shell=await readFile(new URL('index.html',root),'utf8');
-const origin='https://mydocpro.in';
+const origin='https://mydocpro.co.in';
 const nav=`<nav class="static-nav" aria-label="Main navigation"><a href="/">MyDocPro · All tools</a>${contentLinks()}</nav>`;
 const notice='<p class="static-notice">The interactive tool needs JavaScript enabled. Your selected files are processed locally in your browser. Read the guidance below before starting.</p>';
 function html(id,title,description,body){return shell.replace(/<title>.*?<\/title>/,'').replace(/<meta name="description" content="[^"]*">/,'').replace('</head>',seoHead(id)+'</head>').replace('<div id="app"></div>',`<div id="app">${nav}${body}<footer>${contentLinks()}</footer></div>`);}

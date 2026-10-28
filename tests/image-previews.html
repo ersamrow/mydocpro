@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Image preview checks</title></head><body><div id="app"></div>
+<script type="module">
+import {processImage} from '../src/app.js';
+import {showImagePreviews} from '../src/image-previews.js';
+const sample=new File([await (await fetch('photo.png')).arrayBuffer()],'sample-photo.png',{type:'image/png'});
+document.getElementById('app').innerHTML='<main class="workspace"><h1>Crop & rotate preview</h1><section class="workpanel"><section class="image-previews" id="image-preview"></section><div class="settings"></div></section><details><summary>Automated preview checks</summary><pre id="results"></pre></details></main>';
+const controls=document.querySelector('.settings'),results=[];
+function fields(values){controls.replaceChildren();for(const [key,value] of Object.entries(values)){const label=document.createElement('label'),input=document.createElement('input');label.textContent=key;input.id=key;input.value=value;label.append(input);controls.append(label);}}
+const cases=[
+ ['compress-image',{maxWidth:600,target:50},600,800],
+ ['resize-image',{width:320,height:240,unit:'px',dpi:300,fit:'contain',format:'image/png'},320,240],
+ ['convert-image',{format:'image/png',quality:90},900,1200],
+ ['crop-image',{ratio:1,rotation:0,zoom:200},450,450],
+ ['crop-image',{ratio:'original',rotation:90,zoom:100},1200,900],
+ ['exam-photo',{preset:'35,45',dpi:300,target:50},413,531],
+ ['signature',{threshold:170,format:'image/png'},900,1200],
+ ['white-background',{threshold:225,format:'image/png'},900,1200],
+ ['passport-sheet',{copies:6},1200,1800],
+ ['name-date',{name:'Sample name',date:'2026-10-28'},900,1344],
+ ['join-images',{layout:'vertical'},900,2400]
+];
+for(const [id,values,w,h] of cases){
+ fields(values);
+ try{const blob=await processImage(id,true,id==='join-images'?[sample,sample]:[sample]),image=await createImageBitmap(blob);results.push({tool:id,pass:image.width===w&&image.height===h,width:image.width,height:image.height});image.close();}
+ catch(error){results.push({tool:id,pass:false,error:error.message});}
+ document.getElementById('results').textContent=JSON.stringify(results,null,2);
+}
+const displaySample=new File([await (await fetch('/brand/mydocpro-500.png')).arrayBuffer()],'MyDocPro-logo.png',{type:'image/png'});
+fields({ratio:1,rotation:0,zoom:100});
+showImagePreviews(document.getElementById('image-preview'),[displaySample],{render:()=>processImage('crop-image',true,[displaySample]),isBusy:()=>false});
+</script></body></html>

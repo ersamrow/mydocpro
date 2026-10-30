@@ -1,9 +1,10 @@
 import './pdf-editor.css';
 
-export function setupPdfEditor({host, grid, cards, split, input, parsePages, isBusy, isReady, hasFailed, updateOrder, syncSelection, setSelection, move, openPdf, status}) {
+export function setupPdfEditor({host, grid, cards, split, tool = split ? 'split-pdf' : 'merge-pdf', readOnly = false, rotation, input, parsePages, isBusy, isReady, hasFailed, updateOrder, syncSelection, setSelection, move, openPdf, status}) {
   const history = [];
   const toolbar = document.createElement('div');
   toolbar.className = 'page-toolbar';
+  toolbar.hidden = readOnly;
   grid.before(toolbar);
   const summary = document.getElementById('output-summary');
   const process = document.getElementById('process');
@@ -14,6 +15,7 @@ export function setupPdfEditor({host, grid, cards, split, input, parsePages, isB
   const orderTitle = document.createElement('summary');
   const orderText = document.createElement('p');
   orderSummary.append(orderTitle, orderText);
+  orderSummary.hidden = readOnly;
   grid.after(orderSummary);
   const buttons = [];
   function button(label, action) {
@@ -62,14 +64,17 @@ export function setupPdfEditor({host, grid, cards, split, input, parsePages, isB
     }
     const count = selected.length;
     summary.hidden = false;
-    summary.textContent = hasFailed() ? 'Remove the PDF that could not be opened.' : !ready ? 'Loading page previews…' : error || `${count} ${count === 1 ? 'page' : 'pages'} ${split ? 'selected' : 'to merge'}`;
+    summary.textContent = hasFailed() ? 'Remove the PDF that could not be opened.' : !ready ? 'Loading page previews…' : error || `${count} ${count === 1 ? 'page' : 'pages'} ${split ? 'selected' : readOnly ? 'to compress' : 'to merge'}`;
     const labels = selected.filter(Boolean).map(c => split ? `${c.index+1}` : `F${c.fileIndex+1}:P${c.index+1}`);
     orderTitle.textContent = `Output order: ${labels.slice(0, 8).join(', ') || 'No pages selected'}${labels.length > 8 ? '… (show all)' : ''}`;
     orderText.textContent = labels.join(' → ') || 'Select at least one page.';
-    process.disabled = busy || !ready || !count || (!split && new Set(cards.map(c=>c.file)).size < 2);
+    process.disabled = busy || !ready || !count || (tool === 'merge-pdf' && new Set(cards.map(c=>c.file)).size < 2);
     cards.forEach((c, i) => {
       c.earlier.disabled = !ready || busy || i === 0;
       c.later.disabled = !ready || busy || i === cards.length-1;
+      const angle = Number(rotation?.value || 0);
+      const image = c.zoom.querySelector('img');
+      if (image) image.style.transform = `rotate(${angle}deg) scale(${angle % 180 ? 0.7 : 1})`;
       c.zoom.disabled = !ready || busy;
       c.position.disabled = !ready || busy;
       c.grip.disabled = !ready || busy;
@@ -77,6 +82,7 @@ export function setupPdfEditor({host, grid, cards, split, input, parsePages, isB
     });
   }
   window.addEventListener('mydocpro:processing', refresh);
+  rotation?.addEventListener('change', refresh);
 
   // Render only the requested page at reading resolution; release it on close.
   const dialog = document.createElement('dialog');
@@ -108,8 +114,9 @@ export function setupPdfEditor({host, grid, cards, split, input, parsePages, isB
       zoomDoc = doc;
       const page = await doc.getPage(entry.index+1);
       if (token !== generation) return;
-      const natural = page.getViewport({scale:1});
-      const view = page.getViewport({scale:Math.min(1600/natural.width,2200/natural.height)});
+      const angle = (page.rotate + Number(rotation?.value || 0)) % 360;
+      const natural = page.getViewport({scale:1, rotation:angle});
+      const view = page.getViewport({scale:Math.min(1600/natural.width,2200/natural.height), rotation:angle});
       const canvas = document.createElement('canvas');
       canvas.width = Math.ceil(view.width); canvas.height = Math.ceil(view.height);
       canvas.setAttribute('role','img'); canvas.setAttribute('aria-label',`Page ${entry.index+1} preview`);
@@ -143,6 +150,7 @@ export function setupPdfEditor({host, grid, cards, split, input, parsePages, isB
   return {remember, refresh, zoom, moveTo, dispose() {
     input?.removeEventListener('beforeinput', beforeInput);
     window.removeEventListener('mydocpro:processing', refresh);
+    rotation?.removeEventListener('change', refresh);
     if (dialog.open) dialog.close(); release(); dialog.remove(); moveDialog.remove();
     panel.classList.remove('pdf-editor-panel');
     summary.hidden = true; process.disabled = false;

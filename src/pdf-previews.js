@@ -11,18 +11,20 @@ export function getMergePageOrder() {
 }
 export function clearPdfPreviews() { disposeCurrent(); disposeCurrent = () => {}; mergeOrder = null; }
 
-export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy}) {
+export function showPdfPreviews(host, files, {split, tool = split ? 'split-pdf' : 'merge-pdf', openPdf, parsePages, isBusy}) {
   clearPdfPreviews();
   host.replaceChildren();
   if (!files.length) return;
+  const readOnly = tool === 'compress-pdf';
+  const rotation = tool === 'organize-pdf' ? document.getElementById('rotation') : null;
   let disposed = false, renderTask, pageCount = 0, ready = false, failed = false, keepVisualOrder = false;
   const urls = [], cards = [];
   const input = split ? document.getElementById('pages') : null;
   const heading = document.createElement('h2');
-  heading.textContent = split ? 'Choose your pages' : 'Preview merge order';
+  heading.textContent = readOnly ? 'Preview PDF pages' : tool === 'organize-pdf' ? 'Arrange your pages' : split ? 'Choose your pages' : 'Preview merge order';
   const help = document.createElement('p');
   help.className = 'preview-help';
-  help.textContent = 'Drag the grip to reorder pages, or use the arrow buttons. ' + (split ? 'Select the pages to extract; the range below shows their output order.' : 'Pages can move between files. Changing the file list resets the page order.');
+  help.textContent = readOnly ? 'Preview every page before compression. Click a thumbnail to zoom.' : 'Drag the grip to reorder pages, or use the arrow buttons. ' + (split ? (tool === 'organize-pdf' ? 'Uncheck pages to remove them. Use the rotation setting below to rotate all selected pages.' : tool === 'pdf-to-image' ? 'Select the pages to export as images.' : 'Select the pages to extract; the range below shows their output order.') : 'Pages can move between files. Changing the file list resets the page order.');
   const status = document.createElement('p');
   status.className = 'preview-help';
   status.setAttribute('role', 'status');
@@ -45,7 +47,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       entry.earlier.disabled = !ready || i === 0;
       entry.later.disabled = !ready || i === cards.length-1;
     });
-    if (!split && ready && !failed) mergeOrder = cards;
+    if (tool === 'merge-pdf' && ready && !failed) mergeOrder = cards;
     editor?.refresh();
   }
   function move(entry, offset, focus = true) {
@@ -80,7 +82,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
     status.textContent = `${selected.size} of ${pageCount} pages selected`;
     editor?.refresh();
   }
-  editor = setupPdfEditor({host, grid, cards, split, input, parsePages, isBusy,
+  editor = setupPdfEditor({host, grid, cards, split, tool, readOnly, rotation, input, parsePages, isBusy,
     isReady:()=>ready && !failed, hasFailed:()=>failed, updateOrder, syncSelection, setSelection, move, openPdf, status});
   editor.refresh();
   input?.addEventListener('input', syncSelection);
@@ -189,6 +191,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
           controls.insertBefore(position, entry.later);
           controls.insertBefore(grip, entry.later);
           card.title = `${file.name}, page ${n}`;
+          controls.hidden = readOnly;
           card.append(controls);
           let dragging = false, target;
           const endDrag = event => {
@@ -269,7 +272,7 @@ export function showPdfPreviews(host, files, {split, openPdf, parsePages, isBusy
       ready = true;
       updateOrder();
       if (split) syncSelection();
-      else status.textContent = `${total} pages across ${files.length} PDFs`;
+      else status.textContent = readOnly ? `${total} pages to compress` : `${total} pages across ${files.length} PDFs`;
     }
   }
   void render();

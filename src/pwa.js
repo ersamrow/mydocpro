@@ -1,4 +1,3 @@
-import './mobile.css';
 
 export function initPwa() {
   let promptEvent, registration, ready = false, failed = false, waiting = false;
@@ -13,7 +12,7 @@ export function initPwa() {
   function statusText() {
     if (ready) return navigator.onLine ? 'Ready offline' : 'Offline · tools ready';
     if (!navigator.onLine) return 'Offline · setup incomplete';
-    if (!import.meta.env.PROD) return 'Offline setup in published app';
+    if (!(process.env.NODE_ENV === 'production')) return 'Offline setup in published app';
     return failed ? 'Offline setup unavailable' : 'Preparing offline tools…';
   }
   function paint() {
@@ -51,7 +50,7 @@ export function initPwa() {
   window.addEventListener('offline',()=>{paint();checkOffline();});
   window.addEventListener('mydocpro:route',paint);
   paint();
-  if (!import.meta.env.PROD) return;
+  if (!(process.env.NODE_ENV === 'production')) return;
   if (!('serviceWorker' in navigator) || !window.isSecureContext) {failed=true;paint();return;}
   navigator.serviceWorker.addEventListener('controllerchange',checkOffline);
   navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}).then(reg=>{

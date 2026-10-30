@@ -6,3 +6,7 @@ vendor/
 dist/
 *.zip
 .sites/
+
+.next/
+out/
+public/pdf.worker.min.mjs

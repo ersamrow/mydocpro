@@ -11,19 +11,20 @@ self.addEventListener('install', event => {
         const response = await fetch(new Request(url, {cache:'reload', credentials:'same-origin'}));
         // Static hosts may canonicalize /index.html to /. Accept only that
         // same-origin shell redirect, then verify the app marker below.
-        const shellRedirect = url === '/index.html' && new URL(response.url).origin === self.location.origin;
+        const isPage = url.endsWith('.html');
+        const shellRedirect = isPage && new URL(response.url).origin === self.location.origin && new URL(response.url).pathname === (url === '/index.html' ? '/' : url.slice(0,-5));
         if (!response.ok || (response.redirected && !shellRedirect)) throw Error('Asset unavailable: '+url);
         const type = response.headers.get('content-type') || '';
         if (/\.(m?js)$/.test(url) && !/^(text|application)\/javascript(?:;|$)/i.test(type)) {
           throw Error('Expected JavaScript content type: '+url);
         }
-        if (url === '/index.html') {
+        if (isPage) {
           if (!(await response.clone().text()).includes('name="application-name" content="MyDocPro"')) throw Error('App shell unavailable');
         } else if (type.includes('text/html')) throw Error('Expected application asset: '+url);
         // Navigation requests use redirect:'manual'. A followed redirect response
         // cannot be returned to them by respondWith (even with status 200).
         // Store a fresh shell response without the network redirect metadata.
-        const cached = url === '/index.html'
+        const cached = isPage
           ? new Response(await response.arrayBuffer(), {status:response.status, statusText:response.statusText, headers:response.headers})
           : response;
         await cache.put(url,cached);
@@ -55,7 +56,7 @@ self.addEventListener('fetch', event => {
   const route = url.pathname.replace(/\/$/,'') || '/';
   if (event.request.mode === 'navigate' && (ROUTES.has(route) || route === '/index.html')) {
     // Keep HTML and hashed chunks from the same build, even during an update.
-    event.respondWith((async () => (await caches.open(CACHE)).match('/index.html').then(hit=>hit || fetch(event.request)))());
+    event.respondWith((async () => (await caches.open(CACHE)).match(route === '/' || route === '/index.html' ? '/index.html' : route+'.html').then(hit=>hit || fetch(event.request)))());
   } else if (PRECACHE.includes(url.pathname)) {
     event.respondWith((async () => (await caches.open(CACHE)).match(url.pathname).then(hit=>hit || fetch(event.request)))());
   }

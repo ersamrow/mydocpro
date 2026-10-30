@@ -76,12 +76,14 @@ test('complete offline installation serves every tool and lazy PDF library witho
   const routes=['/','/compress-image?kb=20','/resize-image','/convert-image','/crop-image','/merge-pdf','/split-pdf','/compress-pdf','/jpg-to-pdf','/exam-photo','/signature','/passport-sheet','/pdf-to-image','/organize-pdf','/name-date','/join-images','/white-background','/privacy','/about'];
   for(const route of routes){
     const response=await w.event('fetch',{request:{url:'https://example.test'+route,method:'GET',mode:'navigate'}});
-    assert.ok((await response.text()).includes('name="application-name" content="MyDocPro"'),route);
+    const html=await response.text();
+    assert.ok(html.includes('name="application-name" content="MyDocPro"'),route);
+    const data=JSON.parse(html.match(/<script id="__NEXT_DATA__"[^>]*>(.*?)<\/script>/)[1]);
+    assert.equal(data.props.pageProps.id,new URL(route,'https://example.test').pathname.slice(1),'offline HTML must match the requested Next.js page');
   }
-  const assets=(await readdir(new URL('assets/',dist))).filter(name=>!name.startsWith('.'));
-  assert.ok(assets.some(name=>name.startsWith('pdf.worker')&&name.endsWith('.mjs')));
+  const assets=['pdf.worker.min.mjs',...(await readdir(new URL('_next/static/',dist),{recursive:true})).filter(name=>/\.(js|css)$/.test(name)).map(name=>'_next/static/'+name.replaceAll('\\','/'))];
   for(const name of assets){
-    const response=await w.event('fetch',{request:{url:'https://example.test/assets/'+name,method:'GET',mode:'cors'}});
+    const response=await w.event('fetch',{request:{url:'https://example.test/'+name.split('/').map(encodeURIComponent).join('/'),method:'GET',mode:'cors'}});
     assert.ok((await response.arrayBuffer()).byteLength>0,name);
   }
 });
@@ -129,8 +131,7 @@ test('redirected shell is safe for normal address-bar navigation, online and off
 
 
 test('plain-text PDF workers cannot be marked ready offline',async()=>{
-  const assets=await readdir(new URL('assets/',dist));
-  const workerPath='/assets/'+assets.find(name=>name.startsWith('pdf.worker')&&name.endsWith('.mjs'));
+  const workerPath='/pdf.worker.min.mjs';
   const w=worker({badMime:workerPath});
   await assert.rejects(w.event('install'),/Expected JavaScript content type/);
   assert.deepEqual([...w.stores.keys()].sort(),['mydocpro-old','other-app']);

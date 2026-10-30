@@ -1,5 +1,4 @@
 import {cropBox,dragCrop,clamp} from './image-geometry.js';
-import './image-manipulator.css';
 
 export function attachImageManipulator(host, file, {kind,isBusy,onChange}) {
   if (!['crop-image','resize-image'].includes(kind)) return () => {};

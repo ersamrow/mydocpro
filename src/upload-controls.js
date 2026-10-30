@@ -1,4 +1,3 @@
-import './upload-controls.css';
 
 let refresh = () => {};
 export function refreshUploadControls(count) { refresh(count); }

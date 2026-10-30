@@ -21,7 +21,7 @@ test('search and social metadata are unique, consistent and valid before JavaScr
  for(const id of ids){
   const html=await readFile(new URL((id||'index')+'.html',root),'utf8');
   const expected=pageSeo(id);
-  const title=html.match(/<title>(.*?)<\/title>/)[1];
+  const title=html.match(/<title[^>]*>(.*?)<\/title>/)[1];
   const description=html.match(/name="description" content="([^"]+)"/)[1];
   assert.ok(!titles.has(title),`Duplicate title: ${id}`);titles.add(title);
   assert.ok(!descriptions.has(description),`Duplicate description: ${id}`);descriptions.add(description);
@@ -29,7 +29,7 @@ test('search and social metadata are unique, consistent and valid before JavaScr
   assert.equal([...html.matchAll(/rel="canonical"/g)].length,1);
   assert.ok(html.includes(`property="og:url" content="${expected.url}"`));
   assert.match(html,/name="twitter:card" content="summary"/);
-  const schema=JSON.parse(html.match(/<script id="site-schema" type="application\/ld\+json">(.*?)<\/script>/)[1]);
+  const schema=JSON.parse(html.match(/<script id="site-schema" type="application\/ld\+json"[^>]*>(.*?)<\/script>/)[1]);
   assert.deepEqual(schema,expected.schema);
   assert.ok(!JSON.stringify(schema).includes('aggregateRating'));
   if(id){const crumb=schema['@graph'].find(n=>n['@type']==='BreadcrumbList');assert.equal(crumb.itemListElement.at(-1).item,expected.url);assert.match(html,/aria-label="Breadcrumb"/);}

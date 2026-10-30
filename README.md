@@ -1,14 +1,15 @@
 # MyDocPro
 
-A browser-only image and PDF toolkit. Files are never sent to an application server.
+A Next.js image and PDF toolkit. Image and PDF files are processed entirely in the browser. Next.js generates the public pages as static HTML for PHP-enabled Hostinger hosting.
 
 ## Run
 
-Requires Node.js 20.19+.
+Requires Node.js 20.9+ (Node.js 22 LTS recommended).
 
 ```sh
 npm install
 npm run dev
+# http://127.0.0.1:3000
 ```
 
 ## Build
@@ -23,7 +24,7 @@ Deploy the contents of `dist/` to the domain's web root. For Hostinger Apache/Li
 
 ## Hostinger publication
 
-Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.co.in, with `index.html`, `.htaccess`, `assets/`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
+Back up the existing web root before updating. Extract the Hostinger ZIP into the `public_html` directory for mydocpro.co.in, with `index.html`, `.htaccess`, `_next/`, `pdf.worker.min.mjs`, `robots.txt` and `sitemap.xml` directly in that directory (not inside another `dist/` folder). Preserve unrelated host configuration and verify any existing redirects before replacing `.htaccess`.
 
 After uploading, check `/`, `/compress-image`, `/contact`, `/privacy`, `/sitemap.xml` and `/robots.txt`. Disable JavaScript and confirm that tool guidance remains readable. A made-up URL must return HTTP 404. Close all open MyDocPro tabs and reopen online to refresh the offline version. Verify that info@mydocpro.co.in receives mail; it intentionally differs from the website's .in domain.
 
@@ -31,13 +32,21 @@ Submit `https://mydocpro.co.in/sitemap.xml` to Search Console and inspect repres
 
 ## Search metadata and performance
 
-`src/seo.js` is the shared source for static and client-side titles, descriptions, canonical URLs, social cards and JSON-LD. It describes the actual site through Organization, WebSite, WebPage and BreadcrumbList data; no review scores, fake authors or unsupported rich-result promises are included. New routes must be added to the sitemap builder, routing and offline route allowlist as well as the metadata source.
+`src/seo.js` is the shared source for static and client-side titles, descriptions, canonical URLs, social cards and JSON-LD. It describes the actual site through Organization, WebSite, WebPage and BreadcrumbList data; no review scores, fake authors or unsupported rich-result promises are included. Routes are generated from `src/tools.js` and `src/site-content.js` through `src/static-content.js`. Add new routes to the offline route allowlist and metadata source too.
 
 Hostinger rules redirect www and HTTP production URLs to `https://mydocpro.co.in`, preserve query parameters used by the tools and canonicalize variants to the clean path. Confirm redirects on the real host, especially when a CDN or host-level HTTPS redirect is enabled. Query parameters such as `?kb=20` remain usable but share the tool's canonical URL. Do not block these variants in robots.txt: crawlers need access to read the canonical.
 
-Hashed assets receive long-lived cache headers; HTML and the service worker revalidate. Apache configuration files are excluded from the offline cache. Check the deployed pages with Search Console URL Inspection, Google Rich Results Test (breadcrumbs) and PageSpeed Insights on mobile. No Search Console verification token has been invented or added. Submit the sitemap only for the public Hostinger domain, not the private Sites copy.
+HTML and the service worker revalidate. Apache configuration files are excluded from the offline cache. Check the deployed pages with Search Console URL Inspection, Google Rich Results Test (breadcrumbs) and PageSpeed Insights on mobile. No Search Console verification token has been invented or added. Submit the sitemap only for the public Hostinger domain, not the private Sites copy.
 
 Run `node --test tests/content.test.mjs tests/pwa.test.mjs tests/download-name.test.mjs` after building. The content checks validate static output, internal links, canonical URLs, sitemap coverage and missing-page metadata. Apache routing and public DNS still require checks on the real host.
+
+## Next.js architecture
+
+The Pages Router in `pages/[[...slug]].js` pre-renders every known route using `getStaticPaths` and `getStaticProps`. `pages/404.js` provides the missing-page response. Metadata is rendered with Next Head, and shared global styles load in `pages/_app.js`.
+
+`components/ToolApplication.js` mounts the existing browser editor after hydration inside an isolated DOM container. The image/PDF processing and editor controls remain vanilla JavaScript; they have not been rewritten as React components. Normal page links use document navigation, preserving file downloads and modifier-key behavior.
+
+`next build` exports to `out/`; the build then prepares `dist/`, packages the PHP contact dependencies, and generates the offline cache. Deploy `dist/`. `npm run preview` serves it at http://127.0.0.1:4173 (without PHP execution). There is no `next start` server for this static-export configuration.
 
 ## Initial release
 
@@ -67,11 +76,11 @@ Deploy `dist/`, verify `/ads.txt` on the public domain, then complete site appro
 
 ## Contact form email delivery
 
-`/contact` submits to `public/api/contact.php`, copied to `dist/api/contact.php` by the build. Deploy to PHP-enabled Hostinger hosting (PHP 8.1+). Vite and static-only previews do not execute PHP. The form also works without JavaScript on PHP hosting.
+`/contact` submits to `public/api/contact.php`, copied to `dist/api/contact.php` by the build. Deploy to PHP-enabled Hostinger hosting (PHP 8.1+). Next.js development and static-only previews do not execute PHP. The form also works without JavaScript on PHP hosting.
 
 Email uses PHPMailer with authenticated SMTP. Set `SMTP_HOST`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `CONTACT_FROM_EMAIL`, and `CONTACT_ADMIN_EMAIL` in the PHP server environment. Set `SMTP_ENCRYPTION=tls` with `SMTP_PORT=587` for STARTTLS, or `SMTP_ENCRYPTION=ssl` with `SMTP_PORT=465` for implicit TLS, as required by your provider. TLS certificate verification remains enabled. Missing or invalid settings fail safely; there is no fallback to PHP mail().
 
-See `.env.example` for sample values. It is a reference only: PHP does not automatically load `.env`. Configure these values through your hosting environment/PHP process configuration. Never use `VITE_` prefixes or put passwords in `public/`, `dist/`, or Git. Use an authorized sender and configure the domain's SPF/DKIM.
+See `.env.example` for sample values. It is a reference only: PHP does not automatically load `.env`. Configure these values through your hosting environment/PHP process configuration. Never use `NEXT_PUBLIC_` prefixes or put passwords in `public/`, `dist/`, or Git. Use an authorized sender and configure the domain's SPF/DKIM.
 
 `npm run build` automatically runs `composer install` using `composer.lock` before packaging mail dependencies. The build environment needs PHP 8.1+ and Composer 2 on PATH in addition to Node.js. Keep the hosting build command as `npm run build` and output directory as `dist`. If the hosting builder only provides Node.js, build locally with PHP and Composer installed and upload `dist/` to PHP-enabled hosting. A static-only or Node-only runtime cannot execute the contact PHP endpoint; build-time environment variables alone do not configure the PHP runtime. The build packages the locked PHP dependencies into `dist/api/vendor/` and blocks direct HTTP access with `.htaccess`. Upload the complete `dist/` directory contents, including those dependencies. SMTP traffic requires outbound access from the PHP host.
 

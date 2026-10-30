@@ -1,4 +1,3 @@
-import './image-previews.css';
 import {attachImageManipulator} from './image-manipulator.js';
 let dispose = () => {};
 export function clearImagePreviews() { dispose(); dispose = () => {}; }

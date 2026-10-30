@@ -1,4 +1,3 @@
-import './pdf-editor.css';
 
 export function setupPdfEditor({host, grid, cards, split, tool = split ? 'split-pdf' : 'merge-pdf', readOnly = false, rotation, input, parsePages, isBusy, isReady, hasFailed, updateOrder, syncSelection, setSelection, move, openPdf, status}) {
   const history = [];

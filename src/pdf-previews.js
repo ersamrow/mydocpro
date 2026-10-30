@@ -1,5 +1,3 @@
-import './pdf-previews.css';
-import './page-cards.css';
 import {setupPdfEditor} from './pdf-editor.js';
 // Each view owns its render task, PDF documents and object URLs.
 // Replacing/removing files or leaving the tool disposes the previous view.

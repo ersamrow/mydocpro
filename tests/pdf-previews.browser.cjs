@@ -9,7 +9,7 @@ const path = require('node:path');
   const errors=[];
   page.on('pageerror', error=>errors.push(error.message));
   for (const tool of ['organize-pdf','compress-pdf','pdf-to-image','split-pdf','merge-pdf']) {
-   await page.goto(`${process.env.TEST_URL || 'http://127.0.0.1:5175'}/${tool}`);
+   await page.goto(`${process.env.TEST_URL || 'http://127.0.0.1:4173'}/${tool}`);
    await page.locator('#upload').setInputFiles([path.join(__dirname,'two-pages.pdf'), ...(tool==='merge-pdf' ? [path.join(__dirname,'one-page.pdf')] : [])]);
    await page.waitForFunction(()=>document.querySelector('#output-summary')?.textContent && !document.querySelector('#output-summary').textContent.includes('Loading'));
    assert.equal(await page.locator('.page-thumbnail img').count(), tool==='merge-pdf' ? 3 : 2);

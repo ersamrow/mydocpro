@@ -5,17 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/prepare-next.mjs && next dev --hostname 127.0.0.1",
-    "build": "node scripts/prepare-next.mjs && next build --webpack && node scripts/export-next.mjs && node scripts/build-mail.mjs && node scripts/build-pwa.mjs",
-    "check": "node --check src/app.js && node --check src/pdf-previews.js && node --check src/pwa.js && node --check src/pdf-editor.js && node --check src/download-name.js",
-    "preview": "node scripts/preview.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "build": "node scripts/prepare-next.mjs && next build --webpack && node scripts/build-pwa.mjs",
+    "start": "next start --hostname 127.0.0.1",
+    "preview": "next start --hostname 127.0.0.1 --port 4173",
+    "check": "node --check src/processing.js && node --check src/tool-settings.js && node --check server/contact.js",
+    "test": "node --test tests/*.test.mjs",
+    "format": "prettier --write components pages server src scripts tests next.config.mjs",
+    "test:browser": "node tests/pdf-previews.browser.cjs && node tests/next.browser.cjs && node tests/all-tools.browser.cjs"
   },
   "dependencies": {
-    "lucide": "0.468.0",
+    "lucide-react": "^1.65.0",
     "next": "^16.4.3",
+    "nodemailer": "^10.3.1",
     "pdf-lib": "1.17.1",
     "pdfjs-dist": "4.10.38",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1",
+    "prettier": "^3.9.10"
   }
 }

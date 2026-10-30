@@ -1,50 +1,156 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {spawnSync} from 'node:child_process';
-import {mkdtempSync, rmSync, readFileSync} from 'node:fs';
-import {tmpdir} from 'node:os';
-import {join} from 'node:path';
-
-// Execute the real handler with a fake transport: never send test emails.
-const directory = mkdtempSync(join(tmpdir(), 'mydocpro-contact-test-'));
-const source = readFileSync(new URL('../public/api/contact.php', import.meta.url), 'utf8')
- .replace('<?php', '').replace('declare(strict_types=1);', '')
- .replace("require_once __DIR__ . '/smtp.php';", '')
- .replace('contactMailer()', 'null')
- .replaceAll('contactSend($mailer, ', 'test_mail(')
- .replace("sys_get_temp_dir() . '/mydocpro-contact-limits.json'", "getenv('CONTACT_TEST_STORE')");
-let counter = 0;
-function request(data, {method='POST', fail=0, store}={}) {
- const code = `function test_mail($to,$subject,$body,$headers) { static $n=0; $n++; file_put_contents('php://stderr', json_encode([$to,$subject,$body,$headers])."\\n"); return $n !== ${fail}; }
- register_shutdown_function(function(){file_put_contents('php://stderr','STATUS:'.http_response_code());});
- $_SERVER=['REQUEST_METHOD'=>'${method}','HTTP_ACCEPT'=>'application/json','REMOTE_ADDR'=>'127.0.0.1'];
- $_POST=json_decode(base64_decode('${Buffer.from(JSON.stringify(data)).toString('base64')}'),true);
- ${source}`;
- const result=spawnSync('php',['-r',code], {encoding:'utf8',env:{...process.env,CONTACT_ADMIN_EMAIL:'admin@example.com',CONTACT_FROM_EMAIL:'sender@example.com',CONTACT_TEST_STORE:store || join(directory,`${counter++}.json`)}});
- assert.equal(result.status,0,result.stderr);
- return {status:Number(result.stderr.match(/STATUS:(\d+)/)?.[1]), body:JSON.parse(result.stdout), emails:result.stderr.split('\n').filter(s=>s.startsWith('[')).map(s=>JSON.parse(s))};
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { createContactHandler, consumeLimit } from "../server/contact.js";
+const env = {
+  SMTP_HOST: "smtp.example.com",
+  SMTP_USERNAME: "user",
+  SMTP_PASSWORD: "test-only",
+  CONTACT_FROM_EMAIL: "sender@example.com",
+  CONTACT_ADMIN_EMAIL: "admin@example.com",
+};
+const input = {
+  name: "Test User",
+  email: "user@example.com",
+  subject: "Testing",
+  message: "A message long enough.",
+};
+async function request(
+  body = input,
+  {
+    fail = 0,
+    method = "POST",
+    limit = async () => true,
+    accept = "application/json",
+    config = env,
+    type = "application/json",
+  } = {},
+) {
+  const sent = [];
+  let code;
+  let result;
+  const headers = {};
+  const handler = createContactHandler({
+    env: config,
+    limit,
+    transport: () => ({
+      sendMail: async (mail) => {
+        sent.push(mail);
+        if (sent.length === fail) throw Error("Test failure");
+        return { accepted: [mail.to] };
+      },
+      close() {},
+    }),
+  });
+  const res = {
+    setHeader(k, v) {
+      headers[k] = v;
+    },
+    status(s) {
+      code = s;
+      return this;
+    },
+    json(v) {
+      result = v;
+      return this;
+    },
+    send(v) {
+      result = v;
+      return this;
+    },
+  };
+  await handler(
+    {
+      method,
+      headers: { accept, "content-type": type },
+      body,
+      socket: { remoteAddress: "127.0.0.1" },
+    },
+    res,
+  );
+  return { code, result, headers, sent };
 }
-const valid={name:'A User',email:'user@example.com',subject:'Tool help',message:'Please help me resize my photo.',website:''};
-test('contact validation rejects invalid submissions without sending',()=>{
- assert.equal(request(valid,{method:'GET'}).status,405);
- for(const data of [{...valid,email:'bad'}, {...valid,email:'user@example.com\r\nBcc: bad@example.com'}, {...valid,name:[]}, {...valid,message:'short'}, {...valid,website:'spam'}, {...valid,subject:'x'.repeat(601)}]) {
-  const r=request(data); assert.equal(r.status,400); assert.equal(r.emails.length,0);
- }
+test("contact rejects malformed input, header injection and attachments without sending", async () => {
+  for (const body of [
+    { ...input, email: "bad" },
+    { ...input, website: "spam" },
+    { ...input, name: "a\nb" },
+    { ...input, subject: ["x"] },
+    { ...input, message: "short" },
+    null,
+  ]) {
+    const r = await request(body);
+    assert.equal(r.code, 400);
+    assert.equal(r.sent.length, 0);
+  }
+  assert.equal(
+    (await request(input, { type: "multipart/form-data" })).code,
+    415,
+  );
+  assert.equal((await request(input, { method: "GET" })).code, 405);
 });
-test('admin and user receive separate messages with correct reply addresses',()=>{
- const r=request(valid); assert.equal(r.status,200); assert.equal(r.emails.length,2);
- assert.equal(r.emails[0][0],'admin@example.com'); assert.equal(r.emails[0][3]['Reply-To'],valid.email);
- assert.ok(r.emails[0][2].includes(valid.message));
- assert.equal(r.emails[1][0],valid.email); assert.equal(r.emails[1][3]['Reply-To'],'admin@example.com');
- assert.ok(!r.emails[1][2].includes(valid.message));
+test("contact sends separate fixed acknowledgement and admin message", async () => {
+  const r = await request();
+  assert.equal(r.code, 200);
+  assert.equal(r.sent.length, 2);
+  assert.equal(r.sent[0].replyTo, input.email);
+  assert.equal(r.sent[1].replyTo, env.CONTACT_ADMIN_EMAIL);
+  assert.ok(!r.sent[1].text.includes(input.message));
 });
-test('transport failures distinguish unsent and partial success',()=>{
- const failed=request(valid,{fail:1}); assert.equal(failed.status,503); assert.equal(failed.emails.length,1);
- const partial=request(valid,{fail:2}); assert.equal(partial.status,200); assert.match(partial.body.message,/do not need to submit again/);
+test("contact distinguishes admin delivery failure from acknowledgement failure", async () => {
+  assert.equal((await request(input, { fail: 1 })).code, 503);
+  const partial = await request(input, { fail: 2 });
+  assert.equal(partial.code, 200);
+  assert.match(partial.result.message, /do not need to submit again/);
 });
-test('sixth submission is limited',()=>{
- const store=join(directory,'limit.json');
- for(let i=0;i<5;i++) assert.equal(request(valid,{store}).status,200);
- const r=request(valid,{store}); assert.equal(r.status,429); assert.equal(r.emails.length,0);
+test("missing SMTP and unavailable or exhausted rate store fail safely", async () => {
+  assert.equal((await request(input, { config: {} })).code, 503);
+  assert.equal(
+    (
+      await request(input, {
+        limit: async () => {
+          throw Error();
+        },
+      })
+    ).code,
+    503,
+  );
+  const r = await request(input, { limit: async () => false });
+  assert.equal(r.code, 429);
+  assert.equal(r.headers["Retry-After"], "3600");
+  assert.equal(r.sent.length, 0);
 });
-test.after(()=>rmSync(directory,{recursive:true,force:true}));
+test("non-JavaScript submission returns a readable response", async () => {
+  const r = await request(input, {
+    accept: "text/html",
+    type: "application/x-www-form-urlencoded",
+  });
+  assert.equal(r.code, 200);
+  assert.match(r.result, /Back to contact/);
+});
+test("rate limits are atomic across concurrent requests, hashed and expire", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "mydocpro-react-test-"));
+  try {
+    const now = Date.now();
+    const results = await Promise.all(
+      Array.from({ length: 8 }, () =>
+        consumeLimit("127.0.0.1", "user@example.com", { directory, now }),
+      ),
+    );
+    assert.equal(results.filter(Boolean).length, 5);
+    const data = await readFile(join(directory, "limits.json"), "utf8");
+    assert.ok(!data.includes("user@example.com"));
+    assert.ok(!data.includes("127.0.0.1"));
+    assert.equal(
+      await consumeLimit("127.0.0.1", "user@example.com", {
+        directory,
+        now: now + 3600001,
+      }),
+      true,
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

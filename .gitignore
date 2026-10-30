@@ -10,3 +10,7 @@ dist/
 .next/
 out/
 public/pdf.worker.min.mjs
+
+public/sw.js
+public/sitemap.xml
+public/robots.txt

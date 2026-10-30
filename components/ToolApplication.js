@@ -1,10 +1,9 @@
 import Head from "next/head";
 import Link from "next/link";
 import { pageSeo, siteOrigin } from "../src/seo.js";
-import { sitePages } from "../src/site-content.js";
 import { tools } from "../src/tools.js";
 import { pageBodies } from "./ContentPages.js";
-import { Breadcrumb } from "./Shared.js";
+import InformationPage from "./InformationPage.js";
 import Home from "./Home.js";
 import Workspace from "./Workspace.js";
 export default function ToolApplication({ id }) {
@@ -54,17 +53,20 @@ export default function ToolApplication({ id }) {
       ) : tool ? (
         <Workspace key={id} tool={tool} />
       ) : Content ? (
-        <main className="workspace privacy-page">
-          <Breadcrumb title={sitePages[id].title} />
-          <h1>{sitePages[id].title}</h1>
+        <InformationPage id={id}>
           <Content />
-        </main>
+        </InformationPage>
       ) : (
-        <main className="workspace">
+        <main className="workspace not-found-page">
+          <span className="page-kicker">ERROR 404</span>
           <h1>Page not found</h1>
           <p>
-            Check the address or <Link href="/">browse all tools</Link>.
+            We couldn’t find that page. Check the address or choose a tool to
+            get started.
           </p>
+          <Link className="primary" href="/">
+            Browse all tools <span aria-hidden="true">→</span>
+          </Link>
         </main>
       )}
     </>

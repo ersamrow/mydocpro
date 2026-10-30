@@ -316,9 +316,12 @@ export async function processPdf(
     try {
       if (id === "pdf-to-image") {
         const selected = pageIndices(val("pages"), doc.numPages);
-        let total = 0;
+        let total = 0,
+          completed = 0;
         for (const i of selected) {
-          setStatus(`Rendering page ${i + 1} of ${doc.numPages}…`);
+          setStatus(
+            `Rendering page ${++completed} of ${selected.length} (source page ${i + 1})…`,
+          );
           const c = await renderPage(doc, i + 1, dpi),
             b = await blob(c, val("format"));
           total += b.size;
@@ -378,7 +381,10 @@ export async function processPdf(
       docs.set(file, doc);
     }
     if (!order.length) throw Error("Wait for page previews before merging.");
+    let completed = 0;
     for (const { file, index } of order) {
+      setStatus(`Merging page ${++completed} of ${order.length}…`);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       const [page] = await out.copyPages(docs.get(file), [index]);
       out.addPage(page);
     }
@@ -389,7 +395,10 @@ export async function processPdf(
     return;
   }
   if (id === "jpg-to-pdf") {
+    let completed = 0;
     for (const f of files) {
+      setStatus(`Converting image ${++completed} of ${files.length}…`);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       const im = await loadImage(f),
         c = draw(im),
         b = await blob(c),
@@ -429,7 +438,10 @@ export async function processPdf(
           ? src.getPageIndices()
           : pageIndices(val("pages"), src.getPageCount());
       if (id === "split-pdf" && val("mode") === "each") {
+        let completed = 0;
         for (const i of indices) {
+          setStatus(`Extracting page ${++completed} of ${indices.length}…`);
+          await new Promise((resolve) => setTimeout(resolve, 0));
           const part = await PDFDocument.create();
           const [p] = await part.copyPages(src, [i]);
           part.addPage(p);
@@ -440,6 +452,8 @@ export async function processPdf(
         }
         return;
       }
+      setStatus(`Copying ${indices.length} selected pages…`);
+      await new Promise((resolve) => setTimeout(resolve, 0));
       const pages = await out.copyPages(src, indices);
       pages.forEach((p) => {
         if (id === "organize-pdf")

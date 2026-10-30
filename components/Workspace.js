@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Breadcrumb, Icon } from "./Shared.js";
+import { Icon } from "./Shared.js";
+import PdfQualityPreview from "./PdfQualityPreview.js";
 import Settings from "./Settings.js";
 import ToolGuide from "./ToolGuide.js";
 import ImageEditor from "./ImageEditor.js";
@@ -24,12 +25,14 @@ function Download({ result }) {
     return () => URL.revokeObjectURL(u);
   }, [result]);
   return (
-    <a className="output" href={url} download={result.name}>
+    <a className="output result-download" href={url} download={result.name}>
       {result.blob.type.startsWith("image/") && url && (
         <img src={url} alt="Processed image preview" />
       )}
       <span>
-        Download {result.name} · {size(result.blob.size)}
+        <strong>{result.name}</strong>
+        <small>{size(result.blob.size)}</small>
+        <span className="download-label">Download file ↓</span>
       </span>
     </a>
   );
@@ -56,7 +59,9 @@ export default function Workspace({ tool }) {
     [error, setError] = useState(false),
     [outputs, setOutputs] = useState([]),
     [pdf, setPdf] = useState({ entries: [], ready: false, error: "" }),
-    [dragging, setDragging] = useState(false);
+    [dragging, setDragging] = useState(false),
+    [settingsOpen, setSettingsOpen] = useState(true);
+  const resultsRef = useRef(null);
   const upload = useRef(null),
     replace = useRef(false),
     alive = useRef(true),
@@ -64,10 +69,10 @@ export default function Workspace({ tool }) {
   const isPdf = pdfTools.includes(id),
     multi = multiTools.includes(id),
     meta = pageSeo(id);
-  const onValues = useCallback(
-    (patch) => setValues((v) => ({ ...v, ...patch })),
-    [],
-  );
+  const onValues = useCallback((patch) => {
+    setValues((v) => ({ ...v, ...patch }));
+    setOutputs([]);
+  }, []);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -109,6 +114,7 @@ export default function Workspace({ tool }) {
         multi,
         replace: replacing,
       });
+      setSettingsOpen(true);
       setFiles(next);
       setOutputs([]);
       setError(false);
@@ -160,7 +166,8 @@ export default function Workspace({ tool }) {
     setOutputs([]);
     setError(false);
     setStatus("Processing on your device…");
-    let note = "";
+    let note = "",
+      succeeded = false;
     const output = (blob, name) => {
       if (alive.current)
         setOutputs((out) => [
@@ -186,6 +193,7 @@ export default function Workspace({ tool }) {
           `mydocpro-${id}.${blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg"}`,
         );
       }
+      succeeded = true;
       if (alive.current)
         setStatus(
           note ||
@@ -200,25 +208,54 @@ export default function Workspace({ tool }) {
       }
     } finally {
       processing.current = false;
-      if (alive.current) setBusy(false);
+      if (alive.current) {
+        setBusy(false);
+        if (succeeded && window.matchMedia("(max-width: 600px)").matches) {
+          setSettingsOpen(false);
+          requestAnimationFrame(() =>
+            resultsRef.current?.scrollIntoView({
+              behavior: "auto",
+              block: "start",
+            }),
+          );
+        }
+      }
     }
   }
   return (
-    <main className="workspace">
+    <main className="workspace tool-workspace">
       <div className="tool-heading">
         <div className="tool-heading-meta">
           <Link className="back" href="/">
             <Icon name="arrow-left" />
             All tools
           </Link>
-          <span className="eyebrow">{isPdf ? "PDF TOOLS" : "IMAGE TOOLS"}</span>
+          <span className="eyebrow">
+            {tool[3] === "pdf"
+              ? "PDF TOOLS"
+              : tool[3] === "special"
+                ? "PHOTO PRESETS"
+                : "IMAGE TOOLS"}
+          </span>
         </div>
-        <Breadcrumb title={title} />
-        <h1>{meta.name}</h1>
-        <p className="intro">
-          {meta.description}{" "}
-          <span className="tool-privacy">Processed on your device.</span>
-        </p>
+        <div className="page-intro-heading">
+          <span className="page-emblem">
+            <Icon name={tool[4]} />
+          </span>
+          <h1>{title}</h1>
+        </div>
+        <p className="intro">{meta.description} </p>
+        <div className="tool-assurances">
+          <span>
+            <Icon name="shield-check" /> Files stay on your device
+          </span>
+          <span>
+            <Icon name="check" /> Free to use
+          </span>
+          <span>
+            <Icon name="zap" /> No sign-up
+          </span>
+        </div>
       </div>
       <section
         className={
@@ -243,13 +280,16 @@ export default function Workspace({ tool }) {
           }}
         >
           <Icon name="upload" />
-          <strong>Drop your {isPdf ? "PDFs" : "images"} here</strong>
-          <span>
-            or choose {multi ? "files" : "a file"} below ·{" "}
-            {isPdf
-              ? "PDF, up to 100 MB total / 300 pages"
-              : "JPG, PNG or WebP, up to 25 MB per image"}
-          </span>
+          <div className="upload-copy">
+            <strong>
+              Choose {isPdf ? "PDFs" : "images"} or drop them here
+            </strong>
+            <span>
+              {isPdf
+                ? "PDF, up to 100 MB total / 300 pages"
+                : "JPG, PNG or WebP, up to 25 MB per image"}
+            </span>
+          </div>
           <input
             ref={upload}
             id="upload"
@@ -347,32 +387,45 @@ export default function Workspace({ tool }) {
               busy={busy}
             />
           ))}
-        <Settings
-          id={id}
-          values={values}
-          onChange={(key, value) => {
-            const patch = { [key]: value };
-            if (
-              id === "resize-image" &&
-              values.keepProportions &&
-              ["width", "height"].includes(key) &&
-              Number(value) > 0
-            ) {
-              const ratio = Number(values.width) / Number(values.height);
-              if (Number.isFinite(ratio) && ratio > 0)
-                patch[key === "width" ? "height" : "width"] = String(
-                  Number(
-                    (key === "width"
-                      ? Number(value) / ratio
-                      : Number(value) * ratio
-                    ).toFixed(values.unit === "px" ? 0 : 3),
-                  ),
-                );
-            }
-            onValues(patch);
-          }}
-          busy={busy}
-        />
+        {id === "compress-pdf" && files.length > 0 && (
+          <PdfQualityPreview file={files[0]} values={values} busy={busy} />
+        )}
+        <details
+          className="settings-disclosure"
+          open={settingsOpen}
+          onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
+        >
+          <summary>
+            Settings{" "}
+            <span>{settingsOpen ? "Hide" : "Adjust and process again"}</span>
+          </summary>
+          <Settings
+            id={id}
+            values={values}
+            onChange={(key, value) => {
+              const patch = { [key]: value };
+              if (
+                id === "resize-image" &&
+                values.keepProportions &&
+                ["width", "height"].includes(key) &&
+                Number(value) > 0
+              ) {
+                const ratio = Number(values.width) / Number(values.height);
+                if (Number.isFinite(ratio) && ratio > 0)
+                  patch[key === "width" ? "height" : "width"] = String(
+                    Number(
+                      (key === "width"
+                        ? Number(value) / ratio
+                        : Number(value) * ratio
+                      ).toFixed(values.unit === "px" ? 0 : 3),
+                    ),
+                  );
+              }
+              onValues(patch);
+            }}
+            busy={busy}
+          />
+        </details>
         {notices[id] && <p className="notice">{notices[id]}</p>}
         <div className="process-actions">
           <p
@@ -403,15 +456,45 @@ export default function Workspace({ tool }) {
                   : "Process file" + (multi ? "s" : "")}
           </button>
         </div>
+        {busy && (
+          <progress
+            className="processing-progress"
+            aria-label={status || "Processing file"}
+          />
+        )}
         <div
           id="status"
           className={"status " + (error ? "error" : "")}
-          role="status"
-          aria-live="polite"
+          role={error ? "alert" : "status"}
+          aria-live={error ? "assertive" : "polite"}
         >
           {status}
         </div>
-        <div className="outputs" id="outputs">
+        <div className="outputs" id="outputs" ref={resultsRef} tabIndex={-1}>
+          {outputs.length > 0 && (
+            <div className="results-summary">
+              <h2>
+                {busy || error ? "Available downloads" : "Your files are ready"}
+              </h2>
+              <p>
+                Original: {size(files.reduce((sum, f) => sum + f.size, 0))} →
+                Output: {size(outputs.reduce((sum, r) => sum + r.blob.size, 0))}
+                {!busy &&
+                  !error &&
+                  (() => {
+                    const original = files.reduce((sum, f) => sum + f.size, 0),
+                      total = outputs.reduce((sum, r) => sum + r.blob.size, 0);
+                    return original
+                      ? ` · ${Math.abs((1 - total / original) * 100).toFixed(1)}% ${total <= original ? "smaller" : "larger"}`
+                      : "";
+                  })()}
+              </p>
+              <small>
+                Compare the result before submitting. Your original files are
+                unchanged.
+              </small>
+            </div>
+          )}
           {outputs.map((result, i) => (
             <Download key={i} result={result} />
           ))}

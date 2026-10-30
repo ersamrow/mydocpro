@@ -10,22 +10,13 @@ import "../src/pdf-previews.css";
 import "../src/page-cards.css";
 import "../src/mobile.css";
 import "../src/upload-controls.css";
-import Link from "next/link";
-import { Logo, Footer } from "../components/Shared.js";
-import PwaControls from "../components/PwaControls.js";
+import "../src/interface.css";
+import Header from "../components/Header.js";
+import { Footer } from "../components/Shared.js";
 export default function App({ Component, pageProps }) {
   return (
     <div id="app">
-      <header className="site-header">
-        <Logo />
-        <nav aria-label="Main navigation">
-          <Link href="/#tools">All tools</Link>
-          <Link href="/#image">Image tools</Link>
-          <Link href="/#pdf">PDF tools</Link>
-          <Link href="/exam-photo">Photo presets</Link>
-        </nav>
-        <PwaControls />
-      </header>
+      <Header id={pageProps.id} />
       <Component {...pageProps} />
       <Footer />
     </div>

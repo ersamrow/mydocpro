@@ -96,7 +96,9 @@ export function pageIndices(spec, count) {
 }
 export async function pdfRenderer(f) {
   const pdfjs = await import("pdfjs-dist");
-  const worker = "/pdf.worker.min.mjs";
+  // Some hosts serve .mjs as text/plain. Keep module contents under a .js URL,
+  // versioned with PDF.js so an older cache cannot supply a mismatched worker.
+  const worker = `/pdf.worker-${pdfjs.version}.js`;
   pdfjs.GlobalWorkerOptions.workerSrc = worker;
   const doc = await pdfjs.getDocument({
     data: await f.arrayBuffer(),
@@ -341,14 +343,12 @@ export async function processPdf(
             c = await renderPage(doc, i, dpi),
             b = await blob(c, "image/jpeg", quality),
             img = await out.embedJpg(await b.arrayBuffer());
-          out
-            .addPage([view.width, view.height])
-            .drawImage(img, {
-              x: 0,
-              y: 0,
-              width: view.width,
-              height: view.height,
-            });
+          out.addPage([view.width, view.height]).drawImage(img, {
+            x: 0,
+            y: 0,
+            width: view.width,
+            height: view.height,
+          });
           c.width = c.height = 1;
         }
         const b = new Blob([await out.save()], { type: "application/pdf" });

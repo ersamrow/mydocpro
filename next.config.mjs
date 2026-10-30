@@ -4,6 +4,12 @@ export default {
   async headers() {
     return [
       {
+        source: "/pdf.worker-:version.js",
+        headers: [
+          { key: "Content-Type", value: "text/javascript; charset=utf-8" },
+        ],
+      },
+      {
         source: "/sw.js",
         headers: [
           {

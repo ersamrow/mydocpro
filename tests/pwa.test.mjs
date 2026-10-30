@@ -5,7 +5,11 @@ import vm from "node:vm";
 import { routeIds } from "../src/routes.js";
 const root = new URL("../", import.meta.url),
   script = await readFile(new URL("public/sw.js", root), "utf8");
-function worker({ badAsset, badMime } = {}) {
+const { version } = JSON.parse(
+  await readFile(new URL("node_modules/pdfjs-dist/package.json", root), "utf8"),
+);
+const workerUrl = `/pdf.worker-${version}.js`;
+function worker({ badAsset, badMime, jsMime = "text/javascript" } = {}) {
   let online = true;
   const handlers = {},
     stores = new Map([
@@ -57,7 +61,7 @@ function worker({ badAsset, badMime } = {}) {
             : file.endsWith(".html")
               ? "text/html"
               : /\.m?js$/.test(file)
-                ? "text/javascript"
+                ? jsMime
                 : "application/octet-stream",
       },
     });
@@ -121,10 +125,12 @@ test("offline cache contains route-specific React HTML, page data and Next chunk
     assert.equal(data.props.pageProps.id, id);
   }
   const precache = JSON.parse(script.match(/const PRECACHE\s*=\s*(.*);/)[1]);
+  assert.ok(precache.includes(workerUrl));
+  assert.ok(!precache.includes("/pdf.worker.min.mjs"));
   assert.ok(precache.some((url) => url.includes("%5B")));
   assert.ok(precache.some((url) => url.startsWith("/_next/data/")));
   for (const url of precache.filter(
-    (url) => url.startsWith("/_next/") || url === "/pdf.worker.min.mjs",
+    (url) => url.startsWith("/_next/") || url === workerUrl,
   )) {
     const response = await w.event("fetch", {
       request: {
@@ -157,10 +163,21 @@ test("contact, user files, ads and unknown routes are excluded", async () => {
     );
   assert.ok(!script.includes('.php"'));
 });
+test("Hostinger's legacy JavaScript MIME type can be cached", async () => {
+  const w = worker({ jsMime: "application/x-javascript; charset=utf-8" });
+  await w.event("install");
+  let report;
+  await w.event("message", {
+    data: { type: "OFFLINE_STATUS" },
+    ports: [{ postMessage: (r) => (report = r) }],
+  });
+  assert.equal(report.ready, true);
+});
+
 test("bad content or incorrect worker MIME aborts cache installation", async () => {
   for (const config of [
     { badAsset: "/manifest.webmanifest" },
-    { badMime: "/pdf.worker.min.mjs" },
+    { badMime: workerUrl },
   ]) {
     const w = worker(config);
     await assert.rejects(w.event("install"));

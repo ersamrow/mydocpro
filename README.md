@@ -59,3 +59,5 @@ npm test
 ```
 
 Browser regression scripts `tests/pdf-previews.browser.cjs`, `tests/next.browser.cjs`, and `tests/all-tools.browser.cjs` use Playwright against `TEST_URL` (default port 4173). Run `npx playwright install chromium` once, or set `CHROME_PATH` to an installed Chrome executable. Run `npm run test:browser` with the preview server running. They cover hydration/navigation, image and PDF outputs, crop/resize interactions, PDF controls, offline routes and 404 behavior.
+
+PDF rendering uses a versioned `pdf.worker-<PDF.js version>.js` module generated during the build. The `.js` suffix avoids hosts that serve `.mjs` as `text/plain`. Deploy the generated `public/` directory along with `.next/`; both must come from the same build. If upgrading from the old worker URL, close all app tabs after deployment and reopen online so the service worker can update.

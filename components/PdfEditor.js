@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { pdfRenderer, pageIndices } from "../src/processing.js";
+import { isBackdropClick, useDialogFocus } from "./dialog.js";
 import { BlobImage } from "./ImageEditor.js";
 const colors = [
   "#1e6b52",
@@ -13,6 +14,7 @@ function Zoom({ entry, rotation, onClose }) {
   const dialog = useRef(null),
     canvas = useRef(null);
   const [message, setMessage] = useState("Loading page…");
+  useDialogFocus(dialog);
   useEffect(() => {
     let dead = false,
       doc,
@@ -60,7 +62,7 @@ function Zoom({ entry, rotation, onClose }) {
       aria-labelledby="page-zoom-title"
       onClose={onClose}
       onClick={(e) => {
-        if (e.target === dialog.current) onClose();
+        if (isBackdropClick(e)) onClose();
       }}
     >
       <div className="zoom-heading">
@@ -86,6 +88,7 @@ function Zoom({ entry, rotation, onClose }) {
 function MoveDialog({ position, count, onMove, onClose }) {
   const ref = useRef(null),
     [value, setValue] = useState(position + 1);
+  useDialogFocus(ref);
   useEffect(() => {
     ref.current.showModal();
   }, []);

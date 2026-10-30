@@ -15,3 +15,5 @@ public/pdf.worker-*.js
 public/sw.js
 public/sitemap.xml
 public/robots.txt
+
+ui-audit/

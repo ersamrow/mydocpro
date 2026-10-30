@@ -1,3 +1,4 @@
+import { isBackdropClick } from "./dialog.js";
 import { useEffect, useRef, useState } from "react";
 export default function PwaControls() {
   const [ready, setReady] = useState(false),
@@ -125,7 +126,7 @@ export default function PwaControls() {
         className="pwa-dialog"
         aria-labelledby="pwa-heading"
         onClick={(e) => {
-          if (e.target === dialog.current) dialog.current.close();
+          if (isBackdropClick(e)) dialog.current.close();
         }}
       >
         <h2 id="pwa-heading">MyDocPro, on your home screen</h2>

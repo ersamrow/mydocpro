@@ -64,6 +64,12 @@ export const pageBodies = {
         </p>
         <h2>{"Browser storage"}</h2>
         <p>
+          If you enable “Remember settings on this device”, numeric and dropdown
+          preferences are saved locally for that tool. Names, dates, page
+          selections, output filenames and documents are excluded. Reset
+          settings deletes the saved preferences for that tool.
+        </p>
+        <p>
           {
             "The offline feature caches application code and icons. It does not deliberately cache your selected documents. Files and results are held in browser memory during use. Close the tab to end the session. Downloaded files remain on your device until you delete them; clear site data in browser settings to remove the offline cache."
           }

@@ -1,14 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
 import PdfQualityPreview from "./PdfQualityPreview.js";
+import useToolSettings from "./useToolSettings.js";
+import ZipDownload from "./ZipDownload.js";
+import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
+import { actionLabels } from "../src/ui-copy.js";
 import Settings from "./Settings.js";
 import ToolGuide from "./ToolGuide.js";
 import ImageEditor from "./ImageEditor.js";
 import PdfEditor from "./PdfEditor.js";
 import {
-  defaults,
+  batchTools,
   pdfTools,
   multiTools,
   size,
@@ -53,15 +57,32 @@ export default function Workspace({ tool }) {
   const [id, title] = tool,
     router = useRouter();
   const [files, setFiles] = useState([]),
-    [values, setValues] = useState(() => defaults(id)),
     [busy, setBusy] = useState(false),
+    [validating, setValidating] = useState(false),
+    [cancelling, setCancelling] = useState(false),
     [status, setStatus] = useState(""),
     [error, setError] = useState(false),
     [outputs, setOutputs] = useState([]),
     [pdf, setPdf] = useState({ entries: [], ready: false, error: "" }),
     [dragging, setDragging] = useState(false),
     [settingsOpen, setSettingsOpen] = useState(true);
-  const resultsRef = useRef(null);
+  const resultsRef = useRef(null),
+    controller = useRef(null),
+    selecting = useRef(false);
+  const {
+    values,
+    setValues,
+    onValues,
+    remember,
+    setRemember,
+    canUndo,
+    undo,
+    reset,
+    storageNote,
+  } = useToolSettings(id, () => {
+    setOutputs([]);
+    setStatus("");
+  });
   const upload = useRef(null),
     replace = useRef(false),
     alive = useRef(true),
@@ -69,14 +90,11 @@ export default function Workspace({ tool }) {
   const isPdf = pdfTools.includes(id),
     multi = multiTools.includes(id),
     meta = pageSeo(id);
-  const onValues = useCallback((patch) => {
-    setValues((v) => ({ ...v, ...patch }));
-    setOutputs([]);
-  }, []);
   useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
+      controller.current?.abort();
     };
   }, []);
   useEffect(() => {
@@ -106,14 +124,19 @@ export default function Workspace({ tool }) {
       router.events.off("routeChangeStart", route);
     };
   }, [busy, router]);
-  function choose(incoming, replacing = false) {
-    if (busy || !incoming.length) return;
+  async function choose(incoming, replacing = false) {
+    if (busy || selecting.current || !incoming.length) return;
+    selecting.current = true;
+    setValidating(true);
+    setStatus("Checking files…");
     try {
       const next = validateFiles(Array.from(incoming), files, {
         pdf: isPdf,
         multi,
         replace: replacing,
       });
+      await inspectFiles(Array.from(incoming), isPdf);
+      if (!alive.current) return;
       setSettingsOpen(true);
       setFiles(next);
       setOutputs([]);
@@ -131,10 +154,14 @@ export default function Workspace({ tool }) {
     } catch (e) {
       setError(true);
       setStatus(e.message);
+    } finally {
+      selecting.current = false;
+      if (alive.current) setValidating(false);
     }
   }
   function changeFiles(next) {
-    if (busy) return;
+    if (busy || validating) return;
+    setSettingsOpen(true);
     setFiles(next);
     setOutputs([]);
     setPdf({ entries: [], ready: false, error: "" });
@@ -153,6 +180,7 @@ export default function Workspace({ tool }) {
   }
   const disabled =
     busy ||
+    validating ||
     !files.length ||
     (isPdf &&
       (!pdf.ready ||
@@ -163,22 +191,40 @@ export default function Workspace({ tool }) {
     if (disabled || processing.current) return;
     processing.current = true;
     setBusy(true);
+    setCancelling(false);
+    const abortController = new AbortController();
+    controller.current = abortController;
+    const signal = abortController.signal;
     setOutputs([]);
     setError(false);
     setStatus("Processing on your device…");
     let note = "",
       succeeded = false;
+    let outputBytes = 0;
     const output = (blob, name) => {
+      throwIfCancelled(signal);
+      outputBytes += blob.size;
+      if (outputBytes > 150 * 1048576)
+        throw Error(
+          "Results exceed 150 MB. Download the completed files, then process a smaller batch.",
+        );
       if (alive.current)
         setOutputs((out) => [
           ...out,
-          { blob, name: downloadName(values["output-name"] || "", name) },
+          {
+            blob,
+            name:
+              batchTools.includes(id) && files.length > 1
+                ? `${out.length + 1}-${downloadName(values["output-name"] || "", name)}`
+                : downloadName(values["output-name"] || "", name),
+          },
         ]);
     };
     try {
       await new Promise((r) => setTimeout(r, 20));
       if (isPdf || id === "jpg-to-pdf")
         await processPdf(id, files, values, {
+          signal,
           order: pdf.entries,
           onOutput: output,
           onStatus: (text) => {
@@ -187,12 +233,20 @@ export default function Workspace({ tool }) {
           },
         });
       else {
-        const blob = await processImage(id, files, values);
-        output(
-          blob,
-          `mydocpro-${id}.${blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg"}`,
-        );
+        const batches = batchTools.includes(id)
+          ? files.map((f) => [f])
+          : [files];
+        for (const [index, batch] of batches.entries()) {
+          throwIfCancelled(signal);
+          setStatus(`Processing image ${index + 1} of ${batches.length}…`);
+          const blob = await processImage(id, batch, values, false, signal);
+          output(
+            blob,
+            `mydocpro-${id}.${blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg"}`,
+          );
+        }
       }
+      throwIfCancelled(signal);
       succeeded = true;
       if (alive.current)
         setStatus(
@@ -203,13 +257,16 @@ export default function Workspace({ tool }) {
       if (alive.current) {
         setError(true);
         setStatus(
-          e.message || "Could not process this file. Try another file.",
+          signal.aborted
+            ? "Processing cancelled. Completed downloads remain available."
+            : e.message || "Could not process this file. Try another file.",
         );
       }
     } finally {
       processing.current = false;
       if (alive.current) {
         setBusy(false);
+        setCancelling(false);
         if (succeeded && window.matchMedia("(max-width: 600px)").matches) {
           setSettingsOpen(false);
           requestAnimationFrame(() =>
@@ -264,6 +321,25 @@ export default function Workspace({ tool }) {
           (isPdf && files.length ? "pdf-editor-panel" : "")
         }
       >
+        <ol className="workflow-steps" aria-label="Tool workflow">
+          {["Choose files", "Adjust settings", "Download"].map(
+            (label, index) => {
+              const stage = outputs.length && !busy ? 2 : files.length ? 1 : 0;
+              return (
+                <li
+                  key={label}
+                  aria-current={stage === index ? "step" : undefined}
+                  className={index < stage ? "completed" : ""}
+                >
+                  <span aria-hidden="true">
+                    {index < stage ? "✓" : index + 1}
+                  </span>
+                  {label}
+                </li>
+              );
+            },
+          )}
+        </ol>
         <label
           className={"dropzone " + (dragging ? "dragover" : "")}
           id="dropzone"
@@ -298,7 +374,7 @@ export default function Workspace({ tool }) {
               isPdf ? "application/pdf,.pdf" : "image/jpeg,image/png,image/webp"
             }
             multiple={multi}
-            disabled={busy}
+            disabled={busy || validating}
             onChange={(e) => {
               choose(e.target.files, replace.current);
               replace.current = false;
@@ -396,7 +472,7 @@ export default function Workspace({ tool }) {
           onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
         >
           <summary>
-            Settings{" "}
+            Adjust settings{" "}
             <span>{settingsOpen ? "Hide" : "Adjust and process again"}</span>
           </summary>
           <Settings
@@ -425,6 +501,34 @@ export default function Workspace({ tool }) {
             }}
             busy={busy}
           />
+          <div className="settings-toolbar">
+            <button
+              className="secondary"
+              disabled={busy || validating || !canUndo}
+              onClick={undo}
+            >
+              Undo settings
+            </button>
+            <button
+              className="secondary"
+              disabled={busy || validating}
+              onClick={reset}
+            >
+              Reset settings
+            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={remember}
+                disabled={busy || validating}
+                onChange={(e) => setRemember(e.target.checked)}
+              />{" "}
+              Remember settings on this device
+            </label>
+          </div>
+          <p className="preference-note" role="status">
+            {storageNote}
+          </p>
         </details>
         {notices[id] && <p className="notice">{notices[id]}</p>}
         <div className="process-actions">
@@ -432,29 +536,43 @@ export default function Workspace({ tool }) {
             className="output-summary"
             id="output-summary"
             aria-live="polite"
-            hidden={!isPdf || !files.length}
+            hidden={false}
           >
-            {pdf.error ||
-              (!pdf.ready
-                ? "Loading page previews…"
-                : rangeError ||
-                  `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
+            {!files.length
+              ? "Choose a file above to get started."
+              : !isPdf
+                ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
+                : pdf.error ||
+                  (!pdf.ready
+                    ? "Loading page previews…"
+                    : (id === "merge-pdf" && files.length < 2
+                        ? "Add one more PDF to merge."
+                        : rangeError) ||
+                      `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
           </p>
           <button
             className="primary"
             id="process"
             disabled={disabled}
             onClick={run}
+            aria-describedby="output-summary"
           >
             <Icon name="wand-sparkles" />
-            {busy
-              ? "Processing…"
-              : id === "merge-pdf"
-                ? "Merge PDFs"
-                : id === "split-pdf"
-                  ? "Extract pages"
-                  : "Process file" + (multi ? "s" : "")}
+            {busy ? "Processing…" : actionLabels[id] || "Save result"}
           </button>
+          {busy && (
+            <button
+              className="secondary cancel-processing"
+              disabled={cancelling}
+              onClick={() => {
+                controller.current?.abort();
+                setCancelling(true);
+                setStatus("Cancelling… finishing the current operation.");
+              }}
+            >
+              {cancelling ? "Cancelling…" : "Cancel processing"}
+            </button>
+          )}
         </div>
         {busy && (
           <progress
@@ -494,6 +612,13 @@ export default function Workspace({ tool }) {
                 unchanged.
               </small>
             </div>
+          )}
+          {outputs.length > 1 && (
+            <ZipDownload
+              key={outputs.map((o) => o.name).join("|")}
+              outputs={outputs}
+              busy={busy}
+            />
           )}
           {outputs.map((result, i) => (
             <Download key={i} result={result} />

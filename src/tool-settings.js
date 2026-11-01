@@ -170,7 +170,13 @@ export const pdfTools = [
   "pdf-to-image",
   "organize-pdf",
 ];
-export const multiTools = ["merge-pdf", "jpg-to-pdf", "join-images"];
+export const batchTools = ["compress-image", "resize-image", "convert-image"];
+export const multiTools = [
+  "merge-pdf",
+  "jpg-to-pdf",
+  "join-images",
+  ...batchTools,
+];
 export function validateFiles(incoming, current, { pdf, multi, replace }) {
   for (const f of incoming) {
     if (
@@ -181,6 +187,7 @@ export function validateFiles(incoming, current, { pdf, multi, replace }) {
           ? "Please choose PDF files."
           : "Please choose JPG, PNG or WebP images.",
       );
+    if (!f.size) throw Error(f.name + " is empty. Choose a file with content.");
     if (f.size > (pdf ? 100 : 25) * 1048576)
       throw Error(f.name + " exceeds the file-size limit.");
   }

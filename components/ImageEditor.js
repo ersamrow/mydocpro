@@ -13,7 +13,8 @@ export function BlobImage({ blob, ...props }) {
 export default function ImageEditor({ files, id, values, onValues, busy }) {
   const [result, setResult] = useState(null),
     [note, setNote] = useState(""),
-    [updating, setUpdating] = useState(false);
+    [updating, setUpdating] = useState(false),
+    [compare, setCompare] = useState(false);
   const sourceOnly = id === "jpg-to-pdf";
   const previewQueue = useRef(Promise.resolve());
   useEffect(() => {
@@ -91,13 +92,39 @@ export default function ImageEditor({ files, id, values, onValues, busy }) {
         </details>
         {!sourceOnly && (
           <>
-            <div className="image-edit-stage" aria-busy={updating}>
-              {result && (
-                <BlobImage
-                  blob={result}
-                  alt="Preview with current editing settings"
-                />
+            <button
+              type="button"
+              className="secondary compare-toggle"
+              aria-pressed={compare}
+              onClick={() => setCompare((v) => !v)}
+            >
+              {compare ? "Show result only" : "Compare before / after"}
+            </button>
+            {files.length > 1 && id !== "join-images" && (
+              <p className="preview-batch-note">
+                Preview shows the first image. Settings apply to every image in
+                the batch.
+              </p>
+            )}
+            <div className={compare ? "before-after" : ""}>
+              {compare && (
+                <figure>
+                  <figcaption>Before</figcaption>
+                  <BlobImage
+                    blob={files[0]}
+                    alt="Original image before edits"
+                  />
+                </figure>
               )}
+              <div className="image-edit-stage" aria-busy={updating}>
+                {compare && <span className="comparison-label">After</span>}
+                {result && (
+                  <BlobImage
+                    blob={result}
+                    alt="Preview with current editing settings"
+                  />
+                )}
+              </div>
             </div>
             <p className="image-preview-note" role="status">
               {note}

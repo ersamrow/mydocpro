@@ -190,8 +190,11 @@ const path = require("node:path");
       ),
       "Mobile page must not overflow horizontally",
     );
+    require("node:fs").mkdirSync(path.join(__dirname, "../ui-audit"), {
+      recursive: true,
+    });
     await page.screenshot({
-      path: path.join(__dirname, "../react-mobile-preview.png"),
+      path: path.join(__dirname, "../ui-audit/react-mobile-preview.png"),
       fullPage: true,
     });
     assert.deepEqual(errors, []);

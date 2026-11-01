@@ -1,3 +1,4 @@
+import { throwIfCancelled, checkpoint } from "./file-validation.js";
 function canvas(w, h) {
   w = Math.round(w);
   h = Math.round(h);
@@ -55,13 +56,14 @@ function draw(im, w = im.width, h = im.height, fit = "contain") {
   }
   return c;
 }
-async function compress(c, kb, preserveDimensions = false) {
+async function compress(c, kb, preserveDimensions = false, signal) {
   const max = kb * 1024;
   for (let attempt = 0; attempt < 24; attempt++) {
     let low = 0.03,
       high = 0.98,
       best = null;
     for (let i = 0; i < 11; i++) {
+      await checkpoint(signal);
       const q = (low + high) / 2,
         b = await blob(c, "image/jpeg", q);
       if (b.size <= max) {
@@ -94,35 +96,65 @@ export function pageIndices(spec, count) {
   if (result.length > 300) throw Error("Select at most 300 pages.");
   return result;
 }
-export async function pdfRenderer(f) {
+export async function pdfRenderer(f, signal) {
   const pdfjs = await import("pdfjs-dist");
   // Some hosts serve .mjs as text/plain. Keep module contents under a .js URL,
   // versioned with PDF.js so an older cache cannot supply a mismatched worker.
   const worker = `/pdf.worker-${pdfjs.version}.js`;
   pdfjs.GlobalWorkerOptions.workerSrc = worker;
-  const doc = await pdfjs.getDocument({
+  throwIfCancelled(signal);
+  const loading = pdfjs.getDocument({
     data: await f.arrayBuffer(),
     isEvalSupported: false,
-  }).promise;
+  });
+  const abort = () => {
+    loading.destroy().catch(() => {});
+  };
+  signal?.addEventListener("abort", abort, { once: true });
+  let doc;
+  try {
+    doc = await loading.promise;
+    throwIfCancelled(signal);
+  } catch (e) {
+    throwIfCancelled(signal);
+    if (e.name === "PasswordException")
+      throw Error(
+        "This PDF is password-protected. Unlock it in your PDF app, save an unprotected copy, then try again.",
+      );
+    throw Error(
+      "This PDF could not be opened. It may be damaged; export a fresh copy and try again.",
+    );
+  } finally {
+    signal?.removeEventListener("abort", abort);
+  }
   if (doc.numPages > 300) {
     await doc.destroy();
     throw Error("Please use PDFs with at most 300 pages.");
   }
   return doc;
 }
-async function renderPage(doc, n, dpi) {
+async function renderPage(doc, n, dpi, signal) {
   const page = await doc.getPage(n),
     view = page.getViewport({ scale: dpi / 72 }),
     c = canvas(view.width, view.height);
-  await page.render({
+  throwIfCancelled(signal);
+  const task = page.render({
     canvasContext: c.getContext("2d"),
     viewport: view,
     background: "#ffffff",
-  }).promise;
-  page.cleanup();
+  });
+  const abort = () => task.cancel();
+  signal?.addEventListener("abort", abort, { once: true });
+  try {
+    await task.promise;
+    throwIfCancelled(signal);
+  } finally {
+    signal?.removeEventListener("abort", abort);
+    page.cleanup();
+  }
   return c;
 }
-export async function processImage(id, files, values, preview = false) {
+export async function processImage(id, files, values, preview = false, signal) {
   const val = (id) => values[id];
   const num = (id, min, max) => {
     const n = Number(val(id));
@@ -130,13 +162,15 @@ export async function processImage(id, files, values, preview = false) {
       throw Error(`Enter a valid ${id} between ${min} and ${max}.`);
     return n;
   };
+  await checkpoint(signal);
   const im = await loadImage(files[0]);
+  throwIfCancelled(signal);
   let c, b;
   const type = val("format") || "image/jpeg";
   if (id === "compress-image") {
     const w = Math.min(im.width, num("maxWidth", 1, 10000));
     c = draw(im, w, (im.height * w) / im.width);
-    if (!preview) b = await compress(c, num("target", 1, 25000));
+    if (!preview) b = await compress(c, num("target", 1, 25000), false, signal);
   } else if (id === "resize-image") {
     const dpi = num("dpi", 1, 1200),
       factor = { px: 1, cm: dpi / 2.54, mm: dpi / 25.4, in: dpi }[val("unit")];
@@ -151,7 +185,7 @@ export async function processImage(id, files, values, preview = false) {
     if (w === 51) w = h = 50.8;
     const dpi = num("dpi", 72, 600);
     c = draw(im, (w * dpi) / 25.4, (h * dpi) / 25.4, "cover");
-    if (!preview) b = await compress(c, num("target", 1, 25000), true);
+    if (!preview) b = await compress(c, num("target", 1, 25000), true, signal);
   } else if (id === "crop-image") {
     const rotation = +val("rotation"),
       swap = rotation % 180 !== 0;
@@ -291,13 +325,14 @@ export async function processImage(id, files, values, preview = false) {
       type,
       id === "convert-image" ? num("quality", 1, 100) / 100 : 0.94,
     ));
+  throwIfCancelled(signal);
   return b;
 }
 export async function processPdf(
   id,
   files,
   values,
-  { onOutput, order = [], onStatus = () => {} },
+  { onOutput, order = [], onStatus = () => {}, signal },
 ) {
   const val = (id) => values[id];
   const num = (id, min, max) => {
@@ -308,11 +343,18 @@ export async function processPdf(
       );
     return n;
   };
-  const setStatus = onStatus;
-  const output = onOutput;
+  const setStatus = (text) => {
+    throwIfCancelled(signal);
+    onStatus(text);
+  };
+  const output = (...args) => {
+    throwIfCancelled(signal);
+    onOutput(...args);
+  };
+  await checkpoint(signal);
   if (id === "pdf-to-image" || id === "compress-pdf") {
     const dpi = num("dpi", 36, id === "compress-pdf" ? 200 : 300),
-      doc = await pdfRenderer(files[0]);
+      doc = await pdfRenderer(files[0], signal);
     try {
       if (id === "pdf-to-image") {
         const selected = pageIndices(val("pages"), doc.numPages);
@@ -322,7 +364,7 @@ export async function processPdf(
           setStatus(
             `Rendering page ${++completed} of ${selected.length} (source page ${i + 1})…`,
           );
-          const c = await renderPage(doc, i + 1, dpi),
+          const c = await renderPage(doc, i + 1, dpi, signal),
             b = await blob(c, val("format"));
           total += b.size;
           if (total > 150 * 1048576)
@@ -343,7 +385,7 @@ export async function processPdf(
           setStatus(`Compressing page ${i} of ${doc.numPages}…`);
           const page = await doc.getPage(i),
             view = page.getViewport({ scale: 1 }),
-            c = await renderPage(doc, i, dpi),
+            c = await renderPage(doc, i, dpi, signal),
             b = await blob(c, "image/jpeg", quality),
             img = await out.embedJpg(await b.arrayBuffer());
           out.addPage([view.width, view.height]).drawImage(img, {
@@ -384,7 +426,7 @@ export async function processPdf(
     let completed = 0;
     for (const { file, index } of order) {
       setStatus(`Merging page ${++completed} of ${order.length}…`);
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await checkpoint(signal);
       const [page] = await out.copyPages(docs.get(file), [index]);
       out.addPage(page);
     }
@@ -398,7 +440,7 @@ export async function processPdf(
     let completed = 0;
     for (const f of files) {
       setStatus(`Converting image ${++completed} of ${files.length}…`);
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await checkpoint(signal);
       const im = await loadImage(f),
         c = draw(im),
         b = await blob(c),
@@ -441,7 +483,7 @@ export async function processPdf(
         let completed = 0;
         for (const i of indices) {
           setStatus(`Extracting page ${++completed} of ${indices.length}…`);
-          await new Promise((resolve) => setTimeout(resolve, 0));
+          await checkpoint(signal);
           const part = await PDFDocument.create();
           const [p] = await part.copyPages(src, [i]);
           part.addPage(p);
@@ -453,7 +495,7 @@ export async function processPdf(
         return;
       }
       setStatus(`Copying ${indices.length} selected pages…`);
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await checkpoint(signal);
       const pages = await out.copyPages(src, indices);
       pages.forEach((p) => {
         if (id === "organize-pdf")

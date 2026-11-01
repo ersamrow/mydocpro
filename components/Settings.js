@@ -1,3 +1,4 @@
+import { fieldHints } from "../src/ui-copy.js";
 import { fields } from "../src/tool-settings.js";
 import {
   sliderBounds,
@@ -25,6 +26,9 @@ export default function Settings({ id, values, onChange, busy }) {
                     className="range-exact"
                     id={key}
                     aria-label={label + " — exact value"}
+                    aria-describedby={
+                      fieldHints[key] ? key + "-hint" : undefined
+                    }
                     value={values[key]}
                     disabled={busy}
                     onChange={(e) => onChange(key, e.target.value)}
@@ -38,6 +42,7 @@ export default function Settings({ id, values, onChange, busy }) {
               <input
                 type="range"
                 id={sliderId}
+                aria-describedby={fieldHints[key] ? key + "-hint" : undefined}
                 min={bounds.min}
                 max={bounds.max}
                 step={bounds.step}
@@ -67,6 +72,11 @@ export default function Settings({ id, values, onChange, busy }) {
                   ))}
                 </div>
               )}
+              {fieldHints[key] && (
+                <span id={key + "-hint"} className="field-hint">
+                  {fieldHints[key]}
+                </span>
+              )}
               {key === "threshold" && (
                 <span className="range-hint">
                   Lower values whiten more of the image.
@@ -93,11 +103,17 @@ export default function Settings({ id, values, onChange, busy }) {
             ) : (
               <input
                 {...props}
+                aria-describedby={fieldHints[key] ? key + "-hint" : undefined}
                 id={key}
                 value={values[key]}
                 disabled={busy}
                 onChange={(e) => onChange(key, e.target.value)}
               />
+            )}
+            {fieldHints[key] && (
+              <span id={key + "-hint"} className="field-hint">
+                {fieldHints[key]}
+              </span>
             )}
           </label>
         );

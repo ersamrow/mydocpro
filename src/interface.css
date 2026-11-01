@@ -1311,3 +1311,291 @@ footer {
     font-size: 14px;
   }
 }
+.settings-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+.settings-toolbar button {
+  min-height: 44px;
+  padding: 10px 14px;
+}
+.settings-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 12px;
+  color: #3e5d4c;
+}
+.settings-toolbar input {
+  width: 20px;
+  height: 20px;
+  accent-color: #18644e;
+}
+.preference-note:empty {
+  display: none;
+}
+.preference-note {
+  font-size: 12px;
+  color: #4b6657;
+  line-height: 1.6;
+}
+.cancel-processing {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 10px 18px;
+}
+.zip-download {
+  grid-column: 1/-1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  margin: 8px 0;
+}
+.zip-download .primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+}
+.zip-download span {
+  font-size: 12px;
+}
+.compare-toggle {
+  min-height: 44px;
+  padding: 10px 14px;
+  margin: 12px 0;
+}
+.before-after {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.before-after figure {
+  margin: 0;
+  min-width: 0;
+  background: #f4f6f2;
+  border: 1px solid #dce5da;
+  border-radius: 10px;
+  padding: 10px;
+}
+.before-after figure img {
+  display: block;
+  width: 100%;
+  height: 250px;
+  object-fit: contain;
+}
+.before-after .image-edit-stage {
+  position: relative;
+  min-width: 0;
+  height: 290px;
+  padding-top: 32px;
+}
+.before-after .image-edit-stage img {
+  max-height: 250px;
+}
+.comparison-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+}
+.before-after figcaption,
+.comparison-label {
+  font-size: 12px;
+  color: #3e5d4c;
+  font-weight: 650;
+}
+.preview-batch-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #4b6657;
+}
+@media (max-width: 600px) {
+  .before-after figure img {
+    height: 170px;
+  }
+  .before-after .image-edit-stage {
+    height: 210px;
+    padding: 28px 8px 8px;
+  }
+  .before-after .image-edit-stage img {
+    max-height: 170px;
+  }
+  .settings-toolbar label {
+    flex-basis: 100%;
+  }
+  .settings-toolbar button {
+    flex: 1;
+  }
+}
+.tool-workspace .process-actions .cancel-processing {
+  margin: 0;
+  min-height: 44px;
+  padding: 10px 14px;
+  flex-shrink: 0;
+}
+/* Put the current task first; keep supporting controls quiet but reachable. */
+.workflow-steps {
+  display: flex;
+  gap: 12px;
+  padding: 0 0 16px;
+  margin: 0 0 18px;
+  border-bottom: 1px solid var(--ui-border);
+  list-style: none;
+}
+.workflow-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  font-size: 12px;
+  color: #53695d;
+  line-height: 1.4;
+}
+.workflow-steps li > span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #edf2ed;
+  border: 1px solid #d9e3d9;
+  font-size: 11px;
+  font-weight: 700;
+}
+.workflow-steps li[aria-current="step"] {
+  color: #164e39;
+  font-weight: 700;
+}
+.workflow-steps li[aria-current="step"] > span {
+  background: #18644e;
+  color: white;
+  border-color: #18644e;
+}
+.workflow-steps .completed > span {
+  color: #18644e;
+  background: #e1f0df;
+}
+.tool-workspace .settings-toolbar {
+  margin: 0;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--ui-border);
+}
+.tool-workspace .settings-toolbar label {
+  margin-left: auto;
+}
+.field-hint {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #4b6657;
+  margin-top: 10px;
+}
+.tool-workspace .workpanel .settings {
+  gap: 14px;
+  margin: 16px 0;
+}
+.tool-workspace .settings-disclosure {
+  margin-top: 18px;
+}
+.tool-workspace .workpanel .process-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 18px;
+}
+.tool-workspace .output-summary {
+  margin: 0;
+  flex: 1 1 200px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #4b6657;
+}
+.tool-workspace .workpanel .process-actions .primary {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+.search .clear-search {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: #315c47;
+  font-size: 24px;
+  border-radius: 8px;
+}
+.search input {
+  min-width: 0;
+}
+.empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 30px;
+  background: white;
+  border: 1px dashed #bacdbb;
+  border-radius: 14px;
+}
+.empty h3 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.empty p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.empty button {
+  min-height: 44px;
+  padding: 10px 18px;
+}
+@media (max-width: 600px) {
+  .workflow-steps {
+    gap: 8px;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+  .workflow-steps li {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .workflow-steps li > span {
+    width: 23px;
+    height: 23px;
+  }
+  .tool-workspace .settings-toolbar label {
+    margin-left: 0;
+  }
+  .tool-workspace
+    .workpanel.pdf-editor-panel.has-files
+    .process-actions
+    .output-summary {
+    flex: 1 1 100px;
+    font-size: 11px;
+  }
+  .tool-workspace
+    .workpanel:not(.pdf-editor-panel)
+    .process-actions
+    .output-summary {
+    flex-basis: 100%;
+  }
+  .field-hint {
+    font-size: 12px;
+  }
+  .tool-workspace
+    .workpanel.pdf-editor-panel.has-files
+    .process-actions
+    .primary {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+}

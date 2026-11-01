@@ -94,7 +94,7 @@ export default function Home() {
             <h2>Your everyday toolkit</h2>
             <p>One less thing between you and “submitted”.</p>
           </div>
-          <label className="search">
+          <div className="search">
             <Icon name="search" />
             <input
               id="search"
@@ -103,7 +103,20 @@ export default function Home() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-          </label>
+            {search && (
+              <button
+                type="button"
+                className="clear-search"
+                aria-label="Clear search"
+                onClick={() => {
+                  setSearch("");
+                  document.getElementById("search")?.focus();
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
         </div>
         <div className="filters">
           {[
@@ -114,6 +127,7 @@ export default function Home() {
           ].map(([id, label, icon]) => (
             <button
               key={id}
+              aria-pressed={filter === id}
               className={"filter " + (filter === id ? "active" : "")}
               onClick={() => setFilter(id)}
             >
@@ -126,7 +140,9 @@ export default function Home() {
               </span>
             </button>
           ))}
-          <span className="result-count">A tool for every little task</span>
+          <span className="result-count" role="status">
+            {shown.length} {shown.length === 1 ? "tool" : "tools"} available
+          </span>
         </div>
         <div className="grid" id="grid">
           {shown.map((t) => (
@@ -145,7 +161,20 @@ export default function Home() {
             </Link>
           ))}
           {!shown.length && (
-            <p className="empty">No tools found. Try “photo” or “PDF”.</p>
+            <div className="empty">
+              <h3>No matching tools</h3>
+              <p>Try “photo” or “PDF”, or browse the full toolkit.</p>
+              <button
+                className="secondary"
+                onClick={() => {
+                  setSearch("");
+                  setFilter("all");
+                  document.getElementById("search")?.focus();
+                }}
+              >
+                Show all tools
+              </button>
+            </div>
           )}
         </div>
         <div className="trust">

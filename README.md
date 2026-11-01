@@ -61,3 +61,11 @@ npm test
 Browser regression scripts `tests/pdf-previews.browser.cjs`, `tests/next.browser.cjs`, and `tests/all-tools.browser.cjs` use Playwright against `TEST_URL` (default port 4173). Run `npx playwright install chromium` once, or set `CHROME_PATH` to an installed Chrome executable. Run `npm run test:browser` with the preview server running. They cover hydration/navigation, image and PDF outputs, crop/resize interactions, PDF controls, offline routes and 404 behavior.
 
 PDF rendering uses a versioned `pdf.worker-<PDF.js version>.js` module generated during the build. The `.js` suffix avoids hosts that serve `.mjs` as `text/plain`. Deploy the generated `public/` directory along with `.next/`; both must come from the same build. If upgrading from the old worker URL, close all app tabs after deployment and reopen online so the service worker can update.
+
+## Productivity and visual checks
+
+Resize, convert and compress image tools support batches (up to 50 files / 100 MB total). Previews show the first image. Completed files can be packaged in a ZIP locally; ZIP packaging is limited to 200 MB. Cancel interrupts PDF rendering or stops at the next processing checkpoint; a browser image-encoding step already in progress may finish first.
+
+“Remember settings on this device” is opt-in per tool. It saves numeric and dropdown settings only. Names, dates, page selections, output filenames and uploaded files are excluded. Reset settings restores defaults and deletes that tool’s saved preferences. Undo keeps up to 30 recent setting groups in memory.
+
+With the local server running, use `npm run test:productivity` for batch/ZIP/cancellation/preferences checks. `npm run test:visual` compares desktop and mobile pages against committed screenshot baselines (Windows Chrome). Set `TEST_URL` and `CHROME_PATH` as needed. Review intentional changes before running `npm run test:visual -- --update-snapshots`; failed comparisons are written to `ui-audit/visual-results`. Run `npm run test:ui` alongside screenshots for all-route overflow, focus and touch-target checks.

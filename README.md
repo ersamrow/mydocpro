@@ -4,7 +4,9 @@ All 24 public pages and the 404 page render as React components. The home page, 
 
 ## Combined workspaces
 
-Open `/image-editor` for all existing image operations or `/pdf-toolkit` for all existing PDF operations. Choose an operation, upload files, adjust settings, and download the result. Compatible source uploads carry over when switching operations; single-file operations keep only the first file. Settings and results reset on switching, so download first. To apply another operation to a result, upload that downloaded file. Switching is disabled during file validation and processing.
+Open `/image-editor` for a single-screen image studio: all ten existing image operations plus color effects and flipping appear as open panels beside a shared preview. Upload once, apply successive edits, undo/redo or reset, then download the current image. No operation dropdown or intermediate re-upload is needed. Undo retains up to ten recent images within 100 MB; files and edits remain in memory only.
+
+Open `/pdf-toolkit` for all existing PDF operations. Choose an operation, upload files, adjust settings, and download. Compatible source uploads carry over when switching; single-file operations keep the first file. Settings and results reset on switching, so download first.
 
 The Image Editor accepts JPG, PNG and WebP. Background cleanup uses a brightness threshold. The PDF Toolkit includes merge, split, compression, image conversion, and page organization; it does not provide OCR, PDF text editing, or password management.
 

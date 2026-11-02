@@ -16,25 +16,75 @@ const { PDFDocument } = require("pdf-lib");
     const base = process.env.TEST_URL || "http://127.0.0.1:4173";
     await page.goto(base + "/image-editor");
     assert.equal(await page.locator("h1").count(), 1);
-    assert.equal(await page.locator("#combined-operation option").count(), 10);
+    assert.equal(await page.locator("select").count(), 0);
+    assert.equal(await page.locator(".studio-card").count(), 11);
     await page
-      .locator("#upload")
+      .locator("#studio-upload")
       .setInputFiles(path.join(__dirname, "photo.png"));
-    await page.locator("#combined-operation").selectOption("convert-image");
-    await page.locator("#format").selectOption("image/png");
-    await page.locator("#process").click();
-    await page.locator("#outputs a.result-download").first().waitFor();
-    const image = await page
-      .locator("#outputs a.result-download")
-      .first()
-      .evaluate(async (a) => {
+    const readImage = () =>
+      page.locator(".studio-download").evaluate(async (a) => {
         const b = await (await fetch(a.href)).blob();
-        return { type: b.type, size: b.size };
+        const bitmap = await createImageBitmap(b);
+        const result = {
+          type: b.type,
+          size: b.size,
+          width: bitmap.width,
+          height: bitmap.height,
+        };
+        bitmap.close();
+        return result;
       });
-    assert.equal(image.type, "image/png");
-    assert.ok(image.size > 0);
-    await page.locator("#combined-operation").selectOption("resize-image");
-    assert.equal(await page.locator("#outputs a.result-download").count(), 0);
+    await page.locator(".studio-download").waitFor();
+    const original = await readImage();
+    const resize = page
+      .locator(".studio-card")
+      .filter({ has: page.locator("legend", { hasText: /^Resize image$/ }) });
+    await resize.getByRole("button", { name: "Pixels", exact: true }).click();
+    await page.locator("#studio-resize-image-width").fill("240");
+    await page.locator("#studio-resize-image-height").fill("180");
+    await page
+      .getByRole("button", { name: "Apply resize image", exact: true })
+      .click();
+    await page.locator(".studio-download").waitFor();
+    assert.equal((await readImage()).width, 240);
+    assert.equal((await readImage()).height, 180);
+    await page
+      .getByRole("button", { name: "Flip horizontal", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Apply effects", exact: true })
+      .click();
+    await page.locator(".studio-download").waitFor();
+    assert.equal((await readImage()).width, 240);
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    assert.equal((await readImage()).width, original.width);
+    await page.getByRole("button", { name: "Redo", exact: true }).click();
+    assert.equal((await readImage()).width, 240);
+    const convert = page
+      .locator(".studio-card")
+      .filter({ has: page.locator("legend", { hasText: /^Convert image$/ }) });
+    await convert.getByRole("button", { name: "WebP", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Apply convert image", exact: true })
+      .click();
+    await page.locator(".studio-download").waitFor();
+    assert.equal((await readImage()).type, "image/webp");
+    assert.equal((await readImage()).width, 240);
+    await page.screenshot({
+      path: "ui-audit/image-studio-desktop.png",
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: 375, height: 812 });
+    assert.ok(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    );
+    await page.screenshot({
+      path: "ui-audit/image-studio-mobile.png",
+      fullPage: true,
+    });
     await page.goto(base + "/pdf-toolkit");
     assert.equal(await page.locator("#combined-operation option").count(), 6);
     await page

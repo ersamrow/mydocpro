@@ -11,6 +11,7 @@ import "../src/page-cards.css";
 import "../src/mobile.css";
 import "../src/upload-controls.css";
 import "../src/interface.css";
+import "../src/combined-workspace.css";
 import Header from "../components/Header.js";
 import { Footer } from "../components/Shared.js";
 export default function App({ Component, pageProps }) {

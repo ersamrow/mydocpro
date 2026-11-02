@@ -1,6 +1,12 @@
 # MyDocPro — Next.js
 
-All 22 public pages and the 404 page render as React components. The home page, navigation, information pages, tool settings, upload controls, image previews, crop/resize editor, PDF editor, download controls and install dialog use React state and effects. There is no legacy HTML-string application or PHP backend.
+All 24 public pages and the 404 page render as React components. The home page, navigation, information pages, tool settings, upload controls, image previews, crop/resize editor, PDF editor, download controls and install dialog use React state and effects. There is no legacy HTML-string application or PHP backend.
+
+## Combined workspaces
+
+Open `/image-editor` for all existing image operations or `/pdf-toolkit` for all existing PDF operations. Choose an operation, upload files, adjust settings, and download the result. Compatible source uploads carry over when switching operations; single-file operations keep only the first file. Settings and results reset on switching, so download first. To apply another operation to a result, upload that downloaded file. Switching is disabled during file validation and processing.
+
+The Image Editor accepts JPG, PNG and WebP. Background cleanup uses a brightness threshold. The PDF Toolkit includes merge, split, compression, image conversion, and page organization; it does not provide OCR, PDF text editing, or password management.
 
 ## Run
 

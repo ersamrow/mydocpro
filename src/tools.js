@@ -1,4 +1,6 @@
 export const tools = [
+ ['image-editor','Image Editor','Crop, resize, compress, convert and prepare photos in one workspace.','image','images','NEW'],
+ ['pdf-toolkit','PDF Toolkit','Merge, split, organize, compress and convert PDFs in one workspace.','pdf','files','NEW'],
  ['compress-image','Compress image','Reduce a photo to a target KB size and check the result.','image','minimize-2',''],
  ['resize-image','Resize image','The perfect fit. Resize in pixels, cm, mm or inches.','image','expand',''],
  ['convert-image','Convert image','Switch between JPG, PNG and WebP in seconds.','image','replace',''],

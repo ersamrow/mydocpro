@@ -4,6 +4,14 @@ import { sitePages } from "./site-content.js";
 export const siteOrigin = "https://mydocpro.co.in";
 // Descriptions explain real functionality; no invented ratings or acceptance claims.
 export const toolSearch = {
+  "image-editor": [
+    "Image Editor — All Image Tools",
+    "Crop, rotate, resize, compress and convert JPG, PNG and WebP images. Prepare photos and signatures with local previews and downloads.",
+  ],
+  "pdf-toolkit": [
+    "PDF Toolkit — All PDF Tools",
+    "Merge, split, organize, compress and convert PDFs in one local workspace. Choose an operation, upload files, preview and download.",
+  ],
   "compress-image": [
     "Compress Image to a KB Limit Online",
     "Compress JPG, PNG or WebP images to a target KB size. Download a JPG, check the final dimensions and keep your photo processing on your device.",

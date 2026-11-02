@@ -1,0 +1,46 @@
+.combined-start {
+  padding: clamp(18px, 3vw, 30px);
+  margin: 24px 0;
+  border: 1px solid #dbe3e5;
+  border-radius: 18px;
+  background: #fff;
+}
+.combined-start h2 {
+  margin-top: 0;
+}
+.combined-start p {
+  line-height: 1.6;
+}
+.combined-start label {
+  display: block;
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+.combined-start select {
+  width: 100%;
+  max-width: 520px;
+  min-height: 48px;
+  border: 1px solid #758b91;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: white;
+  color: #18343b;
+  font: inherit;
+}
+.combined-start select:focus-visible {
+  outline: 3px solid #087f8c;
+  outline-offset: 3px;
+}
+.combined-start select:disabled {
+  opacity: 0.6;
+}
+.combined-operation .tool-heading-meta {
+  display: none;
+}
+.combined-operation .page-intro-heading h2 {
+  font-size: clamp(24px, 4vw, 36px);
+  margin: 0;
+}
+.combined-start [role="status"]:empty {
+  display: none;
+}

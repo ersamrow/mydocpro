@@ -53,10 +53,16 @@ const notices = {
   "join-images":
     "Choose two images: photo first, signature second. Use the arrows to reorder.",
 };
-export default function Workspace({ tool }) {
+export default function Workspace({
+  tool,
+  embedded = false,
+  initialFiles = [],
+  onFilesChange,
+  onWorkingChange,
+}) {
   const [id, title] = tool,
     router = useRouter();
-  const [files, setFiles] = useState([]),
+  const [files, setFiles] = useState(initialFiles),
     [busy, setBusy] = useState(false),
     [validating, setValidating] = useState(false),
     [cancelling, setCancelling] = useState(false),
@@ -69,6 +75,12 @@ export default function Workspace({ tool }) {
   const resultsRef = useRef(null),
     controller = useRef(null),
     selecting = useRef(false);
+  useEffect(() => {
+    onFilesChange?.(files);
+  }, [files, onFilesChange]);
+  useEffect(() => {
+    onWorkingChange?.(busy || validating);
+  }, [busy, validating, onWorkingChange]);
   const {
     values,
     setValues,
@@ -279,8 +291,16 @@ export default function Workspace({ tool }) {
       }
     }
   }
+  const Container = embedded ? "section" : "main";
+  const Heading = embedded ? "h2" : "h1";
   return (
-    <main className="workspace tool-workspace">
+    <Container
+      className={
+        embedded
+          ? "tool-workspace combined-operation"
+          : "workspace tool-workspace"
+      }
+    >
       <div className="tool-heading">
         <div className="tool-heading-meta">
           <Link className="back" href="/">
@@ -299,7 +319,7 @@ export default function Workspace({ tool }) {
           <span className="page-emblem">
             <Icon name={tool[4]} />
           </span>
-          <h1>{title}</h1>
+          <Heading>{title}</Heading>
         </div>
         <p className="intro">{meta.description} </p>
         <div className="tool-assurances">
@@ -647,6 +667,6 @@ export default function Workspace({ tool }) {
           </div>
         ))}
       </div>
-    </main>
+    </Container>
   );
 }

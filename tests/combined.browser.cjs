@@ -26,14 +26,23 @@ const { PDFDocument } = require("pdf-lib");
         const b = await (await fetch(a.href)).blob();
         const bitmap = await createImageBitmap(b);
         const canvas = document.createElement("canvas");
-        canvas.width = bitmap.width; canvas.height = bitmap.height;
-        const ctx = canvas.getContext("2d"); ctx.drawImage(bitmap, 0, 0);
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(bitmap, 0, 0);
         const result = {
           type: b.type,
           size: b.size,
           width: bitmap.width,
           height: bitmap.height,
-          center: Array.from(ctx.getImageData(Math.floor(bitmap.width / 2), Math.floor(bitmap.height / 2), 1, 1).data),
+          center: Array.from(
+            ctx.getImageData(
+              Math.floor(bitmap.width / 2),
+              Math.floor(bitmap.height / 2),
+              1,
+              1,
+            ).data,
+          ),
         };
         bitmap.close();
         return result;
@@ -62,6 +71,7 @@ const { PDFDocument } = require("pdf-lib");
       .click();
     await page.locator(".studio-download").waitFor();
     assert.equal((await readImage()).width, 240);
+    assert.deepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
     await page.getByRole("button", { name: "Undo", exact: true }).click();
     assert.notDeepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
     await page.getByRole("button", { name: "Undo", exact: true }).click();
@@ -78,6 +88,10 @@ const { PDFDocument } = require("pdf-lib");
     await page.locator(".studio-download").waitFor();
     assert.equal((await readImage()).type, "image/webp");
     assert.equal((await readImage()).width, 240);
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+      document.querySelector(".studio-controls").scrollTop = 0;
+    });
     await page.screenshot({
       path: "ui-audit/image-studio-desktop.png",
       fullPage: true,

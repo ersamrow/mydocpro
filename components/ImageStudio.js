@@ -348,7 +348,7 @@ export default function ImageStudio() {
         >
           Show original
         </button>
-      {busy && controller.current && (
+        {busy && controller.current && (
           <button onClick={() => controller.current?.abort()}>
             Cancel edit
           </button>

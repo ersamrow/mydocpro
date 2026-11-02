@@ -7,6 +7,7 @@ import InformationPage from "./InformationPage.js";
 import Home from "./Home.js";
 import Workspace from "./Workspace.js";
 import CombinedWorkspace from "./CombinedWorkspace.js";
+import ImageStudio from "./ImageStudio.js";
 export default function ToolApplication({ id }) {
   const m = pageSeo(id),
     tool = tools.find((t) => t[0] === id),
@@ -52,7 +53,9 @@ export default function ToolApplication({ id }) {
       {id === "" ? (
         <Home />
       ) : tool ? (
-        ["image-editor", "pdf-toolkit"].includes(id) ? (
+        id === "image-editor" ? (
+          <ImageStudio />
+        ) : id === "pdf-toolkit" ? (
           <CombinedWorkspace key={id} tool={tool} />
         ) : (
           <Workspace key={id} tool={tool} />

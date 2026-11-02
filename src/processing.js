@@ -328,6 +328,34 @@ export async function processImage(id, files, values, preview = false, signal) {
   throwIfCancelled(signal);
   return b;
 }
+export async function adjustImage(file, values, signal) {
+  await checkpoint(signal);
+  const im = await loadImage(file);
+  const c = canvas(im.width, im.height),
+    x = c.getContext("2d");
+  const limits = {
+    brightness: [0, 200],
+    contrast: [0, 200],
+    saturation: [0, 200],
+    grayscale: [0, 100],
+    sepia: [0, 100],
+    blur: [0, 10],
+  };
+  for (const [key, [min, max]] of Object.entries(limits)) {
+    if (
+      !Number.isFinite(+values[key]) ||
+      +values[key] < min ||
+      +values[key] > max
+    )
+      throw Error(`Invalid ${key}.`);
+  }
+  x.filter = `brightness(${values.brightness}%) contrast(${values.contrast}%) saturate(${values.saturation}%) grayscale(${values.grayscale}%) sepia(${values.sepia}%) blur(${values.blur}px)`;
+  x.translate(values.flipX ? c.width : 0, values.flipY ? c.height : 0);
+  x.scale(values.flipX ? -1 : 1, values.flipY ? -1 : 1);
+  x.drawImage(im, 0, 0);
+  throwIfCancelled(signal);
+  return blob(c, "image/png");
+}
 export async function processPdf(
   id,
   files,

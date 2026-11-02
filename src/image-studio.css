@@ -1,0 +1,208 @@
+.image-studio {
+  max-width: 1600px;
+}
+.image-studio .tool-heading {
+  margin-bottom: 18px;
+}
+.studio-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border: 1px solid #dbe3e5;
+  border-radius: 16px;
+}
+.image-studio button,
+.studio-download {
+  min-height: 42px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.image-studio button {
+  background: white;
+  color: #18343b;
+  border: 1px solid #b8c9cc;
+  font: inherit;
+}
+.image-studio .primary {
+  background: #087b75;
+  color: white;
+  border: 1px solid #087b75;
+}
+.image-studio button[aria-pressed="true"] {
+  background: #d4efea;
+  border-color: #087b75;
+  color: #084b47;
+}
+.image-studio button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.image-studio input {
+  max-width: 100%;
+  min-width: 0;
+}
+.image-studio input:not([type="range"]):not([type="file"]) {
+  padding: 9px;
+  border: 1px solid #b8c9cc;
+  border-radius: 7px;
+  font: inherit;
+  background: white;
+  color: #18343b;
+}
+.image-studio :is(button, input, a):focus-visible {
+  outline: 3px solid #087b75;
+  outline-offset: 3px;
+}
+.studio-upload,
+.studio-filename {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.studio-upload input {
+  max-width: 240px;
+}
+.studio-filename input {
+  width: 160px;
+}
+.studio-status {
+  min-height: 26px;
+  margin: 12px 0;
+}
+.studio-error {
+  color: #a62626;
+}
+.studio-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 20px;
+  align-items: start;
+}
+.studio-preview {
+  position: sticky;
+  top: 90px;
+  border-radius: 18px;
+  background: #eaf0f1;
+  padding: 20px;
+  min-width: 0;
+  text-align: center;
+}
+.studio-preview h2 {
+  margin-top: 0;
+}
+.studio-preview > img {
+  display: block;
+  width: 100%;
+  height: min(48vh, 580px);
+  object-fit: contain;
+  background: repeating-conic-gradient(#e3e8e8 0% 25%, white 0% 50%) 50% / 20px
+    20px;
+}
+.studio-preview p,
+.studio-card p,
+.studio-note {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.studio-empty {
+  padding: 80px 20px;
+  border: 2px dashed #92b0b3;
+  border-radius: 14px;
+}
+.studio-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  max-height: 76vh;
+  overflow-y: auto;
+  padding: 6px 8px 18px 2px;
+}
+.studio-card {
+  margin: 0;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d1dfe1;
+  border-radius: 14px;
+  background: white;
+}
+.studio-card > legend {
+  font-size: 17px;
+  font-weight: 700;
+  padding: 0 5px;
+}
+.studio-card > .primary {
+  width: 100%;
+  margin-top: 12px;
+}
+.studio-field {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.studio-field input {
+  width: 100%;
+}
+.studio-options {
+  border: 0;
+  padding: 0;
+  margin: 12px 0;
+  min-width: 0;
+}
+.studio-options legend {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.studio-options > div {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.studio-options button {
+  font-size: 12px;
+  padding: 6px 9px;
+  margin: 2px;
+}
+.studio-note {
+  grid-column: 1 / -1;
+}
+.studio-card .image-manipulator {
+  min-width: 0;
+}
+.studio-card .manipulator-surface {
+  max-width: 100%;
+}
+@media (max-width: 1150px) {
+  .studio-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .studio-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .studio-preview {
+    position: static;
+  }
+  .studio-preview > img {
+    height: 280px;
+  }
+  .studio-controls {
+    max-height: none;
+    overflow: visible;
+  }
+  .studio-upload,
+  .studio-filename {
+    width: 100%;
+  }
+  .studio-toolbar {
+    padding: 12px;
+  }
+}

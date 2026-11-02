@@ -12,6 +12,7 @@ import "../src/mobile.css";
 import "../src/upload-controls.css";
 import "../src/interface.css";
 import "../src/combined-workspace.css";
+import "../src/image-studio.css";
 import "../src/merge-workspace.css";
 import Header from "../components/Header.js";
 import { Footer } from "../components/Shared.js";

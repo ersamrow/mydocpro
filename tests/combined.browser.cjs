@@ -66,11 +66,23 @@ const { PDFDocument } = require("pdf-lib");
     await page
       .getByRole("button", { name: "Flip horizontal", exact: true })
       .click();
-    await page
-      .getByRole("button", { name: "Apply effects", exact: true })
-      .click();
+    assert.equal(
+      await page
+        .getByRole("button", { name: "Apply effects", exact: true })
+        .count(),
+      0,
+    );
     await page.locator(".studio-download").waitFor();
     assert.equal((await readImage()).width, 240);
+    assert.deepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
+    await page
+      .getByRole("button", { name: "Reset effects", exact: true })
+      .click();
+    await page.locator(".studio-download").waitFor();
+    assert.notDeepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
+    await page.getByRole("slider", { name: "brightness", exact: true }).focus();
+    await page.keyboard.press("Home");
+    await page.locator(".studio-download").waitFor();
     assert.deepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
     await page.getByRole("button", { name: "Undo", exact: true }).click();
     assert.notDeepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);

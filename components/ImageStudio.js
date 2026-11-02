@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { BlobImage } from "./ImageEditor.js";
 import ImageManipulator from "./ImageManipulator.js";
 import { tools } from "../src/tools.js";
 import { defaults, fields, size, validateFiles } from "../src/tool-settings.js";
@@ -122,12 +121,14 @@ export default function ImageStudio() {
     [future, setFuture] = useState([]);
   const [settings, setSettings] = useState(initialSettings),
     [adjust, setAdjust] = useState(adjustments);
+  const [effectBase, setEffectBase] = useState(null),
+    [effectsPending, setEffectsPending] = useState(false);
+  const effectQueue = useRef(Promise.resolve());
   const [second, setSecond] = useState(null),
     [busy, setBusy] = useState(false),
     [status, setStatus] = useState("Upload an image to start editing."),
     [error, setError] = useState(false);
-  const [compare, setCompare] = useState(false),
-    [url, setUrl] = useState(""),
+  const [url, setUrl] = useState(""),
     [filename, setFilename] = useState("edited-image"),
     [dimensions, setDimensions] = useState("");
   const lock = useRef(false),
@@ -157,6 +158,67 @@ export default function ImageStudio() {
       URL.revokeObjectURL(u);
     };
   }, [current]);
+  useEffect(() => {
+    if (!effectBase) return;
+    let stale = false;
+    const abort = new AbortController();
+    // Serialize encoding and discard obsolete slider positions.
+    const timer = setTimeout(() => {
+      effectQueue.current = effectQueue.current
+        .catch(() => {})
+        .then(async () => {
+          if (stale) return;
+          try {
+            const neutral = Object.keys(adjustments).every(
+              (key) => adjust[key] === adjustments[key],
+            );
+            const result = neutral
+              ? effectBase
+              : await adjustImage(effectBase, adjust, abort.signal);
+            if (stale) return;
+            if (result.size > 100 * 1048576)
+              throw Error("Result exceeds 100 MB. Try smaller dimensions.");
+            setCurrent(result);
+            setEffectsPending(false);
+            setStatus(
+              "Effects updated. Continue editing or download the current image.",
+            );
+          } catch (e) {
+            if (stale) return;
+            setEffectsPending(false);
+            setCurrent(effectBase);
+            setEffectBase(null);
+            setAdjust(adjustments);
+            setError(true);
+            setStatus(e.message);
+          }
+        });
+    }, 80);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+      abort.abort();
+    };
+  }, [adjust, effectBase]);
+  function changeEffects(patch) {
+    if (!current || busy) return;
+    if (!effectBase) {
+      setEffectBase(current);
+      setHistory((h) => remember(h, current));
+    }
+    setFuture([]);
+    setAdjust((a) => ({ ...a, ...patch }));
+    setEffectsPending(true);
+
+    setError(false);
+    setStatus("Updating effects…");
+  }
+  function clearEffects() {
+    setEffectBase(null);
+    setEffectsPending(false);
+    setAdjust(adjustments);
+  }
+  const working = busy || effectsPending;
   const update = (id, patch) =>
     setSettings((s) => {
       const next = { ...s[id], ...patch };
@@ -191,7 +253,7 @@ export default function ImageStudio() {
     return next;
   }
   async function upload(file, extra = false) {
-    if (!file || lock.current) return;
+    if (!file || lock.current || effectsPending) return;
     lock.current = true;
     controller.current = null;
     setBusy(true);
@@ -208,8 +270,7 @@ export default function ImageStudio() {
         setFuture([]);
         setSecond(null);
         setSettings(initialSettings());
-        setAdjust(adjustments);
-        setCompare(false);
+        clearEffects();
       }
       setStatus(
         extra
@@ -227,32 +288,27 @@ export default function ImageStudio() {
     }
   }
   async function apply(id) {
-    if (!current || lock.current) return;
+    if (!current || lock.current || effectsPending) return;
     lock.current = true;
     setBusy(true);
     setError(false);
-    setCompare(false);
+
     setStatus("Applying edit…");
     const abort = new AbortController();
     controller.current = abort;
     try {
-      const result =
-        id === "adjust"
-          ? await adjustImage(current, adjust, abort.signal)
-          : await processImage(
-              id,
-              id === "join-images"
-                ? [current, second].filter(Boolean)
-                : [current],
-              {
-                ...settings[id],
-                ...(["name-date", "join-images", "passport-sheet"].includes(id)
-                  ? { format: "image/png" }
-                  : {}),
-              },
-              false,
-              abort.signal,
-            );
+      const result = await processImage(
+        id,
+        id === "join-images" ? [current, second].filter(Boolean) : [current],
+        {
+          ...settings[id],
+          ...(["name-date", "join-images", "passport-sheet"].includes(id)
+            ? { format: "image/png" }
+            : {}),
+        },
+        false,
+        abort.signal,
+      );
       if (!alive.current) return;
       throwIfCancelled(abort.signal);
       if (result.size > 100 * 1048576)
@@ -261,7 +317,7 @@ export default function ImageStudio() {
       setFuture([]);
       setCurrent(result);
       resetCrop();
-      if (id === "adjust") setAdjust(adjustments);
+      clearEffects();
       setStatus(
         "Edit applied. Continue editing or download the current image.",
       );
@@ -281,12 +337,13 @@ export default function ImageStudio() {
   }
   function travel(undo) {
     const stack = undo ? history : future;
-    if (busy || !stack.length) return;
+    if (working || !stack.length) return;
     (undo ? setFuture : setHistory)((h) => remember(h, current));
     setCurrent(stack[stack.length - 1]);
     (undo ? setHistory : setFuture)(stack.slice(0, -1));
     resetCrop();
-    setCompare(false);
+    clearEffects();
+
     setStatus(undo ? "Last edit undone." : "Edit restored.");
   }
   const extension =
@@ -314,39 +371,38 @@ export default function ImageStudio() {
             id="studio-upload"
             type="file"
             accept="image/jpeg,image/png,image/webp"
-            disabled={busy}
+            disabled={working}
             onChange={(e) => {
               upload(e.target.files[0]);
               e.target.value = "";
             }}
           />
         </label>
-        <button disabled={busy || !history.length} onClick={() => travel(true)}>
+        <button
+          disabled={working || !history.length}
+          onClick={() => travel(true)}
+        >
           Undo
         </button>
-        <button disabled={busy || !future.length} onClick={() => travel(false)}>
+        <button
+          disabled={working || !future.length}
+          onClick={() => travel(false)}
+        >
           Redo
         </button>
         <button
-          disabled={busy || !original}
+          disabled={working || !original}
           onClick={() => {
             setHistory((h) => remember(h, current));
             setFuture([]);
             setCurrent(original);
             setSettings(initialSettings());
-            setAdjust(adjustments);
-            setCompare(false);
+            clearEffects();
+
             setStatus("Original image restored.");
           }}
         >
           Reset image
-        </button>
-        <button
-          disabled={!current || busy}
-          aria-pressed={compare}
-          onClick={() => setCompare((v) => !v)}
-        >
-          Show original
         </button>
         {busy && controller.current && (
           <button onClick={() => controller.current?.abort()}>
@@ -362,7 +418,7 @@ export default function ImageStudio() {
             onChange={(e) => setFilename(e.target.value)}
           />
         </label>
-        {current && !busy && (
+        {current && !working && (
           <a
             className="primary studio-download"
             href={url}
@@ -378,43 +434,25 @@ export default function ImageStudio() {
       >
         {status}
       </p>
+      {!current && (
+        <div
+          className="studio-empty"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            upload(e.dataTransfer.files[0]);
+          }}
+        >
+          <strong>Drop an image here</strong>
+          <p>JPG, PNG or WebP · up to 25 MB</p>
+        </div>
+      )}
+      {current && (
+        <p>
+          {dimensions} · {size(current.size)} · {extension.toUpperCase()}
+        </p>
+      )}
       <div className="studio-layout">
-        <section className="studio-preview" aria-label="Shared image preview">
-          <h2>{compare ? "Original image" : "Current image"}</h2>
-          {current ? (
-            <>
-              <BlobImage
-                blob={compare ? original : current}
-                alt={compare ? "Original image" : "Current edited image"}
-              />
-              <p>
-                {!compare &&
-                  `${dimensions} · ${size(current.size)} · ${extension.toUpperCase()}`}
-              </p>
-              <p>
-                Applied edits appear here. Crop framing appears in the crop
-                panel.
-              </p>
-            </>
-          ) : (
-            <div
-              className="studio-empty"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                upload(e.dataTransfer.files[0]);
-              }}
-            >
-              <strong>Drop an image here</strong>
-              <p>JPG, PNG or WebP · up to 25 MB</p>
-              <p>Upload once, edit repeatedly, download when ready.</p>
-            </div>
-          )}
-          <p>
-            Undo keeps up to 10 recent images, within 100 MB. Reloading clears
-            your session.
-          </p>
-        </section>
         <section
           className="studio-controls"
           aria-label="All image editing controls"
@@ -441,9 +479,7 @@ export default function ImageStudio() {
                           : 200
                     }
                     value={value}
-                    onChange={(e) =>
-                      setAdjust((a) => ({ ...a, [key]: +e.target.value }))
-                    }
+                    onChange={(e) => changeEffects({ [key]: +e.target.value })}
                   />
                 </label>
               ))}
@@ -451,37 +487,50 @@ export default function ImageStudio() {
               <button
                 type="button"
                 aria-pressed={adjust.flipX}
-                onClick={() => setAdjust((a) => ({ ...a, flipX: !a.flipX }))}
+                onClick={() => changeEffects({ flipX: !adjust.flipX })}
               >
                 Flip horizontal
               </button>
               <button
                 type="button"
                 aria-pressed={adjust.flipY}
-                onClick={() => setAdjust((a) => ({ ...a, flipY: !a.flipY }))}
+                onClick={() => changeEffects({ flipY: !adjust.flipY })}
               >
                 Flip vertical
               </button>
             </div>
-            <button className="primary" onClick={() => apply("adjust")}>
-              Apply effects
+            <p>Effects update automatically as you adjust the controls.</p>
+            <button onClick={() => changeEffects(adjustments)}>
+              Reset effects
             </button>
           </fieldset>
           {operations.map((id) => (
             <fieldset
               className="studio-card"
               key={id}
-              disabled={busy || !current}
+              disabled={working || !current}
             >
               <legend>{tools.find((t) => t[0] === id)[1]}</legend>
               {id === "crop-image" && current && (
-                <ImageManipulator
-                  file={current}
-                  kind={id}
-                  values={settings[id]}
-                  onValues={(patch) => update(id, patch)}
-                  busy={busy}
-                />
+                <div
+                  className="studio-crop"
+                  style={
+                    effectsPending
+                      ? {
+                          "--effect-filter": `brightness(${adjust.brightness}%) contrast(${adjust.contrast}%) saturate(${adjust.saturation}%) grayscale(${adjust.grayscale}%) sepia(${adjust.sepia}%) blur(${adjust.blur}px)`,
+                          "--effect-transform": `scale(${adjust.flipX ? -1 : 1}, ${adjust.flipY ? -1 : 1})`,
+                        }
+                      : undefined
+                  }
+                >
+                  <ImageManipulator
+                    file={effectsPending ? effectBase : current}
+                    kind={id}
+                    values={settings[id]}
+                    onValues={(patch) => update(id, patch)}
+                    busy={working}
+                  />
+                </div>
               )}
               <Controls
                 id={id}

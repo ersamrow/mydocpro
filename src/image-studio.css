@@ -78,48 +78,28 @@
   color: #a62626;
 }
 .studio-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 20px;
-  align-items: start;
-}
-.studio-preview {
-  position: sticky;
-  top: 90px;
-  border-radius: 18px;
-  background: #eaf0f1;
-  padding: 20px;
-  min-width: 0;
-  text-align: center;
-}
-.studio-preview h2 {
-  margin-top: 0;
-}
-.studio-preview > img {
-  display: block;
   width: 100%;
-  height: min(48vh, 580px);
-  object-fit: contain;
-  background: repeating-conic-gradient(#e3e8e8 0% 25%, white 0% 50%) 50% / 20px
-    20px;
 }
-.studio-preview p,
+.studio-crop canvas {
+  filter: var(--effect-filter, none);
+  transform: var(--effect-transform, none);
+}
 .studio-card p,
 .studio-note {
   font-size: 13px;
   line-height: 1.6;
 }
 .studio-empty {
-  padding: 80px 20px;
+  padding: 24px;
+  margin-bottom: 20px;
   border: 2px dashed #92b0b3;
   border-radius: 14px;
 }
 .studio-controls {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  max-height: 76vh;
-  overflow-y: auto;
+  align-items: start;
   padding: 6px 8px 18px 2px;
 }
 .studio-card {
@@ -181,22 +161,12 @@
 }
 @media (max-width: 1150px) {
   .studio-controls {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 700px) {
-  .studio-layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .studio-preview {
-    position: static;
-  }
-  .studio-preview > img {
-    height: 280px;
-  }
   .studio-controls {
-    max-height: none;
-    overflow: visible;
+    grid-template-columns: minmax(0, 1fr);
   }
   .studio-upload,
   .studio-filename {

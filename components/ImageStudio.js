@@ -4,7 +4,7 @@ import { BlobImage } from "./ImageEditor.js";
 import ImageManipulator from "./ImageManipulator.js";
 import { tools } from "../src/tools.js";
 import { defaults, fields, size, validateFiles } from "../src/tool-settings.js";
-import { inspectFiles } from "../src/file-validation.js";
+import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
 import { processImage, adjustImage } from "../src/processing.js";
 import { downloadName } from "../src/download-name.js";
 import { cropBox } from "../src/image-geometry.js";
@@ -193,6 +193,7 @@ export default function ImageStudio() {
   async function upload(file, extra = false) {
     if (!file || lock.current) return;
     lock.current = true;
+    controller.current = null;
     setBusy(true);
     setError(false);
     try {
@@ -252,7 +253,8 @@ export default function ImageStudio() {
               false,
               abort.signal,
             );
-      if (!alive.current || abort.signal.aborted) return;
+      if (!alive.current) return;
+      throwIfCancelled(abort.signal);
       if (result.size > 100 * 1048576)
         throw Error("Result exceeds 100 MB. Try smaller dimensions.");
       setHistory((h) => remember(h, current));
@@ -295,7 +297,7 @@ export default function ImageStudio() {
         : "jpg";
   return (
     <main className="workspace image-studio">
-      <header className="tool-heading">
+      <div className="tool-heading">
         <Link href="/" className="back">
           ← All tools
         </Link>
@@ -304,7 +306,7 @@ export default function ImageStudio() {
           One image. All your editing controls. Apply edits in any order, then
           download. Files stay on your device.
         </p>
-      </header>
+      </div>
       <div className="studio-toolbar">
         <label className="studio-upload">
           {current ? "Replace image" : "Upload image"}
@@ -346,7 +348,7 @@ export default function ImageStudio() {
         >
           Show original
         </button>
-        {busy && (
+      {busy && controller.current && (
           <button onClick={() => controller.current?.abort()}>
             Cancel edit
           </button>

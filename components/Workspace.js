@@ -21,7 +21,7 @@ import {
 import { pageSeo } from "../src/seo.js";
 import { processImage, processPdf, pageIndices } from "../src/processing.js";
 import { downloadName } from "../src/download-name.js";
-function Download({ result }) {
+function Download({ result, compact = false }) {
   const [url, setUrl] = useState("");
   useEffect(() => {
     const u = URL.createObjectURL(result.blob);
@@ -29,14 +29,24 @@ function Download({ result }) {
     return () => URL.revokeObjectURL(u);
   }, [result]);
   return (
-    <a className="output result-download" href={url} download={result.name}>
-      {result.blob.type.startsWith("image/") && url && (
+    <a
+      className={compact ? "merge-bar-download" : "output result-download"}
+      href={url}
+      download={result.name}
+    >
+      {!compact && result.blob.type.startsWith("image/") && url && (
         <img src={url} alt="Processed image preview" />
       )}
       <span>
-        <strong>{result.name}</strong>
-        <small>{size(result.blob.size)}</small>
-        <span className="download-label">Download file ↓</span>
+        {!compact && (
+          <>
+            <strong>{result.name}</strong>
+            <small>{size(result.blob.size)}</small>
+          </>
+        )}
+        <span className="download-label">
+          {compact ? "Download PDF ↓" : "Download file ↓"}
+        </span>
       </span>
     </a>
   );
@@ -71,7 +81,7 @@ export default function Workspace({
     [outputs, setOutputs] = useState([]),
     [pdf, setPdf] = useState({ entries: [], ready: false, error: "" }),
     [dragging, setDragging] = useState(false),
-    [settingsOpen, setSettingsOpen] = useState(true);
+    [settingsOpen, setSettingsOpen] = useState(tool[0] !== "merge-pdf");
   const resultsRef = useRef(null),
     controller = useRef(null),
     selecting = useRef(false);
@@ -100,6 +110,7 @@ export default function Workspace({
     alive = useRef(true),
     processing = useRef(false);
   const isPdf = pdfTools.includes(id),
+    isMerge = id === "merge-pdf",
     multi = multiTools.includes(id),
     meta = pageSeo(id);
   useEffect(() => {
@@ -149,7 +160,7 @@ export default function Workspace({
       });
       await inspectFiles(Array.from(incoming), isPdf);
       if (!alive.current) return;
-      setSettingsOpen(true);
+      setSettingsOpen(id !== "merge-pdf");
       setFiles(next);
       setOutputs([]);
       setError(false);
@@ -173,7 +184,7 @@ export default function Workspace({
   }
   function changeFiles(next) {
     if (busy || validating) return;
-    setSettingsOpen(true);
+    setSettingsOpen(id !== "merge-pdf");
     setFiles(next);
     setOutputs([]);
     setPdf({ entries: [], ready: false, error: "" });
@@ -292,13 +303,18 @@ export default function Workspace({
     }
   }
   const Container = embedded ? "section" : "main";
+  const FileContainer = "div";
+  const PreviewContainer = isMerge ? "details" : "div";
+  const HelpContainer = isMerge ? "details" : "div";
+  const PreferenceContainer = isMerge ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
   return (
     <Container
       className={
-        embedded
+        (isMerge ? "merge-workspace " : "") +
+        (embedded
           ? "tool-workspace combined-operation"
-          : "workspace tool-workspace"
+          : "workspace tool-workspace")
       }
     >
       <div className="tool-heading">
@@ -321,7 +337,11 @@ export default function Workspace({
           </span>
           <Heading>{title}</Heading>
         </div>
-        <p className="intro">{meta.description} </p>
+        <p className="intro">
+          {isMerge
+            ? "Combine PDFs in your preferred order. Add files, arrange pages, and download one document."
+            : meta.description}{" "}
+        </p>
         <div className="tool-assurances">
           <span>
             <Icon name="shield-check" /> Files stay on your device
@@ -342,331 +362,448 @@ export default function Workspace({
         }
       >
         <ol className="workflow-steps" aria-label="Tool workflow">
-          {["Choose files", "Adjust settings", "Download"].map(
-            (label, index) => {
-              const stage = outputs.length && !busy ? 2 : files.length ? 1 : 0;
-              return (
-                <li
-                  key={label}
-                  aria-current={stage === index ? "step" : undefined}
-                  className={index < stage ? "completed" : ""}
-                >
-                  <span aria-hidden="true">
-                    {index < stage ? "✓" : index + 1}
-                  </span>
-                  {label}
-                </li>
-              );
-            },
-          )}
+          {(isMerge
+            ? ["Add PDFs", "Arrange pages", "Merge & download"]
+            : ["Choose files", "Adjust settings", "Download"]
+          ).map((label, index) => {
+            const stage = outputs.length && !busy ? 2 : files.length ? 1 : 0;
+            return (
+              <li
+                key={label}
+                aria-current={stage === index ? "step" : undefined}
+                className={index < stage ? "completed" : ""}
+              >
+                <span aria-hidden="true">
+                  {index < stage ? "✓" : index + 1}
+                </span>
+                {label}
+              </li>
+            );
+          })}
         </ol>
-        <label
-          className={"dropzone " + (dragging ? "dragover" : "")}
-          id="dropzone"
-          hidden={files.length > 0}
-          onDragOver={(e) => {
-            e.preventDefault();
-            if (!busy) setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragging(false);
-            choose(e.dataTransfer.files);
-          }}
-        >
-          <Icon name="upload" />
-          <div className="upload-copy">
-            <strong>
-              Choose {isPdf ? "PDFs" : "images"} or drop them here
-            </strong>
-            <span>
-              {isPdf
-                ? "PDF, up to 100 MB total / 300 pages"
-                : "JPG, PNG or WebP, up to 25 MB per image"}
-            </span>
-          </div>
-          <input
-            ref={upload}
-            id="upload"
-            type="file"
-            accept={
-              isPdf ? "application/pdf,.pdf" : "image/jpeg,image/png,image/webp"
-            }
-            multiple={multi}
-            disabled={busy || validating}
-            onChange={(e) => {
-              choose(e.target.files, replace.current);
-              replace.current = false;
-              e.target.value = "";
-            }}
-          />
-        </label>
-        <div className="upload-actions" hidden={!files.length}>
-          <span className="upload-summary" role="status">
-            {files.length} {files.length === 1 ? "file" : "files"} selected
-          </span>
-          <div className="upload-buttons">
-            {multi && (
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={() => {
+        <div className="merge-layout">
+          <div className="merge-canvas">
+            <label
+              className={"dropzone " + (dragging ? "dragover" : "")}
+              id="dropzone"
+              hidden={files.length > 0}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (!busy) setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragging(false);
+                choose(e.dataTransfer.files);
+              }}
+            >
+              <Icon name="upload" />
+              <div className="upload-copy">
+                <strong>
+                  {isMerge
+                    ? "Drop your PDFs here"
+                    : `Choose ${isPdf ? "PDFs" : "images"} or drop them here`}
+                </strong>
+                <span>
+                  {isMerge
+                    ? "Select 2+ files · Up to 100 MB / 300 pages"
+                    : isPdf
+                      ? "PDF, up to 100 MB total / 300 pages"
+                      : "JPG, PNG or WebP, up to 25 MB per image"}
+                </span>
+              </div>
+              <input
+                ref={upload}
+                id="upload"
+                type="file"
+                accept={
+                  isPdf
+                    ? "application/pdf,.pdf"
+                    : "image/jpeg,image/png,image/webp"
+                }
+                multiple={multi}
+                disabled={busy || validating}
+                onChange={(e) => {
+                  choose(e.target.files, replace.current);
                   replace.current = false;
-                  upload.current.click();
+                  e.target.value = "";
                 }}
-              >
-                Add more files
-              </button>
-            )}
-            {files.length > 0 && (
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={() => {
-                  replace.current = true;
-                  upload.current.click();
-                }}
-              >
-                {multi ? "Replace all" : "Upload another file"}
-              </button>
+              />
+              {isMerge && (
+                <span className="merge-upload-button" aria-hidden="true">
+                  Choose PDFs <span>＋</span>
+                </span>
+              )}
+            </label>
+            <div className="upload-actions" hidden={!files.length}>
+              <span className="upload-summary" role="status">
+                {files.length} {files.length === 1 ? "file" : "files"} selected
+              </span>
+              <div className="upload-buttons">
+                {multi && (
+                  <button
+                    className="secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      replace.current = false;
+                      upload.current.click();
+                    }}
+                  >
+                    Add more files
+                  </button>
+                )}
+                {files.length > 0 && (
+                  <button
+                    className="secondary"
+                    disabled={busy}
+                    onClick={() => {
+                      replace.current = true;
+                      upload.current.click();
+                    }}
+                  >
+                    {multi ? "Replace all" : "Upload another file"}
+                  </button>
+                )}
+              </div>
+            </div>
+            <FileContainer
+              className="merge-file-manager"
+              hidden={!files.length}
+            >
+              {isMerge && (
+                <div className="merge-list-heading">
+                  Your documents{" "}
+                  <span>
+                    {files.length} files ·{" "}
+                    {size(files.reduce((sum, file) => sum + file.size, 0))}
+                  </span>
+                </div>
+              )}
+              <ul className="file-list" id="file-list">
+                {files.map((file, i) => (
+                  <li key={i}>
+                    {isMerge && (
+                      <span className="merge-file-icon">
+                        <Icon name="file-text" />
+                      </span>
+                    )}
+                    <span>{file.name}</span>
+                    <small>{size(file.size)}</small>
+                    {files.length > 1 && (
+                      <button
+                        className="secondary"
+                        disabled={busy || i === 0}
+                        aria-label={"Move " + file.name + " up"}
+                        onClick={() => {
+                          const next = [...files];
+                          [next[i - 1], next[i]] = [next[i], next[i - 1]];
+                          changeFiles(next);
+                        }}
+                      >
+                        ↑
+                      </button>
+                    )}
+                    {isMerge && files.length > 1 && (
+                      <button
+                        className="secondary"
+                        disabled={busy || validating || i === files.length - 1}
+                        aria-label={"Move " + file.name + " down"}
+                        onClick={() => {
+                          const next = [...files];
+                          [next[i], next[i + 1]] = [next[i + 1], next[i]];
+                          changeFiles(next);
+                        }}
+                      >
+                        ↓
+                      </button>
+                    )}
+                    <button
+                      className="secondary"
+                      disabled={busy}
+                      aria-label={"Remove " + file.name}
+                      onClick={() =>
+                        changeFiles(files.filter((_, j) => j !== i))
+                      }
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </FileContainer>
+            <PreviewContainer
+              className="merge-page-editor"
+              hidden={!files.length}
+            >
+              {isMerge && (
+                <summary>
+                  Arrange individual pages{" "}
+                  <span>Optional · preview, zoom & reorder</span>
+                </summary>
+              )}
+              {files.length > 0 &&
+                (isPdf ? (
+                  <PdfEditor
+                    files={files}
+                    id={id}
+                    values={values}
+                    onValues={onValues}
+                    busy={busy}
+                    pdf={pdf}
+                    onPdf={setPdf}
+                  />
+                ) : (
+                  <ImageEditor
+                    files={files}
+                    id={id}
+                    values={values}
+                    onValues={onValues}
+                    busy={busy}
+                  />
+                ))}
+            </PreviewContainer>
+            {id === "compress-pdf" && files.length > 0 && (
+              <PdfQualityPreview file={files[0]} values={values} busy={busy} />
             )}
           </div>
-        </div>
-        <ul className="file-list" id="file-list">
-          {files.map((file, i) => (
-            <li key={i}>
-              <span>{file.name}</span>
-              <small>{size(file.size)}</small>
-              {files.length > 1 && (
+          <div className="merge-controls">
+            {isMerge && (
+              <div className="merge-output-heading">
+                <span className="eyebrow">FINAL DOCUMENT</span>
+                <h2>Ready to bring it together?</h2>
+                <p>
+                  All pages are included in the order shown. Your original PDFs
+                  stay unchanged.
+                </p>
+              </div>
+            )}
+            <details
+              className="settings-disclosure"
+              open={settingsOpen}
+              onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
+            >
+              <summary>
+                Adjust settings{" "}
+                <span>
+                  {settingsOpen ? "Hide" : "Adjust and process again"}
+                </span>
+              </summary>
+              <Settings
+                id={id}
+                values={values}
+                onChange={(key, value) => {
+                  const patch = { [key]: value };
+                  if (
+                    id === "resize-image" &&
+                    values.keepProportions &&
+                    ["width", "height"].includes(key) &&
+                    Number(value) > 0
+                  ) {
+                    const ratio = Number(values.width) / Number(values.height);
+                    if (Number.isFinite(ratio) && ratio > 0)
+                      patch[key === "width" ? "height" : "width"] = String(
+                        Number(
+                          (key === "width"
+                            ? Number(value) / ratio
+                            : Number(value) * ratio
+                          ).toFixed(values.unit === "px" ? 0 : 3),
+                        ),
+                      );
+                  }
+                  onValues(patch);
+                }}
+                busy={busy}
+              />
+              <PreferenceContainer className="merge-preferences">
+                {isMerge && <summary>Preferences & reset</summary>}
+                <div className="settings-toolbar">
+                  <button
+                    className="secondary"
+                    disabled={busy || validating || !canUndo}
+                    onClick={undo}
+                  >
+                    Undo settings
+                  </button>
+                  <button
+                    className="secondary"
+                    disabled={busy || validating}
+                    onClick={reset}
+                  >
+                    Reset settings
+                  </button>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={remember}
+                      disabled={busy || validating}
+                      onChange={(e) => setRemember(e.target.checked)}
+                    />{" "}
+                    Remember settings on this device
+                  </label>
+                </div>
+                <p className="preference-note" role="status">
+                  {storageNote}
+                </p>
+              </PreferenceContainer>
+            </details>
+            {notices[id] && <p className="notice">{notices[id]}</p>}
+            <div className="process-actions">
+              <p
+                className="output-summary"
+                id="output-summary"
+                aria-live="polite"
+                hidden={false}
+              >
+                {!files.length
+                  ? "Choose a file above to get started."
+                  : !isPdf
+                    ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
+                    : pdf.error ||
+                      (!pdf.ready
+                        ? "Loading page previews…"
+                        : (id === "merge-pdf" && files.length < 2
+                            ? "Add one more PDF to merge."
+                            : rangeError) ||
+                          `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
+              </p>
+              {isMerge && (
                 <button
-                  className="secondary"
-                  disabled={busy || i === 0}
-                  aria-label={"Move " + file.name + " up"}
+                  className="secondary merge-add-files"
+                  disabled={busy || validating}
                   onClick={() => {
-                    const next = [...files];
-                    [next[i - 1], next[i]] = [next[i], next[i - 1]];
-                    changeFiles(next);
+                    replace.current = false;
+                    upload.current.click();
                   }}
                 >
-                  ↑
+                  <Icon name="upload" />
+                  Add PDFs
                 </button>
               )}
               <button
-                className="secondary"
-                disabled={busy}
-                aria-label={"Remove " + file.name}
-                onClick={() => changeFiles(files.filter((_, j) => j !== i))}
+                className="primary"
+                id="process"
+                hidden={isMerge && outputs.length > 0 && !busy}
+                disabled={disabled}
+                onClick={run}
+                aria-describedby="output-summary"
               >
-                ×
+                <Icon name="wand-sparkles" />
+                {busy ? "Processing…" : actionLabels[id] || "Save result"}
               </button>
-            </li>
-          ))}
-        </ul>
-        {files.length > 0 &&
-          (isPdf ? (
-            <PdfEditor
-              files={files}
-              id={id}
-              values={values}
-              onValues={onValues}
-              busy={busy}
-              pdf={pdf}
-              onPdf={setPdf}
-            />
-          ) : (
-            <ImageEditor
-              files={files}
-              id={id}
-              values={values}
-              onValues={onValues}
-              busy={busy}
-            />
-          ))}
-        {id === "compress-pdf" && files.length > 0 && (
-          <PdfQualityPreview file={files[0]} values={values} busy={busy} />
-        )}
-        <details
-          className="settings-disclosure"
-          open={settingsOpen}
-          onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
-        >
-          <summary>
-            Adjust settings{" "}
-            <span>{settingsOpen ? "Hide" : "Adjust and process again"}</span>
-          </summary>
-          <Settings
-            id={id}
-            values={values}
-            onChange={(key, value) => {
-              const patch = { [key]: value };
-              if (
-                id === "resize-image" &&
-                values.keepProportions &&
-                ["width", "height"].includes(key) &&
-                Number(value) > 0
-              ) {
-                const ratio = Number(values.width) / Number(values.height);
-                if (Number.isFinite(ratio) && ratio > 0)
-                  patch[key === "width" ? "height" : "width"] = String(
-                    Number(
-                      (key === "width"
-                        ? Number(value) / ratio
-                        : Number(value) * ratio
-                      ).toFixed(values.unit === "px" ? 0 : 3),
-                    ),
-                  );
-              }
-              onValues(patch);
-            }}
-            busy={busy}
-          />
-          <div className="settings-toolbar">
-            <button
-              className="secondary"
-              disabled={busy || validating || !canUndo}
-              onClick={undo}
-            >
-              Undo settings
-            </button>
-            <button
-              className="secondary"
-              disabled={busy || validating}
-              onClick={reset}
-            >
-              Reset settings
-            </button>
-            <label>
-              <input
-                type="checkbox"
-                checked={remember}
-                disabled={busy || validating}
-                onChange={(e) => setRemember(e.target.checked)}
-              />{" "}
-              Remember settings on this device
-            </label>
-          </div>
-          <p className="preference-note" role="status">
-            {storageNote}
-          </p>
-        </details>
-        {notices[id] && <p className="notice">{notices[id]}</p>}
-        <div className="process-actions">
-          <p
-            className="output-summary"
-            id="output-summary"
-            aria-live="polite"
-            hidden={false}
-          >
-            {!files.length
-              ? "Choose a file above to get started."
-              : !isPdf
-                ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
-                : pdf.error ||
-                  (!pdf.ready
-                    ? "Loading page previews…"
-                    : (id === "merge-pdf" && files.length < 2
-                        ? "Add one more PDF to merge."
-                        : rangeError) ||
-                      `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
-          </p>
-          <button
-            className="primary"
-            id="process"
-            disabled={disabled}
-            onClick={run}
-            aria-describedby="output-summary"
-          >
-            <Icon name="wand-sparkles" />
-            {busy ? "Processing…" : actionLabels[id] || "Save result"}
-          </button>
-          {busy && (
-            <button
-              className="secondary cancel-processing"
-              disabled={cancelling}
-              onClick={() => {
-                controller.current?.abort();
-                setCancelling(true);
-                setStatus("Cancelling… finishing the current operation.");
-              }}
-            >
-              {cancelling ? "Cancelling…" : "Cancel processing"}
-            </button>
-          )}
-        </div>
-        {busy && (
-          <progress
-            className="processing-progress"
-            aria-label={status || "Processing file"}
-          />
-        )}
-        <div
-          id="status"
-          className={"status " + (error ? "error" : "")}
-          role={error ? "alert" : "status"}
-          aria-live={error ? "assertive" : "polite"}
-        >
-          {status}
-        </div>
-        <div className="outputs" id="outputs" ref={resultsRef} tabIndex={-1}>
-          {outputs.length > 0 && (
-            <div className="results-summary">
-              <h2>
-                {busy || error ? "Available downloads" : "Your files are ready"}
-              </h2>
-              <p>
-                Original: {size(files.reduce((sum, f) => sum + f.size, 0))} →
-                Output: {size(outputs.reduce((sum, r) => sum + r.blob.size, 0))}
-                {!busy &&
-                  !error &&
-                  (() => {
-                    const original = files.reduce((sum, f) => sum + f.size, 0),
-                      total = outputs.reduce((sum, r) => sum + r.blob.size, 0);
-                    return original
-                      ? ` · ${Math.abs((1 - total / original) * 100).toFixed(1)}% ${total <= original ? "smaller" : "larger"}`
-                      : "";
-                  })()}
-              </p>
-              <small>
-                Compare the result before submitting. Your original files are
-                unchanged.
-              </small>
+              {isMerge && outputs.length > 0 && !busy && (
+                <Download result={outputs[0]} compact />
+              )}
+              {busy && (
+                <button
+                  className="secondary cancel-processing"
+                  disabled={cancelling}
+                  onClick={() => {
+                    controller.current?.abort();
+                    setCancelling(true);
+                    setStatus("Cancelling… finishing the current operation.");
+                  }}
+                >
+                  {cancelling ? "Cancelling…" : "Cancel processing"}
+                </button>
+              )}
             </div>
-          )}
-          {outputs.length > 1 && (
-            <ZipDownload
-              key={outputs.map((o) => o.name).join("|")}
-              outputs={outputs}
-              busy={busy}
-            />
-          )}
-          {outputs.map((result, i) => (
-            <Download key={i} result={result} />
-          ))}
+            {busy && (
+              <progress
+                className="processing-progress"
+                aria-label={status || "Processing file"}
+              />
+            )}
+            <div
+              id="status"
+              className={"status " + (error ? "error" : "")}
+              role={error ? "alert" : "status"}
+              aria-live={error ? "assertive" : "polite"}
+            >
+              {status}
+            </div>
+            <div
+              className="outputs"
+              id="outputs"
+              ref={resultsRef}
+              tabIndex={-1}
+            >
+              {outputs.length > 0 && (
+                <div className="results-summary">
+                  <h2>
+                    {busy || error
+                      ? "Available downloads"
+                      : "Your files are ready"}
+                  </h2>
+                  <p>
+                    Original: {size(files.reduce((sum, f) => sum + f.size, 0))}{" "}
+                    → Output:{" "}
+                    {size(outputs.reduce((sum, r) => sum + r.blob.size, 0))}
+                    {!busy &&
+                      !error &&
+                      (() => {
+                        const original = files.reduce(
+                            (sum, f) => sum + f.size,
+                            0,
+                          ),
+                          total = outputs.reduce(
+                            (sum, r) => sum + r.blob.size,
+                            0,
+                          );
+                        return original
+                          ? ` · ${Math.abs((1 - total / original) * 100).toFixed(1)}% ${total <= original ? "smaller" : "larger"}`
+                          : "";
+                      })()}
+                  </p>
+                  <small>
+                    Compare the result before submitting. Your original files
+                    are unchanged.
+                  </small>
+                </div>
+              )}
+              {outputs.length > 1 && (
+                <ZipDownload
+                  key={outputs.map((o) => o.name).join("|")}
+                  outputs={outputs}
+                  busy={busy}
+                />
+              )}
+              {outputs.map((result, i) => (
+                <Download key={i} result={result} />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
-      <ToolGuide id={id} />
-      <div className="steps">
-        {[
-          [
-            "01. Choose your file",
-            "Add a file from your device. It stays in your browser.",
-          ],
-          [
-            "02. Make it yours",
-            "Adjust the settings for the form or document you need.",
-          ],
-          [
-            "03. Save & carry on",
-            "Download the result. Your original file stays unchanged.",
-          ],
-        ].map(([title, body]) => (
-          <div key={title}>
-            <h3>{title}</h3>
-            <p>{body}</p>
-          </div>
-        ))}
-      </div>
+      <HelpContainer className="merge-help">
+        {isMerge && (
+          <summary>
+            Need a hand? <span>How to merge, tips & related tools</span>
+          </summary>
+        )}
+        <ToolGuide id={id} />
+        <div className="steps">
+          {[
+            [
+              "01. Choose your file",
+              "Add a file from your device. It stays in your browser.",
+            ],
+            [
+              "02. Make it yours",
+              "Adjust the settings for the form or document you need.",
+            ],
+            [
+              "03. Save & carry on",
+              "Download the result. Your original file stays unchanged.",
+            ],
+          ].map(([title, body]) => (
+            <div key={title}>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </div>
+          ))}
+        </div>
+      </HelpContainer>
     </Container>
   );
 }

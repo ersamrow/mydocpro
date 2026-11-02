@@ -17,7 +17,7 @@ const { PDFDocument } = require("pdf-lib");
     await page.goto(base + "/image-editor");
     assert.equal(await page.locator("h1").count(), 1);
     assert.equal(await page.locator("select").count(), 0);
-    assert.equal(await page.locator(".studio-card").count(), 11);
+    assert.equal(await page.locator(".studio-card:visible").count(), 0);
     await page
       .locator("#studio-upload")
       .setInputFiles(path.join(__dirname, "photo.png"));
@@ -48,6 +48,7 @@ const { PDFDocument } = require("pdf-lib");
         return result;
       });
     await page.locator(".studio-download").waitFor();
+    assert.equal(await page.locator(".studio-card:visible").count(), 3);
     const original = await readImage();
     const resize = page
       .locator(".studio-card")
@@ -90,6 +91,7 @@ const { PDFDocument } = require("pdf-lib");
     assert.equal((await readImage()).width, original.width);
     await page.getByRole("button", { name: "Redo", exact: true }).click();
     assert.equal((await readImage()).width, 240);
+    await page.locator(".studio-more > summary").click();
     const convert = page
       .locator(".studio-card")
       .filter({ has: page.locator("legend", { hasText: /^Convert image$/ }) });
@@ -100,6 +102,7 @@ const { PDFDocument } = require("pdf-lib");
     await page.locator(".studio-download").waitFor();
     assert.equal((await readImage()).type, "image/webp");
     assert.equal((await readImage()).width, 240);
+    await page.locator(".studio-more > summary").click();
     await page.evaluate(() => {
       window.scrollTo(0, 0);
       document.querySelector(".studio-controls").scrollTop = 0;

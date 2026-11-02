@@ -59,9 +59,18 @@ const notes = {
   "name-date": "Adds a white text strip below the image.",
 };
 
-function Controls({ id, values, update }) {
+function Controls({ id, values, update, advanced = false }) {
   return fields(id)
     .filter((f) => f.id !== "output-name")
+    .filter((f) => {
+      const extra =
+        id === "crop-image"
+          ? ["rotation", "zoom"]
+          : id === "resize-image"
+            ? ["dpi", "format", "fit"]
+            : [];
+      return advanced ? extra.includes(f.id) : !extra.includes(f.id);
+    })
     .map(({ id: key, label, options, value, ...props }) => {
       const inputId = `studio-${id}-${key}`;
       if (options)
@@ -275,7 +284,7 @@ export default function ImageStudio() {
       setStatus(
         extra
           ? "Second image ready to join."
-          : "Ready. Apply any edit below; each edit builds on the previous result.",
+          : "Ready to edit. Start with crop, colors or size; changes stay on this page.",
       );
     } catch (e) {
       if (alive.current) {
@@ -352,6 +361,99 @@ export default function ImageStudio() {
       : current?.type === "image/webp"
         ? "webp"
         : "jpg";
+  const renderEffects = (keys) =>
+    Object.entries(adjust)
+      .filter(([key, v]) => keys.includes(key) && typeof v === "number")
+      .map(([key, value]) => (
+        <label className="studio-field" key={key}>
+          <span>
+            {key[0].toUpperCase() + key.slice(1)}: {value}
+            {key === "blur" ? " px" : "%"}
+          </span>
+          <input
+            aria-label={key}
+            type="range"
+            min="0"
+            max={
+              key === "blur"
+                ? 10
+                : ["grayscale", "sepia"].includes(key)
+                  ? 100
+                  : 200
+            }
+            value={value}
+            onChange={(e) => changeEffects({ [key]: +e.target.value })}
+          />
+        </label>
+      ));
+  const renderOperation = (id) => (
+    <fieldset
+      className={`studio-card studio-${id}`}
+      key={id}
+      disabled={working || !current}
+    >
+      <legend>{tools.find((t) => t[0] === id)[1]}</legend>
+      {id === "crop-image" && current && (
+        <div
+          className="studio-crop"
+          style={
+            effectsPending
+              ? {
+                  "--effect-filter": `brightness(${adjust.brightness}%) contrast(${adjust.contrast}%) saturate(${adjust.saturation}%) grayscale(${adjust.grayscale}%) sepia(${adjust.sepia}%) blur(${adjust.blur}px)`,
+                  "--effect-transform": `scale(${adjust.flipX ? -1 : 1}, ${adjust.flipY ? -1 : 1})`,
+                }
+              : undefined
+          }
+        >
+          <ImageManipulator
+            file={effectsPending ? effectBase : current}
+            kind={id}
+            values={settings[id]}
+            onValues={(patch) => update(id, patch)}
+            busy={working}
+          />
+        </div>
+      )}
+      <Controls
+        id={id}
+        values={settings[id]}
+        update={(patch) => update(id, patch)}
+      />
+      {["crop-image", "resize-image"].includes(id) && (
+        <details className="studio-advanced">
+          <summary>Advanced settings</summary>
+          <Controls
+            id={id}
+            values={settings[id]}
+            update={(patch) => update(id, patch)}
+            advanced
+          />
+        </details>
+      )}
+      {id === "join-images" && (
+        <label className="studio-field">
+          Second image
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => {
+              upload(e.target.files[0], true);
+              e.target.value = "";
+            }}
+          />
+          <span>{second?.name || "Choose a signature or another photo."}</span>
+        </label>
+      )}
+      {notes[id] && <p>{notes[id]}</p>}
+      <button
+        className="primary"
+        disabled={id === "join-images" && !second}
+        onClick={() => apply(id)}
+      >
+        Apply {tools.find((t) => t[0] === id)[1].toLowerCase()}
+      </button>
+    </fieldset>
+  );
   return (
     <main className="workspace image-studio">
       <div className="tool-heading">
@@ -360,10 +462,15 @@ export default function ImageStudio() {
         </Link>
         <h1>Image Editor</h1>
         <p>
-          One image. All your editing controls. Apply edits in any order, then
-          download. Files stay on your device.
+          Upload a photo, make your changes, and download. You can undo any
+          edit.
         </p>
       </div>
+      <ol className="studio-steps" aria-label="Editing steps">
+        <li aria-current={!current ? "step" : undefined}>1. Upload a photo</li>
+        <li aria-current={current ? "step" : undefined}>2. Edit your photo</li>
+        <li>3. Download</li>
+      </ol>
       <div className="studio-toolbar">
         <label className="studio-upload">
           {current ? "Replace image" : "Upload image"}
@@ -378,46 +485,53 @@ export default function ImageStudio() {
             }}
           />
         </label>
-        <button
-          disabled={working || !history.length}
-          onClick={() => travel(true)}
-        >
-          Undo
-        </button>
-        <button
-          disabled={working || !future.length}
-          onClick={() => travel(false)}
-        >
-          Redo
-        </button>
-        <button
-          disabled={working || !original}
-          onClick={() => {
-            setHistory((h) => remember(h, current));
-            setFuture([]);
-            setCurrent(original);
-            setSettings(initialSettings());
-            clearEffects();
+        {current && (
+          <>
+            <button
+              disabled={working || !history.length}
+              onClick={() => travel(true)}
+            >
+              Undo
+            </button>
+            <button
+              disabled={working || !future.length}
+              onClick={() => travel(false)}
+            >
+              Redo
+            </button>
+            <button
+              disabled={working || !original}
+              onClick={() => {
+                setHistory((h) => remember(h, current));
+                setFuture([]);
+                setCurrent(original);
+                setSettings(initialSettings());
+                clearEffects();
 
-            setStatus("Original image restored.");
-          }}
-        >
-          Reset image
-        </button>
-        {busy && controller.current && (
-          <button onClick={() => controller.current?.abort()}>
-            Cancel edit
-          </button>
+                setStatus("Original image restored.");
+              }}
+            >
+              Reset image
+            </button>
+            {busy && controller.current && (
+              <button onClick={() => controller.current?.abort()}>
+                Cancel edit
+              </button>
+            )}
+            <details className="studio-save-options">
+              <summary>File name</summary>
+              <label className="studio-filename">
+                Filename
+                <input
+                  aria-label="Download filename"
+                  value={filename}
+                  maxLength={120}
+                  onChange={(e) => setFilename(e.target.value)}
+                />
+              </label>
+            </details>
+          </>
         )}
-        <label className="studio-filename">
-          Filename
-          <input
-            aria-label="Download filename"
-            value={filename}
-            maxLength={120}
-            onChange={(e) => setFilename(e.target.value)}
-          />
-        </label>
         {current && !working && (
           <a
             className="primary studio-download"
@@ -448,128 +562,71 @@ export default function ImageStudio() {
         </div>
       )}
       {current && (
-        <p>
-          {dimensions} · {size(current.size)} · {extension.toUpperCase()}
+        <p className="studio-file-info">
+          {original?.name} · {dimensions} · {size(current.size)} ·{" "}
+          {extension.toUpperCase()}
         </p>
       )}
-      <div className="studio-layout">
-        <section
-          className="studio-controls"
-          aria-label="All image editing controls"
-        >
-          <fieldset className="studio-card" disabled={busy || !current}>
-            <legend>Color & effects</legend>
-            {Object.entries(adjust)
-              .filter(([, v]) => typeof v === "number")
-              .map(([key, value]) => (
-                <label className="studio-field" key={key}>
-                  <span>
-                    {key[0].toUpperCase() + key.slice(1)}: {value}
-                    {key === "blur" ? " px" : "%"}
-                  </span>
-                  <input
-                    aria-label={key}
-                    type="range"
-                    min="0"
-                    max={
-                      key === "blur"
-                        ? 10
-                        : ["grayscale", "sepia"].includes(key)
-                          ? 100
-                          : 200
-                    }
-                    value={value}
-                    onChange={(e) => changeEffects({ [key]: +e.target.value })}
-                  />
-                </label>
-              ))}
-            <div className="studio-options">
-              <button
-                type="button"
-                aria-pressed={adjust.flipX}
-                onClick={() => changeEffects({ flipX: !adjust.flipX })}
+      {current && (
+        <div className="studio-layout">
+          <section
+            className="studio-controls"
+            aria-label="All image editing controls"
+          >
+            {renderOperation("crop-image")}
+            <div className="studio-sidebar">
+              <fieldset
+                className="studio-card studio-effects"
+                disabled={busy || !current}
               >
-                Flip horizontal
-              </button>
-              <button
-                type="button"
-                aria-pressed={adjust.flipY}
-                onClick={() => changeEffects({ flipY: !adjust.flipY })}
-              >
-                Flip vertical
-              </button>
-            </div>
-            <p>Effects update automatically as you adjust the controls.</p>
-            <button onClick={() => changeEffects(adjustments)}>
-              Reset effects
-            </button>
-          </fieldset>
-          {operations.map((id) => (
-            <fieldset
-              className="studio-card"
-              key={id}
-              disabled={working || !current}
-            >
-              <legend>{tools.find((t) => t[0] === id)[1]}</legend>
-              {id === "crop-image" && current && (
-                <div
-                  className="studio-crop"
-                  style={
-                    effectsPending
-                      ? {
-                          "--effect-filter": `brightness(${adjust.brightness}%) contrast(${adjust.contrast}%) saturate(${adjust.saturation}%) grayscale(${adjust.grayscale}%) sepia(${adjust.sepia}%) blur(${adjust.blur}px)`,
-                          "--effect-transform": `scale(${adjust.flipX ? -1 : 1}, ${adjust.flipY ? -1 : 1})`,
-                        }
-                      : undefined
-                  }
-                >
-                  <ImageManipulator
-                    file={effectsPending ? effectBase : current}
-                    kind={id}
-                    values={settings[id]}
-                    onValues={(patch) => update(id, patch)}
-                    busy={working}
-                  />
+                <legend>Color & effects</legend>
+                {renderEffects(["brightness", "contrast", "saturation"])}
+                <details className="studio-advanced">
+                  <summary>More effects</summary>
+                  {renderEffects(["grayscale", "sepia", "blur"])}
+                </details>
+                <div className="studio-options">
+                  <button
+                    type="button"
+                    aria-pressed={adjust.flipX}
+                    onClick={() => changeEffects({ flipX: !adjust.flipX })}
+                  >
+                    Flip horizontal
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={adjust.flipY}
+                    onClick={() => changeEffects({ flipY: !adjust.flipY })}
+                  >
+                    Flip vertical
+                  </button>
                 </div>
-              )}
-              <Controls
-                id={id}
-                values={settings[id]}
-                update={(patch) => update(id, patch)}
-              />
-              {id === "join-images" && (
-                <label className="studio-field">
-                  Second image
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => {
-                      upload(e.target.files[0], true);
-                      e.target.value = "";
-                    }}
-                  />
-                  <span>
-                    {second?.name || "Choose a signature or another photo."}
-                  </span>
-                </label>
-              )}
-              {notes[id] && <p>{notes[id]}</p>}
-              <button
-                className="primary"
-                disabled={id === "join-images" && !second}
-                onClick={() => apply(id)}
-              >
-                Apply {tools.find((t) => t[0] === id)[1].toLowerCase()}
-              </button>
-            </fieldset>
-          ))}
-          <p className="studio-note">
-            JPG output and several photo-layout operations use a white
-            background for transparent areas. For best quality, resize and
-            compress near the end.
-          </p>
-        </section>
-      </div>
+                <p>Effects update automatically as you adjust the controls.</p>
+                <button onClick={() => changeEffects(adjustments)}>
+                  Reset effects
+                </button>
+              </fieldset>
+              {renderOperation("resize-image")}
+            </div>
+            <details className="studio-more">
+              <summary>
+                More tools{" "}
+                <span>
+                  Compress, convert, backgrounds, text & photo layouts
+                </span>
+              </summary>
+              <div className="studio-extra-grid">
+                {operations.slice(2).map(renderOperation)}
+              </div>
+            </details>
+            <p className="studio-note">
+              JPG output and several photo-layout operations use a white
+              background for transparent areas. For best quality, resize and
+              compress near the end.
+            </p>
+          </section>
+        </div>
+      )}
     </main>
   );
 }

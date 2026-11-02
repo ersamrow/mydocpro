@@ -50,6 +50,80 @@ const { PDFDocument } = require("pdf-lib");
     await page.locator(".studio-download").waitFor();
     assert.equal(await page.locator(".studio-card:visible").count(), 3);
     const original = await readImage();
+    const viewport = page.locator(".preview-zoom-viewport");
+    await viewport.scrollIntoViewIfNeeded();
+    await viewport.click({ position: { x: 8, y: 8 } });
+    await page.mouse.wheel(0, -100);
+    await page.waitForFunction(
+      () => document.querySelector('[aria-label="Image zoom"]').value === "125",
+    );
+    await page.mouse.wheel(0, 100);
+    await page.waitForFunction(
+      () => document.querySelector('[aria-label="Image zoom"]').value === "100",
+    );
+    await page.getByRole("button", { name: "Fit image", exact: true }).focus();
+    await viewport.dispatchEvent("wheel", { deltaY: -100 });
+    assert.equal(
+      await page
+        .getByRole("slider", { name: "Image zoom", exact: true })
+        .inputValue(),
+      "100",
+    );
+    const frameBefore = await page.locator(".manipulator-box").boundingBox();
+    await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+    const frameAfter = await page.locator(".manipulator-box").boundingBox();
+    assert.equal(frameBefore.width, frameAfter.width);
+    assert.equal(frameBefore.height, frameAfter.height);
+    await page.getByRole("button", { name: "Zoom out", exact: true }).click();
+    assert.equal(
+      await page
+        .getByRole("slider", { name: "Image zoom", exact: true })
+        .inputValue(),
+      "100",
+    );
+    await page.locator(".manipulator-box").scrollIntoViewIfNeeded();
+    const box = await page.locator(".manipulator-box").boundingBox();
+    const session = await page.context().newCDPSession(page);
+    const cx = box.x + box.width / 2,
+      cy = box.y + box.height / 2;
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [
+        { x: cx - 30, y: cy, id: 1 },
+        { x: cx + 30, y: cy, id: 2 },
+      ],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        { x: cx - 60, y: cy, id: 1 },
+        { x: cx + 60, y: cy, id: 2 },
+      ],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    assert.ok(
+      Number(
+        await page
+          .getByRole("slider", { name: "Image zoom", exact: true })
+          .inputValue(),
+      ) > 150,
+    );
+    await session.detach();
+    await page.getByRole("button", { name: "Fit image", exact: true }).click();
+    for (let i = 0; i < 4; i++)
+      await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+    assert.deepEqual(await readImage(), original);
+    await page
+      .getByRole("button", { name: "Apply crop & rotate", exact: true })
+      .click();
+    await page.locator(".studio-download").waitFor();
+    assert.equal((await readImage()).width, Math.round(original.width / 2));
+    assert.equal((await readImage()).height, Math.round(original.height / 2));
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    assert.equal((await readImage()).width, original.width);
     const resize = page
       .locator(".studio-card")
       .filter({ has: page.locator("legend", { hasText: /^Resize image$/ }) });
@@ -121,8 +195,17 @@ const { PDFDocument } = require("pdf-lib");
       path: "ui-audit/image-studio-mobile.png",
       fullPage: true,
     });
+    await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(base + "/pdf-toolkit");
-    assert.equal(await page.locator("#combined-operation option").count(), 6);
+    await page.screenshot({
+      path: "ui-audit/pdf-toolkit-desktop.png",
+      fullPage: true,
+    });
+    assert.equal(await page.locator(".pdf-task-grid button").count(), 7);
+    await page
+      .locator(".pdf-task-grid")
+      .getByRole("button", { name: /Merge PDF/ })
+      .click();
     await page
       .locator("#upload")
       .setInputFiles([
@@ -141,12 +224,18 @@ const { PDFDocument } = require("pdf-lib");
       (await PDFDocument.load(Uint8Array.from(bytes))).getPageCount(),
       3,
     );
-    await page.locator("#combined-operation").selectOption("split-pdf");
+    await page
+      .locator(".pdf-task-grid")
+      .getByRole("button", { name: /Split PDF/ })
+      .click();
     assert.match(
       await page.locator(".combined-start [role=status]").textContent(),
       /first uploaded file/,
     );
-    await page.locator("#combined-operation").selectOption("jpg-to-pdf");
+    await page
+      .locator(".pdf-task-grid")
+      .getByRole("button", { name: /Image to PDF/ })
+      .click();
     assert.equal(
       await page.locator("#upload").getAttribute("accept"),
       "image/jpeg,image/png,image/webp",
@@ -158,6 +247,10 @@ const { PDFDocument } = require("pdf-lib");
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     );
+    await page.screenshot({
+      path: "ui-audit/pdf-toolkit-mobile.png",
+      fullPage: true,
+    });
     assert.deepEqual(errors, []);
     console.log(
       "Combined workspaces: uploads, switching, image/PDF outputs and mobile layout passed.",

@@ -305,8 +305,8 @@ export default function Workspace({
   const Container = embedded ? "section" : "main";
   const FileContainer = "div";
   const PreviewContainer = isMerge ? "details" : "div";
-  const HelpContainer = isMerge ? "details" : "div";
-  const PreferenceContainer = isMerge ? "details" : "div";
+  const HelpContainer = isMerge || embedded ? "details" : "div";
+  const PreferenceContainer = isMerge || embedded ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
   return (
     <Container
@@ -534,6 +534,7 @@ export default function Workspace({
             </FileContainer>
             <PreviewContainer
               className="merge-page-editor"
+              open={isMerge && embedded ? true : undefined}
               hidden={!files.length}
             >
               {isMerge && (
@@ -580,6 +581,7 @@ export default function Workspace({
             )}
             <details
               className="settings-disclosure"
+              hidden={embedded && !files.length}
               open={settingsOpen}
               onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
             >
@@ -616,7 +618,9 @@ export default function Workspace({
                 busy={busy}
               />
               <PreferenceContainer className="merge-preferences">
-                {isMerge && <summary>Preferences & reset</summary>}
+                {(isMerge || embedded) && (
+                  <summary>Preferences & reset</summary>
+                )}
                 <div className="settings-toolbar">
                   <button
                     className="secondary"
@@ -776,9 +780,9 @@ export default function Workspace({
         </div>
       </section>
       <HelpContainer className="merge-help">
-        {isMerge && (
+        {(isMerge || embedded) && (
           <summary>
-            Need a hand? <span>How to merge, tips & related tools</span>
+            Need a hand? <span>Instructions, tips & related tools</span>
           </summary>
         )}
         <ToolGuide id={id} />

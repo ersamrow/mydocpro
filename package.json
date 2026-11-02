@@ -15,6 +15,7 @@
     "test:ui": "node tests/ui.browser.cjs",
     "test:workflow": "node tests/workflow.browser.cjs",
     "test:combined": "node tests/combined.browser.cjs",
+    "test:pdf-workbench": "node tests/pdf-workbench.browser.cjs",
     "test:productivity": "node tests/productivity.browser.cjs",
     "test:visual": "playwright test --config playwright.visual.config.cjs"
   },

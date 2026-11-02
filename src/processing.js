@@ -217,6 +217,25 @@ export async function processImage(id, files, values, preview = false, signal) {
       w = Number(val("crop-w")) * rotated.width;
       h = Number(val("crop-h")) * rotated.height;
     }
+    const imageZoom = Number(val("image-zoom") || 100) / 100;
+    const imagePanX = Number(val("image-pan-x") || 0),
+      imagePanY = Number(val("image-pan-y") || 0);
+    if (
+      !Number.isFinite(imageZoom) ||
+      imageZoom < 1 ||
+      imageZoom > 4 ||
+      !Number.isFinite(imagePanX) ||
+      !Number.isFinite(imagePanY)
+    )
+      throw Error("Invalid image zoom or position.");
+    sx =
+      ((sx / rotated.width - 0.5 - imagePanX) / imageZoom + 0.5) *
+      rotated.width;
+    sy =
+      ((sy / rotated.height - 0.5 - imagePanY) / imageZoom + 0.5) *
+      rotated.height;
+    w /= imageZoom;
+    h /= imageZoom;
     c = canvas(w, h);
     c.getContext("2d").fillStyle = "#fff";
     c.getContext("2d").fillRect(0, 0, c.width, c.height);
@@ -439,8 +458,9 @@ export async function processPdf(
   }
   const { PDFDocument, degrees } = await import("pdf-lib"),
     out = await PDFDocument.create();
-  if (id === "merge-pdf") {
-    if (files.length < 2) throw Error("Choose at least two PDFs to merge.");
+  if (id === "merge-pdf" || id === "pdf-workbench") {
+    if (id === "merge-pdf" && files.length < 2)
+      throw Error("Choose at least two PDFs to merge.");
     const docs = new Map();
     let pageCount = 0;
     for (const file of files) {
@@ -452,10 +472,12 @@ export async function processPdf(
     }
     if (!order.length) throw Error("Wait for page previews before merging.");
     let completed = 0;
-    for (const { file, index } of order) {
+    for (const { file, index, rotation = 0 } of order) {
       setStatus(`Merging page ${++completed} of ${order.length}…`);
       await checkpoint(signal);
       const [page] = await out.copyPages(docs.get(file), [index]);
+      if (id === "pdf-workbench")
+        page.setRotation(degrees((page.getRotation().angle + rotation) % 360));
       out.addPage(page);
     }
     output(

@@ -250,7 +250,13 @@ export default function ImageStudio() {
       return { ...s, [id]: next };
     });
   function resetCrop() {
-    update("crop-image", { ...defaults("crop-image"), format: "image/png" });
+    update("crop-image", {
+      ...defaults("crop-image"),
+      format: "image/png",
+      "image-zoom": "100",
+      "image-pan-x": "0",
+      "image-pan-y": "0",
+    });
   }
   function remember(list, image) {
     const next = [...list, image].slice(-10);
@@ -406,6 +412,7 @@ export default function ImageStudio() {
           }
         >
           <ImageManipulator
+            previewZoom
             file={effectsPending ? effectBase : current}
             kind={id}
             values={settings[id]}

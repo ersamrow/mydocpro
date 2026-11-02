@@ -162,6 +162,8 @@ export default function PdfEditor({
   const dragged = useRef(null),
     skipSort = useRef(false),
     previousPages = useRef(values.pages);
+  const workbench = id === "pdf-workbench";
+  const selectionKey = (e) => (workbench ? e.key : e.index);
   const split = ["split-pdf", "organize-pdf", "pdf-to-image"].includes(id),
     readOnly = id === "compress-pdf",
     compact = id === "merge-pdf",
@@ -176,7 +178,9 @@ export default function PdfEditor({
           ? []
           : entries.map((_, i) => i);
   } catch {}
-  const selected = new Set(indices),
+  const selected = workbench
+      ? new Set(entries.filter((e) => e.selected !== false).map((e) => e.key))
+      : new Set(indices),
     rotation = id === "organize-pdf" ? Number(values.rotation) : 0;
   useEffect(() => {
     if (!compact) return;
@@ -269,7 +273,7 @@ export default function PdfEditor({
     };
   }, [files, onPdf]);
   useEffect(() => {
-    if (previousPages.current === values.pages) return;
+    if (workbench || previousPages.current === values.pages) return;
     previousPages.current = values.pages;
     if (skipSort.current) {
       skipSort.current = false;
@@ -302,6 +306,10 @@ export default function PdfEditor({
   function choose(set) {
     if (disabled) return;
     remember();
+    if (workbench) {
+      commit(entries.map((e) => ({ ...e, selected: set.has(e.key) })));
+      return;
+    }
     commit(
       entries,
       entries
@@ -318,16 +326,18 @@ export default function PdfEditor({
     commit(
       next,
       next
-        .filter((e) => selected.has(e.index))
+        .filter((e) => selected.has(selectionKey(e)))
         .map((e) => e.index + 1)
         .join(", "),
     );
     setStatus(`Moved page ${entry.index + 1} to position ${to + 1}.`);
     if (compact) setPreviewPage(Math.floor(to / mergePreviewSize));
   }
-  const ordered = split
-    ? indices.map((i) => entries.find((e) => e.index === i)).filter(Boolean)
-    : entries;
+  const ordered = workbench
+    ? entries.filter((e) => e.selected !== false)
+    : split
+      ? indices.map((i) => entries.find((e) => e.index === i)).filter(Boolean)
+      : entries;
   const labels = ordered.map((e) =>
     split ? String(e.index + 1) : `F${e.fileIndex + 1}:P${e.index + 1}`,
   );
@@ -355,7 +365,7 @@ export default function PdfEditor({
         <h2>
           {readOnly
             ? "Preview PDF pages"
-            : id === "organize-pdf"
+            : id === "organize-pdf" || workbench
               ? "Arrange your pages"
               : split
                 ? "Choose your pages"
@@ -378,9 +388,10 @@ export default function PdfEditor({
           (!pdf.ready
             ? "Loading page previews…"
             : status ||
-              `${ordered.length} pages ${split ? "selected" : readOnly ? "to compress" : "to merge"}`)}
+              `${ordered.length} pages ${split || workbench ? "selected" : readOnly ? "to compress" : "to merge"}`)}
       </p>
       {!compact &&
+        !workbench &&
         files.map((f, i) => (
           <section
             className="preview-group file-legend"
@@ -393,16 +404,16 @@ export default function PdfEditor({
           </section>
         ))}
       <div className="page-toolbar" hidden={readOnly}>
-        {split &&
+        {(split || workbench) &&
           [
-            ["Select all", new Set(entries.map((e) => e.index))],
+            ["Select all", new Set(entries.map(selectionKey))],
             ["Deselect all", new Set()],
             [
               "Invert selection",
               new Set(
                 entries
-                  .filter((e) => !selected.has(e.index))
-                  .map((e) => e.index),
+                  .filter((e) => !selected.has(selectionKey(e)))
+                  .map(selectionKey),
               ),
             ],
           ].map(([label, set]) => (
@@ -436,7 +447,7 @@ export default function PdfEditor({
             commit(
               next,
               next
-                .filter((e) => selected.has(e.index))
+                .filter((e) => selected.has(selectionKey(e)))
                 .map((e) => e.index + 1)
                 .join(", "),
             );
@@ -491,10 +502,14 @@ export default function PdfEditor({
       <div className="page-thumbnails">
         {visibleEntries.map((entry, localIndex) => {
           const i = previewStart + localIndex;
+          const pageRotation = workbench
+            ? Number(entry.rotation || 0)
+            : rotation;
           return (
             <figure
               key={entry.key}
               className="page-thumbnail"
+              data-selected={workbench ? entry.selected !== false : undefined}
               draggable={compact && !disabled}
               onDragStart={
                 compact
@@ -529,33 +544,51 @@ export default function PdfEditor({
               }}
             >
               <div className="page-caption">
-                {split && (
+                {(split || workbench) && (
                   <label className="page-select">
                     <input
                       type="checkbox"
-                      aria-label={`Select page ${entry.index + 1}`}
+                      aria-label={
+                        workbench
+                          ? `Select ${entry.file.name} page ${entry.index + 1}`
+                          : `Select page ${entry.index + 1}`
+                      }
                       disabled={disabled}
-                      checked={selected.has(entry.index)}
+                      checked={selected.has(selectionKey(entry))}
                       onChange={(e) => {
                         const next = new Set(selected);
-                        if (e.target.checked) next.add(entry.index);
-                        else next.delete(entry.index);
+                        if (e.target.checked) next.add(selectionKey(entry));
+                        else next.delete(selectionKey(entry));
                         choose(next);
                       }}
                     />
                   </label>
                 )}
-                <span>{compact ? `#${i + 1}` : `Page ${entry.index + 1}`}</span>
+                <span>
+                  {workbench
+                    ? `Position ${i + 1}`
+                    : compact
+                      ? `#${i + 1}`
+                      : `Page ${entry.index + 1}`}
+                </span>
                 <small>
                   {compact
                     ? `Page ${entry.index + 1}`
                     : `F${entry.fileIndex + 1}`}
                 </small>
               </div>
-              {compact && (
+              {(compact || workbench) && (
                 <div className="merge-page-source" title={entry.file.name}>
                   {entry.file.name}
+                  {workbench ? ` · Page ${entry.index + 1}` : ""}
                 </div>
+              )}
+              {workbench && (
+                <span className="pdf-page-state">
+                  {entry.selected !== false
+                    ? "Included in your PDF"
+                    : "Excluded — check to include"}
+                </span>
               )}
               <button
                 className="thumbnail-image"
@@ -568,13 +601,32 @@ export default function PdfEditor({
                     blob={entry.blob}
                     alt={`${entry.file.name}, page ${entry.index + 1}`}
                     style={{
-                      transform: `rotate(${rotation}deg) scale(${rotation % 180 ? 0.7 : 1})`,
+                      transform: `rotate(${pageRotation}deg) scale(${pageRotation % 180 ? 0.7 : 1})`,
                     }}
                   />
                 ) : (
                   "Preview unavailable"
                 )}
               </button>
+              {workbench && (
+                <button
+                  className="secondary"
+                  disabled={disabled}
+                  aria-label={`Rotate ${entry.file.name} page ${entry.index + 1} clockwise`}
+                  onClick={() => {
+                    remember();
+                    commit(
+                      entries.map((e) =>
+                        e.key === entry.key
+                          ? { ...e, rotation: ((e.rotation || 0) + 90) % 360 }
+                          : e,
+                      ),
+                    );
+                  }}
+                >
+                  ↻ Rotate 90°
+                </button>
+              )}
               <div className="page-move-controls" hidden={readOnly}>
                 {!compact && (
                   <button
@@ -651,7 +703,15 @@ export default function PdfEditor({
         )}
       </details>
       {zoom && (
-        <Zoom entry={zoom} rotation={rotation} onClose={() => setZoom(null)} />
+        <Zoom
+          entry={zoom}
+          rotation={
+            workbench
+              ? entries.find((e) => e.key === zoom.key)?.rotation || 0
+              : rotation
+          }
+          onClose={() => setZoom(null)}
+        />
       )}
       {moving && (
         <MoveDialog

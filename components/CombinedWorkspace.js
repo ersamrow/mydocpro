@@ -1,28 +1,40 @@
 import { useState } from "react";
 import Link from "next/link";
 import Workspace from "./Workspace.js";
+import PdfWorkbench from "./PdfWorkbench.js";
+import { Icon } from "./Shared.js";
 import { tools } from "../src/tools.js";
 import { multiTools, pdfTools } from "../src/tool-settings.js";
 
 export default function CombinedWorkspace({ tool }) {
-  const isImage = tool[0] === "image-editor";
-  const operations = tools.filter(
-    (item) =>
-      !["image-editor", "pdf-toolkit"].includes(item[0]) &&
-      (isImage ? item[3] !== "pdf" : item[3] === "pdf"),
-  );
-  const [selected, setSelected] = useState(
-    isImage ? "crop-image" : "merge-pdf",
-  );
+  const operations = [
+    "merge-pdf",
+    "split-pdf",
+    "organize-pdf",
+    "compress-pdf",
+    "jpg-to-pdf",
+    "pdf-to-image",
+  ].map((id) => tools.find((t) => t[0] === id));
+  const descriptions = {
+    "merge-pdf": "Combine multiple PDFs",
+    "split-pdf": "Extract selected pages",
+    "organize-pdf": "Reorder, rotate or remove",
+    "compress-pdf": "Reduce scanned file size",
+    "jpg-to-pdf": "Create a PDF from photos",
+    "pdf-to-image": "Save pages as images",
+  };
+  operations.unshift(["pdf-workbench", "Edit pages", "", "pdf", "layers"]);
+  descriptions["pdf-workbench"] = "Select, move & rotate across PDFs";
+  const [selected, setSelected] = useState("pdf-workbench");
   const [files, setFiles] = useState([]);
   const [working, setWorking] = useState(false);
   const [notice, setNotice] = useState("");
-  function switchOperation(event) {
-    const next = event.target.value;
+  function switchOperation(next) {
     if (working || next === selected) return;
-    const compatible = pdfTools.includes(next) === pdfTools.includes(selected);
+    const acceptsPdf = (id) => id === "pdf-workbench" || pdfTools.includes(id);
+    const compatible = acceptsPdf(next) === acceptsPdf(selected);
     const retained = compatible
-      ? multiTools.includes(next)
+      ? next === "pdf-workbench" || multiTools.includes(next)
         ? files
         : files.slice(0, 1)
       : [];
@@ -39,57 +51,83 @@ export default function CombinedWorkspace({ tool }) {
     setSelected(next);
   }
   return (
-    <main className="workspace combined-workspace">
-      <header className="tool-heading">
+    <main className="workspace combined-workspace pdf-toolkit">
+      <div className="tool-heading">
         <Link className="back" href="/">
           ← All tools
         </Link>
-        <span className="eyebrow">ALL-IN-ONE WORKSPACE</span>
+
         <h1>{tool[1]}</h1>
-        <p className="intro">{tool[2]} Files stay on your device.</p>
-      </header>
-      <section className="combined-start" aria-label="Start a task">
-        <h2>Start a task</h2>
-        <p>
-          Choose an operation, upload{" "}
-          {isImage
-            ? "JPG, PNG or WebP images"
-            : "PDFs (or images for Image to PDF)"}
-          , adjust the settings, then download your result.
+        <p className="intro">
+          Choose a task, add your files, and download the result. Your documents
+          stay on your device.
         </p>
-        <label htmlFor="combined-operation">What would you like to do?</label>
-        <select
-          id="combined-operation"
-          value={selected}
-          onChange={switchOperation}
-          disabled={working}
-          aria-describedby="operation-help"
+      </div>
+      <section className="combined-start" aria-label="PDF tasks">
+        <h2>What would you like to do?</h2>
+        <div
+          className="pdf-task-grid"
+          role="group"
+          aria-label="Choose a PDF task"
         >
           {operations.map((item) => (
-            <option key={item[0]} value={item[0]}>
-              {item[1]}
-            </option>
+            <button
+              key={item[0]}
+              type="button"
+              aria-pressed={selected === item[0]}
+              disabled={working}
+              onClick={() => switchOperation(item[0])}
+            >
+              <Icon name={item[4]} />
+              <span>
+                <strong>{item[1]}</strong>
+                <small>{descriptions[item[0]]}</small>
+              </span>
+              {selected === item[0] && (
+                <span className="pdf-selected" aria-hidden="true">
+                  ✓
+                </span>
+              )}
+            </button>
           ))}
-        </select>
-        <p id="operation-help">
-          Switching operations keeps compatible source files and resets settings
-          and results. Download your result before switching; upload it again to
-          apply another edit.
-        </p>
+        </div>
+        <div className="pdf-task-help">
+          <span>
+            {files.length
+              ? `${files.length} source ${files.length === 1 ? "file" : "files"} ready`
+              : "Start by choosing a task above."}
+          </span>
+          <details>
+            <summary>Switching tasks</summary>
+            <p>
+              Compatible source files stay available. Single-file tasks keep the
+              first file. Download results before switching: settings and
+              results reset. To edit a result, upload the downloaded file.
+            </p>
+          </details>
+        </div>
         <p role="status">
           {working
-            ? "Finish or cancel the current task before switching operations."
+            ? "Processing your files. Task switching will be available when finished."
             : notice}
         </p>
       </section>
-      <Workspace
-        key={selected}
-        tool={operations.find((item) => item[0] === selected)}
-        embedded
-        initialFiles={files}
-        onFilesChange={setFiles}
-        onWorkingChange={setWorking}
-      />
+      {selected === "pdf-workbench" ? (
+        <PdfWorkbench
+          files={files}
+          onFilesChange={setFiles}
+          onWorkingChange={setWorking}
+        />
+      ) : (
+        <Workspace
+          key={selected}
+          tool={operations.find((item) => item[0] === selected)}
+          embedded
+          initialFiles={files}
+          onFilesChange={setFiles}
+          onWorkingChange={setWorking}
+        />
+      )}
     </main>
   );
 }

@@ -452,3 +452,32 @@
     flex-wrap: wrap;
   }
 }
+.preview-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.preview-zoom-controls input[type="range"] {
+  flex: 1;
+  width: 80px;
+  min-width: 60px;
+  accent-color: var(--ui-green);
+}
+.preview-zoom-controls output {
+  min-width: 42px;
+  font-size: 12px;
+  text-align: center;
+}
+.image-studio .preview-zoom-viewport {
+  display: block;
+  overflow: auto;
+  max-height: 440px;
+  overscroll-behavior: contain;
+  min-width: 0;
+}
+.preview-zoom-hint {
+  font-size: 12px;
+  color: var(--ui-muted);
+}

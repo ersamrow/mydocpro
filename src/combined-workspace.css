@@ -44,3 +44,505 @@
 .combined-start [role="status"]:empty {
   display: none;
 }
+.workspace.pdf-toolkit {
+  max-width: 1120px;
+  width: calc(100% - 64px);
+  padding: 0;
+  margin: 20px auto 64px;
+}
+.pdf-toolkit > .tool-heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  align-items: center;
+}
+.pdf-toolkit > .tool-heading .back {
+  grid-row: 1 / 3;
+  margin: 0;
+}
+.pdf-toolkit > .tool-heading .intro {
+  grid-column: 2;
+  margin: 0;
+}
+.pdf-toolkit .combined-start {
+  padding: 18px;
+  margin: 16px 0 24px;
+  border-color: var(--ui-border);
+  border-radius: 14px;
+}
+.pdf-toolkit .combined-start h2 {
+  font-size: 15px;
+  margin: 0 0 14px;
+}
+.pdf-task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.pdf-task-grid button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 78px;
+  text-align: left;
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: white;
+  color: var(--ui-ink);
+  font: inherit;
+  cursor: pointer;
+}
+.pdf-task-grid button[aria-pressed="true"] {
+  border-color: var(--ui-green);
+  background: var(--ui-soft);
+  box-shadow: inset 0 0 0 1px var(--ui-green);
+}
+.pdf-task-grid button:hover {
+  background: var(--ui-soft);
+}
+.pdf-task-grid button:focus-visible {
+  outline: 3px solid var(--ui-green);
+  outline-offset: 3px;
+}
+.pdf-task-grid button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.pdf-task-grid svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--ui-green);
+}
+.pdf-task-grid strong,
+.pdf-task-grid small {
+  display: block;
+}
+.pdf-task-grid strong {
+  font-size: 14px;
+}
+.pdf-task-grid small {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+  margin-top: 3px;
+}
+.pdf-selected {
+  margin-left: auto;
+  color: var(--ui-green);
+}
+.pdf-task-help {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  margin-top: 14px;
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+.pdf-task-help details {
+  max-width: 420px;
+}
+.pdf-task-help summary {
+  cursor: pointer;
+  color: var(--ui-green);
+  min-height: 30px;
+}
+.pdf-toolkit .combined-start [role="status"] {
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.pdf-toolkit .combined-operation .tool-assurances,
+.pdf-toolkit .combined-operation .tool-heading > .intro {
+  display: none;
+}
+.pdf-toolkit .combined-operation .page-intro-heading h2 {
+  font-size: 22px;
+}
+.pdf-toolkit .combined-operation .tool-heading {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+.pdf-toolkit .combined-operation .workpanel {
+  margin-top: 0;
+}
+@media (max-width: 800px) {
+  .workspace.pdf-toolkit {
+    width: calc(100% - 40px);
+  }
+  .pdf-task-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 500px) {
+  .pdf-toolkit > .tool-heading .back {
+    grid-row: auto;
+  }
+  .pdf-toolkit > .tool-heading .intro {
+    grid-column: 1 / -1;
+  }
+  .pdf-toolkit .combined-start {
+    padding: 12px;
+  }
+  .pdf-task-grid button {
+    padding: 10px;
+    gap: 8px;
+  }
+  .pdf-task-grid small {
+    font-size: 11px;
+  }
+  .pdf-task-grid svg,
+  .pdf-selected {
+    display: none;
+  }
+  .pdf-task-help {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+@media (max-width: 400px) {
+  .workspace.pdf-toolkit {
+    width: calc(100% - 24px);
+  }
+}
+.pdf-toolkit .merge-help {
+  margin-top: 20px;
+  padding: 16px 18px;
+  background: white;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+}
+.pdf-toolkit .merge-help > summary,
+.pdf-toolkit .merge-preferences > summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.pdf-toolkit .merge-help > summary span {
+  font-weight: 400;
+  color: var(--ui-muted);
+  margin-left: 8px;
+}
+.pdf-toolkit .settings-disclosure[hidden] {
+  display: none;
+}
+.pdf-workbench {
+  background: white;
+  border: 1px solid var(--ui-border);
+  padding: 20px;
+  border-radius: 14px;
+}
+.pdf-workbench h2 {
+  font-size: 21px;
+  margin-top: 0;
+}
+.pdf-workbench > p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.pdf-workbench-upload {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 1px dashed var(--ui-green);
+  border-radius: 12px;
+  background: var(--ui-soft);
+}
+.pdf-workbench-upload span {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+.pdf-workbench-upload input {
+  max-width: 100%;
+  min-height: 44px;
+}
+.pdf-source-list {
+  list-style: none;
+  padding: 0;
+}
+.pdf-source-list li {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ui-border);
+  font-size: 13px;
+}
+.pdf-source-list li span {
+  flex: 1;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.pdf-workbench button {
+  min-height: 44px;
+  cursor: pointer;
+}
+.pdf-workbench button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.pdf-workbench-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ui-border);
+}
+.pdf-workbench-actions strong {
+  margin-right: auto;
+  font-size: 13px;
+}
+.pdf-workbench .page-thumbnail:has(.page-select input:not(:checked)) {
+  opacity: 0.6;
+  background: var(--ui-soft);
+}
+.pdf-workbench .page-thumbnails {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+@media (max-width: 500px) {
+  .pdf-workbench {
+    padding: 12px;
+  }
+  .pdf-workbench-actions > * {
+    width: 100%;
+  }
+}
+.pdf-task-grid button:first-child {
+  grid-column: 1 / -1;
+}
+.pdf-workbench-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.pdf-workbench-heading .eyebrow {
+  font-size: 10px;
+  color: var(--ui-muted);
+}
+.pdf-workbench-heading h2 {
+  margin: 6px 0 0;
+}
+.pdf-ready-count {
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: var(--ui-soft);
+  color: var(--ui-green);
+  white-space: nowrap;
+  font-size: 12px;
+}
+.pdf-workbench-steps {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 18px 0;
+  font-size: 12px;
+}
+.pdf-workbench-steps li {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f5f7f5;
+  color: var(--ui-muted);
+}
+.pdf-workbench-steps [aria-current="step"] {
+  background: var(--ui-soft);
+  color: var(--ui-green);
+  font-weight: 700;
+}
+.pdf-workbench-upload {
+  position: relative;
+  min-height: 150px;
+  align-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+.pdf-workbench-upload::after {
+  content: "Choose PDF files";
+  justify-self: center;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: var(--ui-green);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+.pdf-workbench-upload input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.pdf-workbench-upload:focus-within {
+  outline: 3px solid var(--ui-green);
+  outline-offset: 3px;
+}
+.pdf-workbench-upload.has-pdfs {
+  min-height: auto;
+  grid-template-columns: 1fr auto;
+  text-align: left;
+  padding: 14px 16px;
+}
+.pdf-workbench-upload.has-pdfs span {
+  grid-column: 1;
+}
+.pdf-workbench-upload.has-pdfs::after {
+  content: "+ Add PDFs";
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+.pdf-source-manager {
+  margin: 12px 0 20px;
+  border-bottom: 1px solid var(--ui-border);
+  padding-bottom: 8px;
+}
+.pdf-source-manager summary {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 10px 0;
+}
+.pdf-source-manager summary span {
+  color: var(--ui-muted);
+  margin-left: 8px;
+}
+.pdf-selection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pdf-selection-heading h3 {
+  font-size: 17px;
+  margin: 0;
+}
+.pdf-selection-heading span {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+.pdf-workbench .pdf-previews {
+  padding-top: 0;
+  border-top: 0;
+  margin-top: 8px;
+}
+.pdf-workbench .pdf-previews > h2 {
+  display: none;
+}
+.pdf-workbench .page-toolbar {
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--ui-soft);
+  gap: 8px;
+}
+.pdf-workbench .page-toolbar button {
+  background: white;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.pdf-workbench .page-thumbnails {
+  gap: 16px;
+}
+.pdf-workbench .page-thumbnail {
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px #123e3308;
+}
+.pdf-workbench .page-thumbnail[data-selected="false"] {
+  opacity: 1;
+  background: #f5f6f5;
+  box-shadow: none;
+}
+.pdf-workbench .page-thumbnail[data-selected="false"] .thumbnail-image {
+  opacity: 0.45;
+}
+.pdf-workbench .page-caption {
+  justify-content: flex-start;
+  font-weight: 600;
+}
+.pdf-workbench .page-caption small {
+  margin-left: auto;
+  color: var(--ui-muted);
+}
+.pdf-workbench .page-caption input {
+  width: 20px;
+  height: 20px;
+}
+.pdf-workbench .merge-page-source {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ui-muted);
+}
+.pdf-page-state {
+  font-size: 11px;
+  color: var(--ui-green);
+}
+.pdf-workbench [data-selected="false"] .pdf-page-state {
+  color: #6b7070;
+}
+.pdf-workbench-actions {
+  position: sticky;
+  bottom: 12px;
+  z-index: 5;
+  background: white;
+  padding: 14px;
+  margin-top: 18px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 22px #123e3315;
+}
+@media (max-width: 600px) {
+  .pdf-workbench-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pdf-workbench-steps {
+    gap: 4px;
+    font-size: 11px;
+  }
+  .pdf-workbench-steps li {
+    padding: 8px 6px;
+  }
+  .pdf-workbench-upload.has-pdfs {
+    grid-template-columns: 1fr;
+  }
+  .pdf-workbench-upload.has-pdfs::after {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+  .pdf-workbench-actions {
+    position: static;
+  }
+}
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail) .pdf-task-grid {
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 8px;
+}
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail)
+  .pdf-task-grid
+  button:first-child {
+  grid-column: auto;
+}
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail) .pdf-task-grid button {
+  min-height: 48px;
+  padding: 10px;
+  gap: 8px;
+}
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail) .pdf-task-grid small,
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail) .pdf-task-grid .pdf-selected {
+  display: none;
+}
+.pdf-toolkit:has(.pdf-workbench .page-thumbnail) .pdf-task-grid strong {
+  font-size: 12px;
+}

@@ -58,6 +58,12 @@ The production build precaches route HTML, Next.js page data, static chunks, ico
 
 AdSense publisher configuration is preserved. Complete applicable consent configuration and publisher approval in AdSense before serving ads where required.
 
+## Visitor analytics
+
+Google Analytics uses Measurement ID `G-YZZFKYVDF4` through `components/GoogleAnalytics.js`. It loads only on `mydocpro.co.in` and `www.mydocpro.co.in`, so localhost and preview-host traffic are excluded. Deploy the updated build to start collection.
+
+In the Analytics web stream, keep Enhanced measurement → Page views → Page changes based on browser history events enabled to measure Next.js navigation. The app relies on that automatic tracking and does not send additional route-change events. Do not install the `GTM-KBDMDM48` snippet alongside this direct integration if that container also sends Analytics events to the same property, as that can duplicate visits. Review Realtime after deployment to confirm receipt in your account.
+
 ## Verification
 
 ```sh

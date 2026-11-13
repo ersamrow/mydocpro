@@ -77,7 +77,7 @@ export const pageBodies = {
         <h2>{"Advertising and analytics"}</h2>
         <p>
           {
-            "This site includes Google AdSense to display advertisements. Google and its partners may use cookies and collect information such as your IP address, browser information and activity on this site to serve and measure ads. The document tools continue to process your selected files locally. Learn more about "
+            "This site uses Google Analytics to measure visits and page views, and Google AdSense to display advertisements. These services may use cookies and collect browser, device and website activity information. Google and its advertising partners may also collect information such as your IP address to serve and measure ads. Selected files and their contents are not sent to Analytics by the document tools; processing stays on your device. Learn more about "
           }
           <a
             href={"https://policies.google.com/technologies/partner-sites"}

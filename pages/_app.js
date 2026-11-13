@@ -15,10 +15,12 @@ import "../src/combined-workspace.css";
 import "../src/image-studio.css";
 import "../src/merge-workspace.css";
 import Header from "../components/Header.js";
+import GoogleAnalytics from "../components/GoogleAnalytics.js";
 import { Footer } from "../components/Shared.js";
 export default function App({ Component, pageProps }) {
   return (
     <div id="app">
+      <GoogleAnalytics />
       <Header id={pageProps.id} />
       <Component {...pageProps} />
       <Footer />

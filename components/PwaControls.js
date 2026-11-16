@@ -66,29 +66,41 @@ export default function PwaControls() {
         setFailed(true);
       else {
         listen(navigator.serviceWorker, "controllerchange", check);
-        navigator.serviceWorker
-          .register("/sw.js", { scope: "/", updateViaCache: "none" })
-          .then((reg) => {
-            if (disposed) return;
-            registration = reg;
-            setWaiting(!!reg.waiting);
-            const watch = (worker) => {
-              if (worker)
-                listen(worker, "statechange", () => {
-                  if (worker.state === "installed")
-                    setWaiting(!!navigator.serviceWorker.controller);
-                  if (worker.state === "activated") check();
-                  if (worker.state === "redundant" && !reg.active)
-                    setFailed(true);
-                });
-            };
-            watch(reg.installing);
-            listen(reg, "updatefound", () => watch(reg.installing));
-            if (reg.active) check();
-          })
-          .catch(() => {
-            if (!disposed) setFailed(true);
-          });
+        const register = () =>
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/", updateViaCache: "none" })
+            .then((reg) => {
+              if (disposed) return;
+              registration = reg;
+              setWaiting(!!reg.waiting);
+              const watch = (worker) => {
+                if (worker)
+                  listen(worker, "statechange", () => {
+                    if (worker.state === "installed")
+                      setWaiting(!!navigator.serviceWorker.controller);
+                    if (worker.state === "activated") check();
+                    if (worker.state === "redundant" && !reg.active)
+                      setFailed(true);
+                  });
+              };
+              watch(reg.installing);
+              listen(reg, "updatefound", () => watch(reg.installing));
+              if (reg.active) check();
+            })
+            .catch(() => {
+              if (!disposed) setFailed(true);
+            });
+        const scheduleRegistration = () => {
+          if ("requestIdleCallback" in window) {
+            const id = window.requestIdleCallback(register, { timeout: 1500 });
+            cleanups.push(() => window.cancelIdleCallback(id));
+          } else {
+            const id = setTimeout(register, 0);
+            cleanups.push(() => clearTimeout(id));
+          }
+        };
+        if (document.readyState === "complete") scheduleRegistration();
+        else listen(window, "load", scheduleRegistration);
       }
     }
     return () => {

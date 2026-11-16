@@ -29,7 +29,13 @@ self.addEventListener("install", (event) => {
       try {
         for (const url of PRECACHE) {
           const response = await fetch(
-            new Request(url, { cache: "reload", credentials: "same-origin" }),
+            new Request(url, {
+              cache: url.startsWith("/_next/static/")
+                ? "force-cache"
+                : "reload",
+              credentials: "same-origin",
+              priority: "low",
+            }),
           );
           if (!response.ok || response.redirected)
             throw Error("Asset unavailable: " + url);

@@ -229,7 +229,7 @@ export default function PdfWorkbench({
           )}
           {result && url && (
             <a className="primary" href={url} download="edited-pages.pdf">
-              Download PDF
+              Download PDF – free
             </a>
           )}
         </div>

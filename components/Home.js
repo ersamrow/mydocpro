@@ -1,3 +1,4 @@
+import TrustBadges from "./TrustBadges.js";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -35,14 +36,7 @@ export default function Home({ heading, cards }) {
             Resize a photo. Tidy up a PDF. Get that form submitted.
             <br /> Free, simple tools that keep your files on your device.
           </p>
-          <div className="hero-checks">
-            {["100% free", "No sign-up", "No file uploads"].map((t) => (
-              <span key={t}>
-                <Icon name="check" />
-                {t}
-              </span>
-            ))}
-          </div>
+          <TrustBadges toolId="" />
         </div>
         <div className="art" aria-hidden="true">
           <div className="orbit" />

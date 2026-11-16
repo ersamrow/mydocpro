@@ -1,3 +1,4 @@
+import TrustBadges from "./TrustBadges.js";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ImageManipulator from "./ImageManipulator.js";
@@ -473,6 +474,7 @@ export default function ImageStudio({ heading }) {
           Upload a photo, make your changes, and download. You can undo any
           edit.
         </p>
+        <TrustBadges toolId="image-editor" />
       </div>
       <ol className="studio-steps" aria-label="Editing steps">
         <li aria-current={!current ? "step" : undefined}>1. Upload a photo</li>
@@ -546,7 +548,7 @@ export default function ImageStudio({ heading }) {
             href={url}
             download={downloadName(filename, `edited-image.${extension}`)}
           >
-            Download {extension.toUpperCase()}
+            Download {extension.toUpperCase()} – free
           </a>
         )}
       </div>

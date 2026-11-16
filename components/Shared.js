@@ -114,6 +114,7 @@ export function Footer() {
       <div className="footer-identity">
         <Logo />
         <p>Made for your everyday paperwork. Built for your privacy.</p>
+        <p>MyDocPro is free to use. No account, no watermark, and your files stay on your device.</p>
       </div>
       <nav aria-labelledby="footer-projects">
         <h2 id="footer-projects">Our projects</h2>

@@ -1,3 +1,4 @@
+import "../src/trust-badges.css";
 import "../src/content.css";
 import "../src/style.css";
 import "../src/brand.css";

@@ -1,3 +1,4 @@
+import TrustBadges from "./TrustBadges.js";
 import { useState } from "react";
 import Link from "next/link";
 import Workspace from "./Workspace.jsx";
@@ -63,6 +64,7 @@ export default function CombinedWorkspace({ heading }) {
           Choose a task, add your files, and download the result. Your documents
           stay on your device.
         </p>
+        <TrustBadges toolId="pdf-toolkit" />
       </div>
       <section className="combined-start" aria-label="PDF tasks">
         <h2>What would you like to do?</h2>

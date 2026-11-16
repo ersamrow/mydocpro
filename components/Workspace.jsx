@@ -1,3 +1,4 @@
+import TrustBadges from "./TrustBadges.js";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
@@ -347,17 +348,7 @@ export default function Workspace({
             ? "Combine PDFs in your preferred order. Add files, arrange pages, and download one document."
             : meta.description}{" "}
         </p>
-        <div className="tool-assurances">
-          <span>
-            <Icon name="shield-check" /> Files stay on your device
-          </span>
-          <span>
-            <Icon name="check" /> Free to use
-          </span>
-          <span>
-            <Icon name="zap" /> No sign-up
-          </span>
-        </div>
+        {!embedded && <TrustBadges toolId={id} />}
       </div>
       <section
         className={

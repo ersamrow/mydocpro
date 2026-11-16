@@ -6,75 +6,75 @@ export const siteOrigin = "https://mydocpro.co.in";
 export const toolSearch = {
   "image-editor": [
     "Free Online Photo Editor, No Sign-up",
-    "Crop, rotate and resize photos, or adjust brightness and contrast. Edit in your browser on your phone or computer and download without a watermark.",
+    "Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser and download without a watermark.",
   ],
   "pdf-toolkit": [
     "Free PDF Tools Online – Merge, Split, Compress",
-    "Merge, split, compress or organize PDFs in your browser. Turn photos into a PDF or export PDF pages as images, with no upload or sign-up.",
+    "Merge, split, compress or organize PDFs for free in your browser. Turn photos into PDFs or export pages as images, with no upload or sign-up.",
   ],
   "compress-image": [
-    "Compress Images for 20 KB, 50 KB or 100 KB Limits",
-    "Choose a 20 KB, 50 KB, 100 KB or custom limit for JPG, PNG or WebP images. Compress photos in your browser and download the result as a JPG.",
+    "Free Image Compressor – 20 KB, 50 KB or 100 KB",
+    "Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.",
   ],
   "resize-image": [
-    "Resize an Image in CM, MM, Inches or Pixels",
-    "Set photo dimensions in pixels, cm, mm or inches. Choose DPI and a crop or white padding, then save the resized image as JPG, PNG or WebP.",
+    "Free Image Resizer in CM, MM, Inches or Pixels",
+    "Resize photos free in pixels, cm, mm or inches. Choose DPI and a crop or white padding, then save as JPG, PNG or WebP.",
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",
-    "Convert JPG to PNG, PNG to JPG, or images to and from WebP. Choose your output format and download the converted image without uploading it.",
+    "Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image.",
   ],
   "crop-image": [
     "Crop Images Online Free – Custom Aspect Ratios",
-    "Set a custom crop or choose a square, 4:3, 16:9 or 35:45 frame. Rotate the photo, check the framing and download it in your browser.",
+    "Crop images free with a custom, square, 4:3, 16:9 or 35:45 frame. Rotate your photo, check the framing and download in your browser.",
   ],
   "merge-pdf": [
     "Merge PDF Files Online Free – Combine PDFs",
-    "Combine multiple PDFs into one file, arrange pages in the order you need and download the merged document. Your files stay on your device.",
+    "Merge PDFs free into one file. Arrange pages in the order you need and download the merged document. Your files stay on your device.",
   ],
   "split-pdf": [
     "Split PDF Online Free – Extract PDF Pages",
-    "Extract selected pages or page ranges from a PDF. Download the selection as one document or save each page as a separate PDF without uploading it.",
+    "Split PDFs free by selecting pages or page ranges. Download one document or save each page as a separate PDF without uploading your file.",
   ],
   "compress-pdf": [
     "Compress Scanned PDFs Online Free",
-    "Adjust resolution and JPEG quality to compress scanned PDFs in your browser. The output contains page images, so searchable text and forms are lost.",
+    "Compress scanned PDFs free in your browser. Adjust resolution and quality. Output is image-only; searchable text and forms are lost.",
   ],
   "jpg-to-pdf": [
     "JPG to PDF Converter Online Free",
-    "Convert JPG, PNG or WebP images into a single PDF. Arrange photos in order, choose A4, Letter or image-sized pages, and download without an upload.",
+    "Convert JPG, PNG or WebP images to PDF free. Arrange photos, choose A4, Letter or image-sized pages, and download without an upload.",
   ],
   "exam-photo": [
-    "Exam Photo Resizer for Application Forms",
-    "Choose a 35 × 45 mm, 25 × 35 mm or 2 × 2 inch photo preset, DPI and maximum KB. Match the settings to the requirements on your application form.",
+    "Free Exam Photo Resizer for Application Forms",
+    "Resize application photos to standard sizes for free. Choose DPI and maximum KB, then check your form’s requirements before downloading.",
   ],
   signature: [
-    "Clean a Signature Background for Online Forms",
-    "Clean a scanned signature on white paper. Adjust the threshold to keep faint pen strokes, preview the result and download it as JPG, PNG or WebP.",
+    "Free Signature Cleaner for Online Forms",
+    "Clean a scanned signature free on white paper. Adjust the threshold to keep faint pen strokes, preview and download as JPG, PNG or WebP.",
   ],
   "passport-sheet": [
-    "Passport Photo Maker – Printable 4 × 6 Inch Sheet",
-    "Arrange four, six or eight copies on a printable 4 × 6 inch sheet. Four or six give roughly 35 × 45 mm photos at actual size. Eight gives smaller prints.",
+    "Free Passport Photo Maker – 4 × 6 Inch Sheet",
+    "Make a free printable 4 × 6 inch passport photo sheet. Choose four or six roughly 35 × 45 mm photos, or eight smaller prints.",
   ],
   "pdf-to-image": [
     "PDF to JPG Converter Online Free",
-    "Convert all or selected PDF pages to JPG, PNG or WebP images. Choose a resolution and download one image per page in your browser.",
+    "Convert PDF pages to JPG, PNG or WebP free. Choose pages and resolution, then download one image per page in your browser.",
   ],
   "organize-pdf": [
-    "Organize PDF Pages – Reorder, Rotate, Delete",
+    "Organize PDF Free – Reorder, Rotate, Delete",
     "Rearrange, rotate or remove pages from a PDF online for free. Check the new page order in the preview and download the document without an upload.",
   ],
   "name-date": [
-    "Add Name and Date on Photo for Exam Forms",
-    "Add a name and date below your photo when an application form asks for them. Preview the text strip and download the finished photo without an upload.",
+    "Add Name and Date on Photo Free for Exam Forms",
+    "Add a name and date below your photo free for application forms. Preview the text strip and download the finished photo without an upload.",
   ],
   "join-images": [
-    "Join Two Images Online – Photo and Signature",
-    "Combine a photo and signature into one image. Place them side by side or stack the photo above the signature, then download the result without an upload.",
+    "Join Two Images Online Free – Photo & Signature",
+    "Combine a photo and signature free into one image. Place them side by side or stack them, then download without uploading your files.",
   ],
   "white-background": [
-    "Whiten a Light Photo Background Online",
-    "Brighten a plain, light background to white. Adjust the brightness threshold and preview pale details in your photo before downloading it.",
+    "Whiten a Light Photo Background Online Free",
+    "Whiten a plain, light photo background free. Adjust the brightness threshold and preview pale details before downloading.",
   ],
 };
 export function pageSeo(id = "") {
@@ -137,6 +137,14 @@ export function pageSeo(id = "") {
           isPartOf: { "@id": siteOrigin + "/#website" },
           ...(id ? { breadcrumb: { "@id": url + "#breadcrumb" } } : {}),
         },
+        ...(tool ? [{
+          "@type": "WebApplication",
+          name,
+          url,
+          applicationCategory: "MultimediaApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+        }] : []),
         ...(id
           ? [
               {

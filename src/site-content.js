@@ -1,26 +1,26 @@
 export const sitePages = {
   about: {
-    title: "About MyDocPro",
+    title: "About MyDocPro – Free, Private Document Tools",
     description:
-      "What MyDocPro does, how its browser tools work and the limits to check before submitting documents.",
+      "Learn how MyDocPro’s free image and PDF tools process your files in your browser and what to check before submitting a document.",
   },
   privacy: {
-    title: "Privacy and local file processing",
+    title: "Privacy Policy",
     description:
-      "How MyDocPro handles selected documents, browser storage, web requests and support emails.",
+      "Learn which files MyDocPro processes on your device and how it handles browser storage, advertising, analytics and messages sent through the contact form.",
   },
   contact: {
-    title: "Contact MyDocPro",
+    title: "Contact Us",
     description:
-      "Get help with MyDocPro tools or report a problem and suggest a correction.",
+      "Questions, feedback or a tool request? Get in touch with the MyDocPro team.",
   },
   help: {
-    title: "Help and troubleshooting",
+    title: "Help & FAQ – How to Use MyDocPro Tools",
     description:
-      "Resolve image size, PDF processing, download and offline problems in MyDocPro.",
+      "Find help with image dimensions and file size limits, PDF processing, downloads and using MyDocPro offline.",
   },
   updates: {
-    title: "MyDocPro updates",
-    description: "A dated record of changes to MyDocPro tools and guidance.",
+    title: "What’s New",
+    description: "The latest tools, features and improvements added to MyDocPro.",
   },
 };

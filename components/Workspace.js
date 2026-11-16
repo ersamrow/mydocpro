@@ -335,7 +335,7 @@ export default function Workspace({
           <span className="page-emblem">
             <Icon name={tool[4]} />
           </span>
-          <Heading>{title}</Heading>
+          <Heading>{embedded ? title : meta.name}</Heading>
         </div>
         <p className="intro">
           {isMerge

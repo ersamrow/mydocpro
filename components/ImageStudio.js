@@ -124,7 +124,7 @@ function Controls({ id, values, update, advanced = false }) {
     });
 }
 
-export default function ImageStudio() {
+export default function ImageStudio({ heading }) {
   const [original, setOriginal] = useState(null),
     [current, setCurrent] = useState(null);
   const [history, setHistory] = useState([]),
@@ -468,7 +468,7 @@ export default function ImageStudio() {
         <Link href="/" className="back">
           ← All tools
         </Link>
-        <h1>Image Editor</h1>
+        <h1>{heading}</h1>
         <p>
           Upload a photo, make your changes, and download. You can undo any
           edit.

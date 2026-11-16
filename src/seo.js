@@ -5,76 +5,76 @@ export const siteOrigin = "https://mydocpro.co.in";
 // Descriptions explain real functionality; no invented ratings or acceptance claims.
 export const toolSearch = {
   "image-editor": [
-    "Image Editor — All Image Tools",
-    "Crop, rotate, resize, compress and convert JPG, PNG and WebP images. Prepare photos and signatures with local previews and downloads.",
+    "Free Online Photo Editor, No Sign-up",
+    "Crop, rotate and resize photos, or adjust brightness and contrast. Edit in your browser on your phone or computer and download without a watermark.",
   ],
   "pdf-toolkit": [
-    "PDF Toolkit — All PDF Tools",
-    "Merge, split, organize, compress and convert PDFs in one local workspace. Choose an operation, upload files, preview and download.",
+    "Free PDF Tools Online – Merge, Split, Compress",
+    "Merge, split, compress or organize PDFs in your browser. Turn photos into a PDF or export PDF pages as images, with no upload or sign-up.",
   ],
   "compress-image": [
-    "Compress Image to a KB Limit Online",
-    "Compress JPG, PNG or WebP images to a target KB size. Download a JPG, check the final dimensions and keep your photo processing on your device.",
+    "Compress Images for 20 KB, 50 KB or 100 KB Limits",
+    "Choose a 20 KB, 50 KB, 100 KB or custom limit for JPG, PNG or WebP images. Compress photos in your browser and download the result as a JPG.",
   ],
   "resize-image": [
-    "Resize Image in Pixels, CM, MM or Inches",
-    "Resize photos in pixels, centimetres, millimetres or inches. Choose DPI, crop or white padding, and save JPG, PNG or WebP locally in your browser.",
+    "Resize an Image in CM, MM, Inches or Pixels",
+    "Set photo dimensions in pixels, cm, mm or inches. Choose DPI and a crop or white padding, then save the resized image as JPG, PNG or WebP.",
   ],
   "convert-image": [
-    "Convert JPG, PNG and WebP Images Online",
-    "Convert images between JPG, PNG and WebP in your browser. Choose output quality and learn how conversion handles transparency and existing image detail.",
+    "Convert JPG, PNG and WebP Images Online Free",
+    "Convert JPG to PNG, PNG to JPG, or images to and from WebP. Choose your output format and download the converted image without uploading it.",
   ],
   "crop-image": [
-    "Crop and Rotate Images Online",
-    "Crop photos to square, portrait or widescreen ratios, rotate and adjust centre zoom. Process images locally and check framing before resizing.",
+    "Crop Images Online Free – Custom Aspect Ratios",
+    "Set a custom crop or choose a square, 4:3, 16:9 or 35:45 frame. Rotate the photo, check the framing and download it in your browser.",
   ],
   "merge-pdf": [
-    "Merge PDF Files Online for Free",
-    "Combine PDFs and arrange pages in your browser without uploading documents. Preview page order, download the merged PDF and check document limitations.",
+    "Merge PDF Files Online Free – Combine PDFs",
+    "Combine multiple PDFs into one file, arrange pages in the order you need and download the merged document. Your files stay on your device.",
   ],
   "split-pdf": [
-    "Split PDF and Extract Selected Pages",
-    "Extract PDF pages using ranges such as 1-3, 8. Save a combined selection or separate files, with local processing and guidance on page numbering.",
+    "Split PDF Online Free – Extract PDF Pages",
+    "Extract selected pages or page ranges from a PDF. Download the selection as one document or save each page as a separate PDF without uploading it.",
   ],
   "compress-pdf": [
-    "Compress Scanned PDF Files Online",
-    "Reduce scanned PDFs using adjustable DPI and JPEG quality. Processing stays local; the result is image-only and does not retain searchable text or forms.",
+    "Compress Scanned PDFs Online Free",
+    "Adjust resolution and JPEG quality to compress scanned PDFs in your browser. The output contains page images, so searchable text and forms are lost.",
   ],
   "jpg-to-pdf": [
-    "Convert JPG, PNG and WebP to PDF",
-    "Create a PDF from images in your browser. Arrange photos, choose A4, Letter or image-sized pages, and check readability before sharing your document.",
+    "JPG to PDF Converter Online Free",
+    "Convert JPG, PNG or WebP images into a single PDF. Arrange photos in order, choose A4, Letter or image-sized pages, and download without an upload.",
   ],
   "exam-photo": [
-    "Resize Application Photos to Standard Sizes",
-    "Prepare photos at generic 35 × 45 mm, 2 × 2 inch or 25 × 35 mm sizes. Set DPI and a KB limit, then check the receiving form’s actual requirements.",
+    "Exam Photo Resizer for Application Forms",
+    "Choose a 35 × 45 mm, 25 × 35 mm or 2 × 2 inch photo preset, DPI and maximum KB. Match the settings to the requirements on your application form.",
   ],
   signature: [
-    "Clean a Signature Image Background",
-    "Clean a signature scan on white paper with an adjustable brightness threshold. Keep processing local and check faint strokes before using the image.",
+    "Clean a Signature Background for Online Forms",
+    "Clean a scanned signature on white paper. Adjust the threshold to keep faint pen strokes, preview the result and download it as JPG, PNG or WebP.",
   ],
   "passport-sheet": [
-    "Create a 4 × 6 Inch Passport Photo Sheet",
-    "Arrange four, six or eight photos on a 4 × 6 inch print sheet. Learn actual-size print settings and why eight-photo layouts use smaller photo areas.",
+    "Passport Photo Maker – Printable 4 × 6 Inch Sheet",
+    "Arrange four, six or eight copies on a printable 4 × 6 inch sheet. Four or six give roughly 35 × 45 mm photos at actual size. Eight gives smaller prints.",
   ],
   "pdf-to-image": [
-    "Convert PDF Pages to JPG, PNG or WebP",
-    "Export selected PDF pages as JPG, PNG or WebP images. Choose rendering DPI, download each page and process smaller ranges to manage device memory.",
+    "PDF to JPG Converter Online Free",
+    "Convert all or selected PDF pages to JPG, PNG or WebP images. Choose a resolution and download one image per page in your browser.",
   ],
   "organize-pdf": [
-    "Reorder, Rotate and Remove PDF Pages",
-    "Organize PDF pages with previews and page-order controls. Reorder, rotate or remove pages locally, then inspect the downloaded document before submitting.",
+    "Organize PDF Pages – Reorder, Rotate, Delete",
+    "Rearrange, rotate or remove pages from a PDF online for free. Check the new page order in the preview and download the document without an upload.",
   ],
   "name-date": [
-    "Add a Name and Date Below a Photo",
-    "Add a readable name and date strip below a photo in your browser. Check final dimensions and the receiving form’s rules before uploading the result.",
+    "Add Name and Date on Photo for Exam Forms",
+    "Add a name and date below your photo when an application form asks for them. Preview the text strip and download the finished photo without an upload.",
   ],
   "join-images": [
-    "Combine a Photo and Signature Image",
-    "Join a photo and signature vertically or side by side. Keep their proportions, process locally and download one image for forms that request it.",
+    "Join Two Images Online – Photo and Signature",
+    "Combine a photo and signature into one image. Place them side by side or stack the photo above the signature, then download the result without an upload.",
   ],
   "white-background": [
-    "Whiten a Light Image Background",
-    "Whiten plain, light backgrounds with an adjustable brightness threshold. See the limits of this method and protect bright details in your subject.",
+    "Whiten a Light Photo Background Online",
+    "Brighten a plain, light background to white. Adjust the brightness threshold and preview pale details in your photo before downloading it.",
   ],
 };
 export function pageSeo(id = "") {
@@ -86,14 +86,14 @@ export function pageSeo(id = "") {
     : page
       ? page.title
       : known
-        ? "Free Image and PDF Tools"
+        ? "Free Image & PDF Tools Online, No Upload"
         : "Page not found";
   const description = tool
     ? toolSearch[id][1]
     : page
       ? page.description
       : known
-        ? "Free image and PDF tools that process files in your browser. Resize photos, compress images, merge PDFs and prepare signatures without uploading documents."
+        ? "Compress, resize and convert images, merge and split PDFs, and prepare application photos for free. Files stay on your device while you use the tools."
         : "This address does not match a MyDocPro page. Browse the image and PDF tools to find what you need.";
   const url = siteOrigin + "/" + id;
   const graph = known
@@ -155,7 +155,7 @@ export function pageSeo(id = "") {
     : [];
   return {
     name,
-    title: name + " | MyDocPro",
+    title: name.includes("MyDocPro") ? name : name + " | MyDocPro",
     description,
     url,
     known,

@@ -7,7 +7,7 @@ import { Icon } from "./Shared.js";
 import { tools } from "../src/tools.js";
 import { multiTools, pdfTools } from "../src/tool-settings.js";
 
-export default function CombinedWorkspace({ tool }) {
+export default function CombinedWorkspace({ heading }) {
   const operations = [
     "merge-pdf",
     "split-pdf",
@@ -58,7 +58,7 @@ export default function CombinedWorkspace({ tool }) {
           ← All tools
         </Link>
 
-        <h1>{tool[1]}</h1>
+        <h1>{heading}</h1>
         <p className="intro">
           Choose a task, add your files, and download the result. Your documents
           stay on your device.

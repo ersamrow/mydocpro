@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
 import { tools } from "../src/tools.js";
-export default function Home() {
+export default function Home({ heading }) {
   const router = useRouter();
   const [filter, setFilter] = useState("all"),
     [search, setSearch] = useState("");
@@ -24,11 +24,7 @@ export default function Home() {
           <span className="eyebrow">
             <i /> SMALL TOOLS. BIG HELP.
           </span>
-          <h1>
-            Free image tools.
-            <br />
-            <em>Simple PDF tools.</em>
-          </h1>
+          <h1>{heading}</h1>
           <p>
             Resize a photo. Tidy up a PDF. Get that form submitted.
             <br /> Free, simple tools that keep your files on your device.

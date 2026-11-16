@@ -51,12 +51,12 @@ export default function ToolApplication({ id }) {
         )}
       </Head>
       {id === "" ? (
-        <Home />
+        <Home heading={m.name} />
       ) : tool ? (
         id === "image-editor" ? (
-          <ImageStudio />
+          <ImageStudio heading={m.name} />
         ) : id === "pdf-toolkit" ? (
-          <CombinedWorkspace key={id} tool={tool} />
+          <CombinedWorkspace key={id} heading={m.name} />
         ) : (
           <Workspace key={id} tool={tool} />
         )

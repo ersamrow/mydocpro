@@ -1,5 +1,6 @@
 export default {
   reactStrictMode: true,
+  experimental: { optimizeCss: true },
   images: { unoptimized: true },
   async headers() {
     return [
@@ -13,6 +14,7 @@ export default {
         source: "/pdf.worker-:version.js",
         headers: [
           { key: "Content-Type", value: "text/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
       {

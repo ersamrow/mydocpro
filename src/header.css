@@ -6,7 +6,6 @@ html:root{scroll-padding-top:80px}
 .site-header nav{gap:4px}
 .site-header nav a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 13px;border-radius:9px;white-space:nowrap;font-size:13px}
 .site-header nav a:hover,.site-header nav a:focus-visible{background:#eaf1e7;color:var(--green)}
-.site-header .app-status:empty{display:none}
 .site-header .app-status{margin-top:2px;line-height:1.2}
 @media(max-width:800px){
   html:root{scroll-padding-top:124px}

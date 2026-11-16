@@ -95,7 +95,9 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 5px;
-  max-width: 190px;
+  /* Keep navigation still when the offline status or install label changes. */
+  width: 128px;
+  flex-shrink: 0;
 }
 .site-header .install-button {
   background: #f4fbf6;
@@ -104,6 +106,7 @@ body {
   border-radius: 10px;
   min-height: 44px;
   font-size: 12px;
+  width: 9.25em;
   font-weight: 700;
   padding: 10px 16px;
 }
@@ -114,6 +117,8 @@ body {
   color: #b4cec1;
   font-size: 10px;
   line-height: 1.35;
+  width: 100%;
+  min-height: 1.35em;
   margin: 0;
 }
 .site-header .pwa-dialog {
@@ -1287,6 +1292,8 @@ html:root {
 }
 .quality-preview img {
   display: block;
+  width: auto;
+  height: auto;
   max-width: 100%;
   max-height: 440px;
   margin: auto;
@@ -1447,6 +1454,14 @@ html:root {
   min-height: 44px;
   padding: 10px 14px;
   margin: 12px 0;
+}
+.image-edit-stage:empty {
+  /* Reserve the preview area while the selected image is being processed. */
+  display: flex;
+  visibility: hidden;
+}
+.image-edit-stage img {
+  aspect-ratio: auto 1 / 1;
 }
 .before-after {
   display: grid;

@@ -39,8 +39,9 @@ export default function PdfQualityPreview({ file, values, busy }) {
                 Number(values.quality) / 100,
               ),
             );
+            if (!blob) throw Error("The browser could not create the preview.");
             if (!disposed) {
-              setPreview(blob);
+              setPreview({ blob, width: canvas.width, height: canvas.height });
               setStatus(
                 "First-page sample, limited to 1,000 pixels for speed. Full output uses your selected DPI.",
               );
@@ -66,7 +67,7 @@ export default function PdfQualityPreview({ file, values, busy }) {
       <summary>Live PDF quality preview</summary>
       {preview && (
         <BlobImage
-          blob={preview}
+          {...preview}
           alt="First PDF page with current JPEG quality and resolution"
         />
       )}

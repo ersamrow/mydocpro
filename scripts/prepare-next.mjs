@@ -1,6 +1,11 @@
 import { copyFile, readFile, rm } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { copyLibFiles } from "@qwik.dev/partytown/utils";
 import "./build-agent-assets.mjs";
 const root = new URL("../", import.meta.url);
+await copyLibFiles(fileURLToPath(new URL("public/~partytown/", root)), {
+  debugDir: false,
+});
 const { version } = JSON.parse(
   await readFile(new URL("node_modules/pdfjs-dist/package.json", root), "utf8"),
 );

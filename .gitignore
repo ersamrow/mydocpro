@@ -11,6 +11,7 @@ dist/
 out/
 public/pdf.worker.min.mjs
 public/pdf.worker-*.js
+public/~partytown/
 
 public/sw.js
 public/sitemap.xml

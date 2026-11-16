@@ -20,6 +20,7 @@
     "test:visual": "playwright test --config playwright.visual.config.cjs"
   },
   "dependencies": {
+    "@qwik.dev/partytown": "1.0.5",
     "critters": "npm:beasties@0.4.3",
     "lucide-react": "^1.65.0",
     "next": "^16.4.3",

@@ -4,7 +4,8 @@ import { routeIds } from "../src/routes.js";
 async function walk(root, prefix = "") {
   const files = [];
   for (const entry of await readdir(root, { withFileTypes: true })) {
-    if (entry.name.startsWith(".")) continue;
+    // Analytics is online-only. Its worker has a separate, narrower scope.
+    if (entry.name.startsWith(".") || entry.name === "~partytown") continue;
     if (entry.isDirectory())
       files.push(
         ...(await walk(

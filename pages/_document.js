@@ -10,11 +10,6 @@ export default function Document() {
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4905030687832208"
-          crossOrigin="anonymous"
-        />
       </Head>
       <body>
         <Main />

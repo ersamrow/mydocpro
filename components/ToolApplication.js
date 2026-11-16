@@ -20,6 +20,12 @@ export default function ToolApplication({ id }) {
           content="width=device-width, initial-scale=1, viewport-fit=cover"
         />
         <title>{m.title}</title>
+        {id === "" && (
+          <meta
+            name="msvalidate.01"
+            content="4334342A88314D32DC60BD48D38750D5"
+          />
+        )}
         <meta name="description" content={m.description} />
         <meta name="robots" content={m.robots} />
         <link rel="canonical" href={m.url} />

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ImageManipulator from "./ImageManipulator.js";
+import ToolGuide from "./ToolGuide.js";
 import { tools } from "../src/tools.js";
 import { defaults, fields, size, validateFiles } from "../src/tool-settings.js";
 import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
@@ -634,6 +635,7 @@ export default function ImageStudio() {
           </section>
         </div>
       )}
+      <ToolGuide id="image-editor" />
     </main>
   );
 }

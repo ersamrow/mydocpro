@@ -1,6 +1,22 @@
 import { tools } from "./tools.js";
 // Guidance describes the implemented tools, not official application requirements.
 export const guides = {
+  "image-editor": [
+    "How to edit a photo in one workspace",
+    "Use the image editor to crop, rotate, resize, compress and convert a photo, or prepare a signature and application photo. Edits run locally in your browser. Each applied operation becomes the starting image for your next edit.",
+    "For an application photo, crop the framing first, add a name/date strip only if requested, then resize the complete image to the required dimensions. Compress near the end, because later edits can change the file size. Check the final downloaded image against the receiving form’s instructions.",
+    "How do I keep edits when moving between tools?",
+    "In this editor, apply each operation before continuing. Download saves the current image. Several operations flatten transparent areas onto white, and increasing dimensions cannot recover lost detail. Keep your original and use undo when an applied change removes detail you need.",
+    "resize-image",
+  ],
+  "pdf-toolkit": [
+    "How to choose the right PDF task",
+    "Use Edit pages to select, move and rotate pages across PDFs. Choose Merge to combine files, Split to extract a range, Organize to reorder or remove pages, Compress for scanned PDFs, Image to PDF for photos, or PDF to image to export page pictures. Files are processed in your browser.",
+    "To assemble a submission from two PDFs, start with Edit pages, add both files and arrange the required pages. Create a PDF from the selected pages, download it and inspect every document boundary. If you also need compression, upload that downloaded PDF to Compress; switching tasks does not automatically use your previous result.",
+    "Will switching tasks preserve my work?",
+    "Compatible source files stay available, but settings and results reset. Single-file tasks retain only the first source file; switching between PDFs and images requires new files. Download results before switching. Editing can invalidate digital signatures, and scanned-PDF compression removes searchable text, links, forms and accessibility tags.",
+    "merge-pdf",
+  ],
   "compress-image": [
     "Fit a photo into an upload limit",
     "Choose a JPG, PNG or WebP image, enter the maximum KB and set the maximum width. The output is JPG. Start with the dimensions required by your form instead of immediately choosing a very small size.",
@@ -129,4 +145,29 @@ export const guides = {
     "The tool cannot distinguish the subject from the background. Increase the threshold to preserve more bright detail, or retake the photo against a uniformly lit plain background. Check the destination’s photo-editing rules before submitting.",
     "crop-image",
   ],
+};
+
+export const combinedGuideDetails = {
+  "image-editor": {
+    steps: [
+      "Choose a source photo and inspect its orientation and detail before editing.",
+      "Crop and rotate first. Review the preview, then apply the edit to use it in later operations.",
+      "Open additional tools for conversion, signature cleanup or photo layouts when needed. Apply one operation at a time.",
+      "Set final dimensions with Resize and use Compress near the end if there is a KB limit. Download the current image before leaving the page.",
+    ],
+    checks:
+      "Open the saved file and check the face or signature at normal size, the complete frame, output format, pixel dimensions and final byte size. The preview alone is not proof that an application will accept the image.",
+    related: ["crop-image", "resize-image", "compress-image"],
+  },
+  "pdf-toolkit": {
+    steps: [
+      "Choose the task that matches your intended output before adding files. Image to PDF needs images; other tasks here need PDFs.",
+      "For Edit pages, add the source PDFs, review page thumbnails and select the pages to keep. Move or rotate pages as needed.",
+      "Create the PDF from selected pages, or run the chosen task with its settings. Wait for processing to finish.",
+      "Download the result before switching tasks. To perform another operation on the result, choose the downloaded file as the new source.",
+    ],
+    checks:
+      "Open the final PDF and confirm page count, page order, orientation and small-text readability. Keep original signed or interactive documents; the output is not guaranteed to preserve digital signatures or document-level features.",
+    related: ["merge-pdf", "split-pdf", "compress-pdf"],
+  },
 };

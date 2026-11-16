@@ -2,6 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Workspace from "./Workspace.js";
 import PdfWorkbench from "./PdfWorkbench.js";
+import ToolGuide from "./ToolGuide.js";
 import { Icon } from "./Shared.js";
 import { tools } from "../src/tools.js";
 import { multiTools, pdfTools } from "../src/tool-settings.js";
@@ -128,6 +129,7 @@ export default function CombinedWorkspace({ tool }) {
           onWorkingChange={setWorking}
         />
       )}
+      <ToolGuide id="pdf-toolkit" />
     </main>
   );
 }

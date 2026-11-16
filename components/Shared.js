@@ -110,17 +110,29 @@ export function Breadcrumb({ title }) {
 }
 export function Footer() {
   return (
-    <footer>
-      <Logo />
-      <span>Made for your everyday paperwork. Built for your privacy.</span>
-      <nav className="foot-links" aria-labelledby="footer-projects">
-        <strong id="footer-projects">Our projects</strong>
-        <a href="https://greetlo.in/">Greetlo</a>
-        <a href="https://myledgerpro.in/">MyLedgerPro</a>
+    <footer className="site-footer">
+      <div className="footer-identity">
+        <Logo />
+        <p>Made for your everyday paperwork. Built for your privacy.</p>
+      </div>
+      <nav aria-labelledby="footer-projects">
+        <h2 id="footer-projects">Our projects</h2>
+        <div className="footer-projects">
+          <a href="https://greetlo.in/">
+            <strong>Greetlo <ArrowUpRight aria-hidden="true" /></strong>
+            <span>Create and share personalized greeting cards.</span>
+          </a>
+          <a href="https://myledgerpro.in/">
+            <strong>MyLedgerPro <ArrowUpRight aria-hidden="true" /></strong>
+            <span>Track customer balances, loans, and repayments.</span>
+          </a>
+        </div>
       </nav>
-      <div className="foot-links">
-        <ContentLinks />
-        <span>© {new Date().getFullYear()} MyDocPro</span>
+      <div className="footer-bottom">
+        <nav className="foot-links" aria-label="MyDocPro information">
+          <ContentLinks />
+        </nav>
+        <small>© {new Date().getFullYear()} MyDocPro</small>
       </div>
     </footer>
   );

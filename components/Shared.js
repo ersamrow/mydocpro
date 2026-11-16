@@ -113,6 +113,11 @@ export function Footer() {
     <footer>
       <Logo />
       <span>Made for your everyday paperwork. Built for your privacy.</span>
+      <nav className="foot-links" aria-labelledby="footer-projects">
+        <strong id="footer-projects">Our projects</strong>
+        <a href="https://greetlo.in/">Greetlo</a>
+        <a href="https://myledgerpro.in/">MyLedgerPro</a>
+      </nav>
       <div className="foot-links">
         <ContentLinks />
         <span>© {new Date().getFullYear()} MyDocPro</span>

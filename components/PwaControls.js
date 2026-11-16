@@ -10,7 +10,10 @@ export default function PwaControls() {
   const dialog = useRef(null);
   useEffect(() => {
     let disposed = false,
-      registration;
+      registration,
+      checkedWorker,
+      statusPort,
+      statusTimer;
     const cleanups = [];
     const listen = (target, type, fn) => {
       target.addEventListener(type, fn);
@@ -21,37 +24,55 @@ export default function PwaControls() {
       matchMedia("(display-mode: standalone)").matches ||
         !!navigator.standalone,
     );
-    function check() {
+    function closeStatusChannel() {
+      clearTimeout(statusTimer);
+      statusPort?.close();
+      statusPort = null;
+    }
+    function check(refresh = false) {
       const worker =
         navigator.serviceWorker?.controller || registration?.active;
-      if (!worker) return;
+      if (!worker) {
+        closeStatusChannel();
+        checkedWorker = null;
+        setReady(false);
+        return;
+      }
+      if (checkedWorker === worker && (statusPort || !refresh)) return;
+      closeStatusChannel();
+      checkedWorker = worker;
       const channel = new MessageChannel();
-      const timer = setTimeout(() => {
-        channel.port1.close();
-        if (!disposed) setFailed(true);
-      }, 10000);
-      cleanups.push(() => {
-        clearTimeout(timer);
-        channel.port1.close();
-      });
-      channel.port1.onmessage = (e) => {
-        clearTimeout(timer);
-        channel.port1.close();
-        if (!disposed) {
-          setReady(e.data?.ready === true);
-          setFailed(!e.data?.ready);
-        }
-      };
-      worker.postMessage({ type: "OFFLINE_STATUS" }, [channel.port2]);
+      statusPort = channel.port1;
+      function finish(available) {
+        if (statusPort !== channel.port1) return;
+        closeStatusChannel();
+        if (!available) checkedWorker = null;
+        setReady(available);
+        setFailed(!available);
+      }
+      statusTimer = setTimeout(() => finish(false), 10000);
+      statusPort.onmessage = (e) => finish(e.data?.ready === true);
+      try {
+        worker.postMessage({ type: "OFFLINE_STATUS" }, [channel.port2]);
+      } catch {
+        finish(false);
+      }
     }
     listen(window, "online", () => {
       setOnline(true);
-      check();
+      check(true);
       registration?.update().catch(() => {});
     });
     listen(window, "offline", () => {
       setOnline(false);
-      check();
+      check(true);
+    });
+    listen(window, "pageshow", (event) => {
+      if (event.persisted) {
+        setOnline(navigator.onLine);
+        closeStatusChannel();
+        check(true);
+      }
     });
     listen(window, "beforeinstallprompt", (e) => {
       e.preventDefault();
@@ -65,7 +86,7 @@ export default function PwaControls() {
       if (!("serviceWorker" in navigator) || !window.isSecureContext)
         setFailed(true);
       else {
-        listen(navigator.serviceWorker, "controllerchange", check);
+        listen(navigator.serviceWorker, "controllerchange", () => check());
         const register = () =>
           navigator.serviceWorker
             .register("/sw.js", { scope: "/", updateViaCache: "none" })
@@ -88,7 +109,9 @@ export default function PwaControls() {
               if (reg.active) check();
             })
             .catch(() => {
-              if (!disposed) setFailed(true);
+              if (disposed) return;
+              if (navigator.serviceWorker.controller) check();
+              else setFailed(true);
             });
         const scheduleRegistration = () => {
           if ("requestIdleCallback" in window) {
@@ -105,6 +128,7 @@ export default function PwaControls() {
     }
     return () => {
       disposed = true;
+      closeStatusChannel();
       cleanups.forEach((fn) => fn());
     };
   }, []);
@@ -130,7 +154,7 @@ export default function PwaControls() {
           {installed ? "App & offline" : "Install app"}
         </button>
         <span className="app-status" data-app-status role="status">
-          {status}
+          <span key={status}>{status}</span>
         </span>
       </div>
       <dialog

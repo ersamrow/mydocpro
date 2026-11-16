@@ -79,9 +79,11 @@ self.addEventListener("message", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(CACHE);
-      const ready = (
-        await Promise.all(PRECACHE.map((url) => cache.match(url)))
-      ).every(Boolean);
+      const entries = await cache.keys();
+      const cachedUrls = new Set(entries.map((request) => request.url));
+      const ready = PRECACHE.every((path) =>
+        cachedUrls.has(self.location.origin + path),
+      );
       event.ports[0]?.postMessage({ ready, version: CACHE });
     })(),
   );

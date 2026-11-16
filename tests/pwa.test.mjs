@@ -25,6 +25,7 @@ function worker({ badAsset, badMime, jsMime = "text/javascript" } = {}) {
       return {
         put: async (k, v) => map.set(k, v.clone()),
         match: async (k) => map.get(k)?.clone(),
+        keys: async () => [...map.keys()].map((url) => new LocalRequest(url)),
       };
     },
   };
@@ -162,6 +163,22 @@ test("contact, user files, ads and unknown routes are excluded", async () => {
       undefined,
     );
   assert.ok(!script.includes('.php"'));
+});
+test("offline readiness detects a missing entry even when the cache count is unchanged", async () => {
+  const w = worker();
+  await w.event("install");
+  await w.event("activate");
+  const cache = [...w.stores.entries()].find(([key]) =>
+    key.startsWith("mydocpro-"),
+  )[1];
+  cache.set("/unrelated.js", cache.get(workerUrl));
+  cache.delete(workerUrl);
+  let report;
+  await w.event("message", {
+    data: { type: "OFFLINE_STATUS" },
+    ports: [{ postMessage: (result) => (report = result) }],
+  });
+  assert.equal(report.ready, false);
 });
 test("Hostinger's legacy JavaScript MIME type can be cached", async () => {
   const w = worker({ jsMime: "application/x-javascript; charset=utf-8" });

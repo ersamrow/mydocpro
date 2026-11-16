@@ -104,6 +104,14 @@ export function pageSeo(id = "") {
           name: "MyDocPro",
           url: siteOrigin + "/",
           logo: siteOrigin + "/brand/mydocpro-1024.png",
+          telephone: "+919781843043",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "Near primary school",
+            addressLocality: "Village Arakwas",
+            postalCode: "148031",
+            addressCountry: "IN",
+          },
           email: "info@mydocpro.co.in",
         },
         {

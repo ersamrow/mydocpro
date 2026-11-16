@@ -1,0 +1,16 @@
+{
+  "name": "mydocpro",
+  "version": "1.0.0",
+  "serverInfo": {
+    "name": "mydocpro",
+    "version": "1.0.0"
+  },
+  "protocolVersion": "2025-06-18",
+  "transport": {
+    "type": "streamable-http",
+    "endpoint": "https://mydocpro.co.in/api/mcp"
+  },
+  "capabilities": {
+    "tools": {}
+  }
+}

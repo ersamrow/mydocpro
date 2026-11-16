@@ -85,6 +85,11 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET" || url.origin !== self.location.origin)
     return;
   const route = url.pathname.replace(/\/$/, "") || "/";
+  if (
+    route === "/" &&
+    event.request.headers?.get("accept")?.includes("text/markdown")
+  )
+    return;
   let key;
   if (event.request.mode === "navigate" && ROUTES.has(route)) key = route;
   else if (PRECACHE.includes(url.pathname)) key = url.pathname;

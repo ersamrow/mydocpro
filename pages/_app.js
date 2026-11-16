@@ -17,7 +17,27 @@ import "../src/merge-workspace.css";
 import Header from "../components/Header.js";
 import GoogleAnalytics from "../components/GoogleAnalytics.js";
 import { Footer } from "../components/Shared.js";
+import { useEffect } from "react";
+import { catalogTool, listDocumentTools } from "../src/agent-catalog.js";
+
 export default function App({ Component, pageProps }) {
+  useEffect(() => {
+    const context = navigator.modelContext;
+    if (!context?.registerTool) return;
+    const controller = new AbortController();
+    context.registerTool(
+      {
+        ...catalogTool,
+        execute: async () => ({
+          content: [
+            { type: "text", text: JSON.stringify(listDocumentTools()) },
+          ],
+        }),
+      },
+      { signal: controller.signal },
+    );
+    return () => controller.abort();
+  }, []);
   return (
     <div id="app">
       <GoogleAnalytics />

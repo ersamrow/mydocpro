@@ -1,4 +1,5 @@
 import { copyFile, readFile, rm } from "node:fs/promises";
+import "./build-agent-assets.mjs";
 const root = new URL("../", import.meta.url);
 const { version } = JSON.parse(
   await readFile(new URL("node_modules/pdfjs-dist/package.json", root), "utf8"),

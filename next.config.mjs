@@ -4,6 +4,12 @@ export default {
   async headers() {
     return [
       {
+        source: "/index.md",
+        headers: [
+          { key: "Content-Type", value: "text/markdown; charset=utf-8" },
+        ],
+      },
+      {
         source: "/pdf.worker-:version.js",
         headers: [
           { key: "Content-Type", value: "text/javascript; charset=utf-8" },

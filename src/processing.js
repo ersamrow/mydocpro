@@ -1,4 +1,6 @@
 import { throwIfCancelled, checkpoint } from "./file-validation.js";
+import { pageIndices } from "./page-indices.js";
+export { pageIndices } from "./page-indices.js";
 function canvas(w, h) {
   w = Math.round(w);
   h = Math.round(h);
@@ -79,22 +81,6 @@ async function compress(c, kb, preserveDimensions = false, signal) {
     c = draw(c, Math.max(1, c.width * 0.85), Math.max(1, c.height * 0.85));
   }
   throw Error("Cannot reach the requested size. Try a larger limit.");
-}
-export function pageIndices(spec, count) {
-  if (spec.trim().toLowerCase() === "all")
-    return Array.from({ length: count }, (_, i) => i);
-  const result = [];
-  for (const part of spec.split(",")) {
-    const m = part.trim().match(/^(\d+)(?:\s*-\s*(\d+))?$/);
-    if (!m) throw Error("Use page numbers like 1-3, 5, 8.");
-    const start = +m[1],
-      end = +(m[2] || m[1]);
-    if (start < 1 || end > count || end < start)
-      throw Error(`Page range must be between 1 and ${count}.`);
-    for (let i = start; i <= end; i++) result.push(i - 1);
-  }
-  if (result.length > 300) throw Error("Select at most 300 pages.");
-  return result;
 }
 export async function pdfRenderer(f, signal) {
   const pdfjs = await import("pdfjs-dist");

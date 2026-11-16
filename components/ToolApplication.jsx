@@ -1,17 +1,17 @@
 import Head from "next/head";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { pageSeo, siteOrigin } from "../src/seo.js";
 import { tools } from "../src/tools.js";
-import { pageBodies } from "./ContentPages.js";
-import InformationPage from "./InformationPage.js";
 import Home from "./Home.js";
-import Workspace from "./Workspace.js";
-import CombinedWorkspace from "./CombinedWorkspace.js";
-import ImageStudio from "./ImageStudio.js";
+const InformationPage = dynamic(() => import("./InformationPage.js"));
+const Workspace = dynamic(() => import("./Workspace.jsx"));
+const CombinedWorkspace = dynamic(() => import("./CombinedWorkspace.js"));
+const ImageStudio = dynamic(() => import("./ImageStudio.js"));
+
 export default function ToolApplication({ id }) {
   const m = pageSeo(id),
-    tool = tools.find((t) => t[0] === id),
-    Content = pageBodies[id];
+    tool = tools.find((t) => t[0] === id);
   return (
     <>
       <Head>
@@ -66,10 +66,8 @@ export default function ToolApplication({ id }) {
         ) : (
           <Workspace key={id} tool={tool} />
         )
-      ) : Content ? (
-        <InformationPage id={id}>
-          <Content />
-        </InformationPage>
+      ) : m.known ? (
+        <InformationPage id={id} />
       ) : (
         <main className="workspace not-found-page">
           <span className="page-kicker">ERROR 404</span>

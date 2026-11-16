@@ -47,8 +47,8 @@ const toolDate = contentDate([
   "src/tools.js",
   "src/tool-guides.js",
   "src/tool-guide-details.js",
-  "components/Tool*.js",
-  "components/*Workspace.js",
+  "components/Tool*.js*",
+  "components/*Workspace.js*",
   "components/Image*.js",
   "components/Pdf*.js",
 ]);

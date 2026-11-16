@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
-import PdfQualityPreview from "./PdfQualityPreview.js";
 import useToolSettings from "./useToolSettings.js";
 import ZipDownload from "./ZipDownload.js";
 import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
 import { actionLabels } from "../src/ui-copy.js";
 import Settings from "./Settings.js";
 import ToolGuide from "./ToolGuide.js";
-import ImageEditor from "./ImageEditor.js";
-import PdfEditor from "./PdfEditor.js";
 import {
   batchTools,
   pdfTools,
@@ -19,8 +17,13 @@ import {
   validateFiles,
 } from "../src/tool-settings.js";
 import { pageSeo } from "../src/seo.js";
-import { processImage, processPdf, pageIndices } from "../src/processing.js";
+import { pageIndices } from "../src/page-indices.js";
 import { downloadName } from "../src/download-name.js";
+
+const PdfQualityPreview = dynamic(() => import("./PdfQualityPreview.js"));
+const ImageEditor = dynamic(() => import("./ImageEditor.js"));
+const PdfEditor = dynamic(() => import("./PdfEditor.js"));
+
 function Download({ result, compact = false }) {
   const [url, setUrl] = useState("");
   useEffect(() => {
@@ -245,6 +248,8 @@ export default function Workspace({
     };
     try {
       await new Promise((r) => setTimeout(r, 20));
+      const { processImage, processPdf } = await import("../src/processing.js");
+      throwIfCancelled(signal);
       if (isPdf || id === "jpg-to-pdf")
         await processPdf(id, files, values, {
           signal,

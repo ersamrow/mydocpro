@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
-import Workspace from "./Workspace.js";
+import Workspace from "./Workspace.jsx";
 import PdfWorkbench from "./PdfWorkbench.js";
 import ToolGuide from "./ToolGuide.js";
 import { Icon } from "./Shared.js";

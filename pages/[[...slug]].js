@@ -1,4 +1,4 @@
-import ToolApplication from "../components/ToolApplication.js";
+import ToolApplication from "../components/ToolApplication.jsx";
 import { routeIds } from "../src/routes.js";
 export default ToolApplication;
 export function getStaticPaths() {

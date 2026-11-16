@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Breadcrumb, Icon } from "./Shared.js";
 import { sitePages } from "../src/site-content.js";
+import { pageBodies } from "./ContentPages.js";
 const pages = [
   ["about", "About us", "files"],
   ["help", "Help centre", "sparkles"],
@@ -8,8 +9,9 @@ const pages = [
   ["contact", "Contact", "contact-round"],
   ["updates", "What’s new", "zap"],
 ];
-export default function InformationPage({ id, children }) {
+export default function InformationPage({ id }) {
   const page = sitePages[id],
+    Content = pageBodies[id],
     current = pages.find((p) => p[0] === id);
   return (
     <main className={"workspace information-page information-" + id}>
@@ -56,7 +58,7 @@ export default function InformationPage({ id, children }) {
           </div>
         </aside>
         <article className="information-content privacy-page">
-          {children}
+          <Content />
         </article>
       </div>
     </main>

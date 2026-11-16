@@ -2,11 +2,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
+import ToolCards from "./ToolCards.js";
 import { tools } from "../src/tools.js";
-export default function Home({ heading }) {
+export default function Home({ heading, cards }) {
   const router = useRouter();
   const [filter, setFilter] = useState("all"),
     [search, setSearch] = useState("");
+  useEffect(() => {
+    // Keep text entered into the prerendered input before React was ready.
+    const value = document.getElementById("search")?.value;
+    if (value) setSearch(value);
+  }, []);
   useEffect(() => {
     const hash = router.asPath.split("#")[1];
     setFilter(["image", "pdf"].includes(hash) ? hash : "all");
@@ -140,22 +146,7 @@ export default function Home({ heading }) {
             {shown.length} {shown.length === 1 ? "tool" : "tools"} available
           </span>
         </div>
-        <div className="grid" id="grid">
-          {shown.map((t) => (
-            <Link key={t[0]} className={"card " + t[3]} href={"/" + t[0]}>
-              <div className="card-top">
-                <span className="tool-icon">
-                  <Icon name={t[4]} />
-                </span>
-                {t[5] && <span className="tag">{t[5]}</span>}
-              </div>
-              <h3>{t[1]}</h3>
-              <p>{t[2]}</p>
-              <span className="go">
-                <Icon name="arrow-up-right" />
-              </span>
-            </Link>
-          ))}
+        <ToolCards shown={shown} cards={cards}>
           {!shown.length && (
             <div className="empty">
               <h3>No matching tools</h3>
@@ -172,7 +163,7 @@ export default function Home({ heading }) {
               </button>
             </div>
           )}
-        </div>
+        </ToolCards>
         <div className="trust">
           <span className="tool-icon">
             <Icon name="shield-check" />

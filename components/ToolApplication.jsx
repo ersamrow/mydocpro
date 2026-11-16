@@ -9,7 +9,7 @@ const Workspace = dynamic(() => import("./Workspace.jsx"));
 const CombinedWorkspace = dynamic(() => import("./CombinedWorkspace.js"));
 const ImageStudio = dynamic(() => import("./ImageStudio.js"));
 
-export default function ToolApplication({ id }) {
+export default function ToolApplication({ id, cards }) {
   const m = pageSeo(id),
     tool = tools.find((t) => t[0] === id);
   return (
@@ -57,7 +57,7 @@ export default function ToolApplication({ id }) {
         )}
       </Head>
       {id === "" ? (
-        <Home heading={m.name} />
+        <Home heading={m.name} cards={cards} />
       ) : tool ? (
         id === "image-editor" ? (
           <ImageStudio heading={m.name} />

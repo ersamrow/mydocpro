@@ -222,23 +222,26 @@ export const multiTools = [
   "join-images",
   ...batchTools,
 ];
-export function validateFiles(incoming, current, { pdf, multi, replace }) {
+export function validateFiles(
+  incoming,
+  current,
+  { pdf, multi, replace, allowImages = false },
+) {
   for (const f of incoming) {
-    if (
-      pdf
-        ? !/\.pdf$/i.test(f.name)
-        : !(
-            /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) ||
-            /\.hei[cf]$/i.test(f.name)
-          )
-    )
+    const isPdf = /\.pdf$/i.test(f.name);
+    const isImage =
+      /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) ||
+      /\.hei[cf]$/i.test(f.name);
+    if (pdf ? !(isPdf || (allowImages && isImage)) : !isImage)
       throw Error(
         pdf
-          ? "Please choose PDF files."
+          ? allowImages
+            ? "Please choose PDFs or JPG, PNG, WebP, HEIC or HEIF images."
+            : "Please choose PDF files."
           : "Please choose JPG, PNG, WebP, HEIC or HEIF images.",
       );
     if (!f.size) throw Error(f.name + " is empty. Choose a file with content.");
-    if (f.size > (pdf ? 100 : 25) * 1048576)
+    if (f.size > (pdf && isPdf ? 100 : 25) * 1048576)
       throw Error(f.name + " exceeds the file-size limit.");
   }
   const next = multi

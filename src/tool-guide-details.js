@@ -34,7 +34,7 @@ export const guideDetails = {
   },
   "merge-pdf": {
     steps: [
-      "Add at least two PDF files and wait for their page previews to load.",
+      "Add at least two PDFs or images and wait for their page previews to load. Each image becomes an A4 page with automatic orientation.",
       "Arrange the documents and pages in the order you want them to appear in the combined PDF.",
       "Check the preview sequence and choose an output filename that distinguishes the bundle from its originals.",
       "Merge the files and download the combined PDF.",

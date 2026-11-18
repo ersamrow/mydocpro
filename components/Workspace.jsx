@@ -191,8 +191,16 @@ export default function Workspace({
       typeof router.query.kb === "string"
     )
       onValues({ target: router.query.kb });
-    if (id === "name-date")
-      onValues({ date: new Date().toISOString().slice(0, 10) });
+    if (id === "name-date") {
+      const today = new Date();
+      onValues({
+        date: [
+          today.getFullYear(),
+          String(today.getMonth() + 1).padStart(2, "0"),
+          String(today.getDate()).padStart(2, "0"),
+        ].join("-"),
+      });
+    }
   }, [id, router.isReady, router.query.kb, onValues]);
   useEffect(() => {
     if (!busy) return;
@@ -221,8 +229,27 @@ export default function Workspace({
         pdf: isPdf,
         multi,
         replace: replacing,
+        allowImages: isMerge,
       });
-      await inspectFiles(Array.from(incoming), isPdf);
+      if (isMerge) {
+        for (const file of incoming)
+          await inspectFiles([file], /\.pdf$/i.test(file.name));
+        const { imageFileToPdf } = await import("../src/pdf-processing.js");
+        const converted = [];
+        for (const file of next) {
+          if (!alive.current) return;
+          if (/\.pdf$/i.test(file.name)) converted.push(file);
+          else {
+            setStatus(`Preparing ${file.name} as a PDF page…`);
+            converted.push(await imageFileToPdf(file));
+          }
+        }
+        next = validateFiles(converted, [], {
+          pdf: true,
+          multi: true,
+          replace: true,
+        });
+      } else await inspectFiles(Array.from(incoming), isPdf);
       if (id === "join-images" && next.length > 6)
         throw Error("Choose between 2 and 6 images to join.");
       if (!isPdf) {
@@ -424,7 +451,7 @@ export default function Workspace({
         </div>
         <p className="intro">
           {isMerge
-            ? "Combine PDFs in your preferred order. Add files, arrange pages, and download one document."
+            ? "Combine PDFs and images in your preferred order. Add files, arrange pages, and download one document."
             : meta.description}{" "}
         </p>
         {!embedded && <TrustBadges toolId={id} />}
@@ -466,7 +493,7 @@ export default function Workspace({
       >
         <ol className="workflow-steps" aria-label="Tool workflow">
           {(isMerge
-            ? ["Add PDFs", "Arrange pages", "Merge & download"]
+            ? ["Add PDFs or images", "Arrange pages", "Merge & download"]
             : ["Choose files", "Adjust settings", "Download"]
           ).map((label, index) => {
             const stage = outputs.length && !busy ? 2 : files.length ? 1 : 0;
@@ -493,23 +520,31 @@ export default function Workspace({
               disabled={busy || validating}
               multiple={multi}
               accept={
-                isPdf
-                  ? "application/pdf,.pdf"
-                  : "image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+                isMerge
+                  ? "application/pdf,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+                  : isPdf
+                    ? "application/pdf,.pdf"
+                    : "image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
               }
               title={
                 isMerge
-                  ? "Drop your PDFs here"
+                  ? "Choose PDFs or images, or drop them here"
                   : `Choose ${isPdf ? "PDFs" : "images"} or drop them here`
               }
               hint={
                 isMerge
-                  ? "Select 2+ files · Up to 100 MB / 300 pages"
+                  ? "Select 2+ PDFs or images · 25 MB per image · 100 MB total / 300 pages"
                   : isPdf
                     ? "PDF, up to 100 MB total / 300 pages"
                     : "JPG, PNG, WebP or HEIC/HEIF, up to 25 MB per image"
               }
-              buttonLabel={isPdf ? "Choose PDFs" : "Choose images"}
+              buttonLabel={
+                isMerge
+                  ? "Choose PDFs or images"
+                  : isPdf
+                    ? "Choose PDFs"
+                    : "Choose images"
+              }
               onFiles={(incoming) => {
                 choose(incoming, replace.current);
                 replace.current = false;
@@ -608,7 +643,7 @@ export default function Workspace({
                         changeFiles(files.filter((_, j) => j !== i))
                       }
                     >
-                      ×
+                      <Icon name="trash-2" />
                     </button>
                   </li>
                 ))}
@@ -616,7 +651,7 @@ export default function Workspace({
             </FileContainer>
             <PreviewContainer
               className="merge-page-editor"
-              open={isMerge && embedded ? true : undefined}
+              open={isMerge && (embedded || !!pdf.error) ? true : undefined}
               hidden={!files.length}
             >
               {isMerge && (
@@ -632,7 +667,7 @@ export default function Workspace({
                     id={id}
                     values={values}
                     onValues={onValues}
-                    busy={busy}
+                    busy={busy || validating}
                     pdf={pdf}
                     onPdf={setPdf}
                   />
@@ -642,7 +677,7 @@ export default function Workspace({
                     id={id}
                     values={values}
                     onValues={onValues}
-                    busy={busy}
+                    busy={busy || validating}
                   />
                 ))}
             </PreviewContainer>
@@ -656,8 +691,8 @@ export default function Workspace({
                 <span className="eyebrow">FINAL DOCUMENT</span>
                 <h2>Ready to bring it together?</h2>
                 <p>
-                  All pages are included in the order shown. Your original PDFs
-                  stay unchanged.
+                  All pages are included in the order shown. Images become A4
+                  pages, with orientation chosen for each image.
                 </p>
               </div>
             )}
@@ -737,7 +772,7 @@ export default function Workspace({
                     }
                     onValues(patch);
                   }}
-                  busy={busy}
+                  busy={busy || validating}
                 />
                 <PreferenceContainer className="merge-preferences">
                   {(isMerge || embedded) && (
@@ -791,7 +826,7 @@ export default function Workspace({
                         (!pdf.ready
                           ? "Loading page previews…"
                           : (id === "merge-pdf" && files.length < 2
-                              ? "Add one more PDF to merge."
+                              ? "Add one more PDF or image to merge."
                               : rangeError) ||
                             `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
                 </p>
@@ -805,7 +840,7 @@ export default function Workspace({
                     }}
                   >
                     <Icon name="upload" />
-                    Add PDFs
+                    Add PDFs or images
                   </button>
                 )}
                 <button

@@ -366,6 +366,22 @@ async function imagesToPdf(files, values, signal, onStatus) {
   };
 }
 
+// Normalize an image once at upload time so merged image pages use the same
+// previews, reordering and PDF export path as the other source documents.
+export async function imageFileToPdf(file, signal) {
+  const { blob } = await imagesToPdf(
+    [file],
+    { pageSize: "a4", orientation: "auto", quality: "92", margin: "8.5" },
+    signal,
+    () => {},
+  );
+  throwIfCancelled(signal);
+  return new File([blob], `${stem(file)}.pdf`, {
+    type: "application/pdf",
+    lastModified: file.lastModified,
+  });
+}
+
 export async function processPdf(
   id,
   files,

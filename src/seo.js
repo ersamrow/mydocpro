@@ -30,15 +30,15 @@ export const toolSearch = {
   ],
   "merge-pdf": [
     "Merge PDF Files Online Free – Combine PDFs",
-    "Merge PDFs free into one file. Arrange pages in the order you need and download the merged document. Your files stay on your device.",
+    "Merge PDFs and images free into one file. Arrange pages in the order you need and download the merged document. Your files stay on your device.",
   ],
   "split-pdf": [
     "Split PDF Online Free – Extract PDF Pages",
     "Split PDFs free by selecting pages or page ranges. Download one document or save each page as a separate PDF without uploading your file.",
   ],
   "compress-pdf": [
-    "Compress Scanned PDFs Online Free",
-    "Compress scanned PDFs free in your browser. Adjust resolution and quality. Output is image-only; searchable text and forms are lost.",
+    "Compress PDF to 100 KB, 200 KB or 500 KB Free",
+    "Compress PDFs free with a size target or custom quality. Supported embedded images are recompressed while preserving text. Processing stays in your browser.",
   ],
   "jpg-to-pdf": [
     "JPG to PDF Converter Online Free",
@@ -53,8 +53,8 @@ export const toolSearch = {
     "Clean a scanned signature free on white paper. Adjust the threshold to keep faint pen strokes, preview and download as JPG, PNG or WebP.",
   ],
   "passport-sheet": [
-    "Free Passport Photo Maker – 4 × 6 Inch Sheet",
-    "Make a free printable 4 × 6 inch passport photo sheet. Choose four or six roughly 35 × 45 mm photos, or eight smaller prints.",
+    "Free Passport Photo Maker – 4 × 6 Inch or A4 Sheet",
+    "Make a printable passport photo sheet on 4 × 6 inch or A4 paper. Choose photo size, DPI, copy count and optional cut guides, free in your browser.",
   ],
   "pdf-to-image": [
     "PDF to JPG Converter Online Free",
@@ -69,12 +69,12 @@ export const toolSearch = {
     "Add a name and date below your photo free for application forms. Preview the text strip and download the finished photo without an upload.",
   ],
   "join-images": [
-    "Join Two Images Online Free – Photo & Signature",
-    "Combine a photo and signature free into one image. Place them side by side or stack them, then download without uploading your files.",
+    "Join Images Online Free – JPG or A4 PDF",
+    "Join 2–6 images in a row, column or grid. Combine Aadhaar front and back on one page, adjust spacing and download a JPG or A4 PDF locally.",
   ],
   "white-background": [
     "Whiten a Light Photo Background Online Free",
-    "Whiten a plain, light photo background free. Adjust the brightness threshold and preview pale details before downloading.",
+    "Whiten a plain photo background free using edge-connected colour matching. Adjust tolerance and preview the result before downloading.",
   ],
 };
 export function pageSeo(id = "") {

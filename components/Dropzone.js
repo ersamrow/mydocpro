@@ -46,7 +46,7 @@ export default function Dropzone({
       <span className={styles.copy}>
         <strong className="dropzone-desktop-title">{title}</strong>
         <strong className="dropzone-touch-title">
-          {accept?.includes("image") ? "Choose images" : "Choose PDFs"}
+          {buttonLabel}
         </strong>
         {hint && <span id={hintId}>{hint}</span>}
       </span>

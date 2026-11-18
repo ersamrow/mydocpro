@@ -112,6 +112,24 @@ const path = require("node:path");
           .locator('.file-list li button[aria-label^="Remove "]')
           .first()
           .boundingBox();
+        const removeStyle = await page
+          .locator('.file-list li button[aria-label^="Remove "]')
+          .first()
+          .evaluate((button) => ({
+            color: getComputedStyle(button).color,
+            padding: getComputedStyle(button).padding,
+          }));
+        assert.equal(
+          await page
+            .locator('.file-list li button[aria-label^="Remove "] svg')
+            .count(),
+          1,
+          "mobile remove control uses the delete icon",
+        );
+        assert.deepEqual(removeStyle, {
+          color: "rgb(164, 52, 44)",
+          padding: "0px",
+        });
         assert.ok(fileRow.height <= 56, "mobile file row stays compact");
         assert.ok(
           removeButton.width >= 44 && removeButton.height >= 44,

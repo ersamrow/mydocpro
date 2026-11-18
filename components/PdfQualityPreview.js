@@ -43,7 +43,7 @@ export default function PdfQualityPreview({ file, values, busy }) {
             if (!disposed) {
               setPreview({ blob, width: canvas.width, height: canvas.height });
               setStatus(
-                "First-page sample, limited to 1,000 pixels for speed. Full output uses your selected DPI.",
+                "Illustrative first-page sample, limited to 1,000 pixels. Compression preserves text and page layout where possible; inspect the downloaded PDF for the final quality.",
               );
             }
           } catch (e) {

@@ -163,19 +163,19 @@ export const pageBodies = {
         <h2>{"The download is missing"}</h2>
         <p>
           {
-            "Wait for the result link and select it. Check your browser’s Downloads list or the Files app. Some mobile browsers open a preview first; use its Save or Share action to save a copy. Multiple page exports have separate download links. Your original file is unchanged."
+            "Wait for the result link and select it. Check your browser’s Downloads list or the Files app. Some mobile browsers open a preview first; use its Save or Share action to save a copy. For multiple files, use Download all (ZIP) or the individual download links. Your original file is unchanged."
           }
         </p>
         <h2>{"The output is unreadable or larger"}</h2>
         <p>
           {
-            "Compare it with the original before deleting anything. Lower JPEG quality and DPI reduce detail; PNG may be larger than JPG. PDF compression creates image-only pages and can enlarge a text-based document. Keep the original when searchable text, forms, accessibility or signatures matter."
+            "Compare it with the original before deleting anything. Lower JPEG quality and DPI reduce detail; PNG may be larger than JPG. PDF compression first recompresses supported embedded images while retaining text; scanned PDFs may use image-only pages. A PDF that does not shrink is not offered for download. Keep the original when forms, accessibility or signatures matter."
           }
         </p>
         <h2>{"Offline use and updates"}</h2>
         <p>
           {
-            "Open the site online and wait for “Ready offline” before disconnecting. Browser storage eviction can remove the cache. Updates wait until all MyDocPro windows close to avoid interrupting work. Reopen online to receive a new version. If problems persist, save your downloads before clearing the site’s browser storage."
+            "Open the site online and wait for “✓ Works offline” before disconnecting. Browser storage eviction can remove the cache. Updates wait until all MyDocPro windows close to avoid interrupting work. Reopen online to receive a new version. If problems persist, save your downloads before clearing the site’s browser storage."
           }
         </p>
         <h2>{"Still stuck?"}</h2>

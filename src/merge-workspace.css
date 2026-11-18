@@ -566,6 +566,16 @@
     width: 44px;
     padding: 0;
   }
+  #app .tool-workspace .file-list li > button[aria-label^="Remove "] {
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--ui-danger);
+  }
+  #app .tool-workspace .file-list li > button[aria-label^="Remove "] svg {
+    width: 18px;
+    height: 18px;
+  }
   .tool-workspace .workpanel .process-actions {
     gap: 8px;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom));

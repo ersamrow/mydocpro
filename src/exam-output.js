@@ -66,13 +66,43 @@ export async function inspectCertificate(file, doc, signal) {
   }
 }
 
-function borderBrightness(canvas) {
+function borderBrightness(canvas, source, fit) {
   const context = canvas.getContext("2d", { willReadFrequently: true });
+  let left = 0,
+    top = 0,
+    right = canvas.width - 1,
+    bottom = canvas.height - 1;
+  if (source && fit === "contain") {
+    // Sample the scan itself. White letterboxing must not hide gray paper or
+    // raise the whitening threshold above the actual paper brightness.
+    const scale = Math.min(
+      canvas.width / source.width,
+      canvas.height / source.height,
+    );
+    left = Math.min(
+      right,
+      Math.ceil((canvas.width - source.width * scale) / 2),
+    );
+    top = Math.min(
+      bottom,
+      Math.ceil((canvas.height - source.height * scale) / 2),
+    );
+    right = Math.max(
+      left,
+      Math.floor((canvas.width + source.width * scale) / 2) - 1,
+    );
+    bottom = Math.max(
+      top,
+      Math.floor((canvas.height + source.height * scale) / 2) - 1,
+    );
+  }
+  const width = right - left + 1,
+    height = bottom - top + 1;
   const edges = [
-    context.getImageData(0, 0, canvas.width, 1).data,
-    context.getImageData(0, canvas.height - 1, canvas.width, 1).data,
-    context.getImageData(0, 0, 1, canvas.height).data,
-    context.getImageData(canvas.width - 1, 0, 1, canvas.height).data,
+    context.getImageData(left, top, width, 1).data,
+    context.getImageData(left, bottom, width, 1).data,
+    context.getImageData(left, top, 1, height).data,
+    context.getImageData(right, top, 1, height).data,
   ];
   let light = 0;
   let count = 0;
@@ -112,7 +142,10 @@ export async function processExamDocument(
   if (whitePaper)
     whitenPaper(
       rendered,
-      Math.max(135, Math.min(225, borderBrightness(rendered) - 16)),
+      Math.max(
+        135,
+        Math.min(225, borderBrightness(rendered, source, fit) - 16),
+      ),
     );
   let encoded = await encodeCanvas(rendered);
   const minimum = (doc.minKB || 0) * 1000;
@@ -173,7 +206,7 @@ export async function processExamDocument(
   let backgroundAverage = null;
   if (doc.type !== "photo") {
     const check = draw(image);
-    backgroundAverage = borderBrightness(check);
+    backgroundAverage = borderBrightness(check, source, fit);
     check.width = check.height = 1;
     if (backgroundAverage < 235)
       issues.push(

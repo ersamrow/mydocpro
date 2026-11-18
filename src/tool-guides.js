@@ -51,7 +51,7 @@ export const guides = {
   ],
   "merge-pdf": [
     "Assemble a document in the right order",
-    "Select at least two PDFs, inspect their thumbnails and arrange the pages before merging. The combined input must stay within 100 MB and 300 pages. Use an output filename that describes the complete document.",
+    "Select at least two PDFs or images, inspect their thumbnails and arrange the pages before merging. Images become A4 pages with automatic orientation. Each image must stay under 25 MB; the combined input must stay within 100 MB and 300 pages.",
     "For an application bundle, place the application first, supporting evidence next and any appendix last. Open the merged download and check the first page, last page and every document boundary. Page copying does not intentionally rasterize text.",
     "Will signatures and interactive features survive?",
     "Do not rely on merging to preserve digital signature validity, bookmarks, interactive forms or document-level features. Keep the original signed files. Check the receiving organisation’s requirements before submitting a modified copy.",

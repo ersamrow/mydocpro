@@ -392,8 +392,8 @@ export default function PdfEditor({
             : "Drag the grip to reorder pages, or use the arrow buttons. Uncheck pages to remove them where selection is available."}
       </p>
       <p
-        className="preview-help"
-        role="status"
+        className={pdf.error ? "status error" : "preview-help"}
+        role={pdf.error ? "alert" : "status"}
         hidden={compact && pdf.ready && !pdf.error && !status}
       >
         {pdf.error ||

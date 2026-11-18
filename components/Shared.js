@@ -32,6 +32,7 @@ import {
   Upload,
   WandSparkles,
   Menu,
+  Trash2,
 } from "lucide-react";
 const icons = {
   Menu,
@@ -64,6 +65,7 @@ const icons = {
   ArrowLeft,
   Upload,
   WandSparkles,
+  Trash2,
 };
 export function Icon({ name }) {
   const Component =

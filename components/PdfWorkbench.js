@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PdfEditor from "./PdfEditor.js";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 import { validateFiles } from "../src/tool-settings.js";
 import { inspectFiles } from "../src/file-validation.js";
 import { processPdf } from "../src/processing.js";
@@ -234,6 +235,7 @@ export default function PdfWorkbench({
           )}
         </div>
       )}
+      <WhatsAppChannel visible={Boolean(result && url && !busy && !loading)} />
     </section>
   );
 }

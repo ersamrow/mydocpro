@@ -1,5 +1,6 @@
 import TrustBadges from "./TrustBadges.js";
 import ExamLinks from "./ExamLinks.js";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
@@ -354,7 +355,12 @@ export default function Workspace({
         </p>
         {!embedded && <TrustBadges toolId={id} />}
       </div>
-      {!embedded && id === "exam-photo" && <ExamLinks exams={examLinks} />}
+      {!embedded && id === "exam-photo" && (
+        <>
+          <ExamLinks exams={examLinks} />
+          <WhatsAppChannel />
+        </>
+      )}
       {!embedded && id === "signature" && (
         <label className="settings">
           Signature preset
@@ -799,6 +805,7 @@ export default function Workspace({
                 <Download key={i} result={result} />
               ))}
             </div>
+            <WhatsAppChannel visible={outputs.length > 0 && !busy && !error} />
           </div>
         </div>
       </section>

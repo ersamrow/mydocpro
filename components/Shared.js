@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ExamLinks from "./ExamLinks.js";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 import {
   Files,
   ShieldCheck,
@@ -116,16 +117,28 @@ export function Footer({ examLinks }) {
         <Logo />
         <p>Made for your everyday paperwork. Built for your privacy.</p>
         <p>MyDocPro is free to use. No account, no watermark, and your files stay on your device.</p>
+        <WhatsAppChannel />
       </div>
       <nav aria-labelledby="footer-projects">
-        <h2 id="footer-projects">Our projects</h2>
+        <h2 id="footer-projects">Our Products</h2>
         <div className="footer-projects">
           <a href="https://greetlo.in/">
-            <strong>Greetlo <ArrowUpRight aria-hidden="true" /></strong>
+            <strong>
+              <span className="footer-product-brand">
+                <img src="/brand/greetlo-logo.webp" alt="Greetlo" width="640" height="234" loading="lazy" decoding="async" />
+              </span>
+              <ArrowUpRight aria-hidden="true" />
+            </strong>
             <span>Create and share personalized greeting cards.</span>
           </a>
           <a href="https://myledgerpro.in/">
-            <strong>MyLedgerPro <ArrowUpRight aria-hidden="true" /></strong>
+            <strong>
+              <span className="footer-product-brand">
+                <img src="/brand/myledgerpro-logo.png" alt="" width="512" height="512" loading="lazy" decoding="async" />
+                MyLedgerPro
+              </span>
+              <ArrowUpRight aria-hidden="true" />
+            </strong>
             <span>Track customer balances, loans, and repayments.</span>
           </a>
         </div>

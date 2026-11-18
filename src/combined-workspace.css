@@ -52,7 +52,7 @@
 }
 .pdf-toolkit > .tool-heading {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: 6px 16px;
   align-items: center;
 }
@@ -63,6 +63,9 @@
 .pdf-toolkit > .tool-heading .intro {
   grid-column: 2;
   margin: 0;
+}
+.pdf-toolkit > .tool-heading .trust-badges {
+  grid-column: 1 / -1;
 }
 .pdf-toolkit .combined-start {
   padding: 18px;
@@ -177,6 +180,9 @@
   }
 }
 @media (max-width: 500px) {
+  .pdf-toolkit > .tool-heading {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .pdf-toolkit > .tool-heading .back {
     grid-row: auto;
   }

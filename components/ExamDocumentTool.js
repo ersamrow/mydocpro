@@ -5,6 +5,7 @@ import {
   formatExamFileRange,
 } from "../src/exam-requirements.js";
 import styles from "./ExamDocumentTool.module.css";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 
 function useFileUrl(file) {
   const [url, setUrl] = useState("");
@@ -263,6 +264,9 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
           </div>
         )}
       </div>
+      <WhatsAppChannel
+        visible={Boolean(output && outputUrl && !busy && !output.issues.length)}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import TrustBadges from "./TrustBadges.js";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ImageManipulator from "./ImageManipulator.js";
@@ -558,6 +559,7 @@ export default function ImageStudio({ heading }) {
       >
         {status}
       </p>
+      <WhatsAppChannel visible={Boolean(current && url && !working && !error)} />
       {!current && (
         <div
           className="studio-empty"

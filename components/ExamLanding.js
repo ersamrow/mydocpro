@@ -7,6 +7,7 @@ import {
 import ExamDocumentTool from "./ExamDocumentTool.js";
 import SeoHead from "./SeoHead.js";
 import TrustBadges from "./TrustBadges.js";
+import WhatsAppChannel from "./WhatsAppChannel.js";
 import styles from "./ExamLanding.module.css";
 
 const relatedTools = [
@@ -139,6 +140,7 @@ export default function ExamLanding({ exam, relatedExams }) {
           </section>
 
           <Requirements exam={exam} />
+          <WhatsAppChannel />
 
           <section>
             <h2>How to resize for {shortName}</h2>

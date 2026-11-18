@@ -6,7 +6,7 @@
 }
 .image-studio .tool-heading {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: max-content minmax(0, 1fr);
   align-items: center;
   gap: 6px 16px;
   margin-bottom: 16px;
@@ -21,6 +21,9 @@
   font-size: 13px;
   line-height: 1.6;
   color: var(--ui-muted, #62766e);
+}
+.image-studio .tool-heading .trust-badges {
+  grid-column: 1 / -1;
 }
 .studio-toolbar {
   display: flex;
@@ -205,6 +208,7 @@
 }
 @media (max-width: 700px) {
   .image-studio .tool-heading {
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px 12px;
   }
   .image-studio .tool-heading .back {

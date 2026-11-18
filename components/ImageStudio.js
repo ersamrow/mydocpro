@@ -12,7 +12,12 @@ import {
   processImage,
   adjustImage,
   normalizeImageFile,
+  loadImage,
+  draw,
+  byteBudget,
+  compressCanvasToTarget,
 } from "../src/processing.js";
+import { setImageDensity } from "../src/image-metadata.js";
 import { downloadName } from "../src/download-name.js";
 import { cropBox } from "../src/image-geometry.js";
 
@@ -131,6 +136,56 @@ function Controls({ id, values, update, advanced = false }) {
     });
 }
 
+async function prepareExport(current, format, options, signal) {
+  let result =
+    current.type === format
+      ? current
+      : await processImage(
+          "convert-image",
+          [current],
+          { format, quality: "94" },
+          false,
+          signal,
+        );
+  throwIfCancelled(signal);
+  const limit = options.maxKB ? byteBudget(options.maxKB) : null;
+  const metadataSpace =
+    options.dpi && ["image/jpeg", "image/png"].includes(format) ? 32 : 0;
+  if (limit && result.size > limit - metadataSpace) {
+    const image = await loadImage(result);
+    throwIfCancelled(signal);
+    const canvas = draw(
+      image,
+      image.width,
+      image.height,
+      "contain",
+      format === "image/jpeg" ? "#fff" : null,
+    );
+    try {
+      result = await compressCanvasToTarget(
+        canvas,
+        (limit - metadataSpace) / 1000,
+        {
+          type: format,
+          preserveDimensions: options.preserveDimensions,
+          signal,
+          maxQuality: 0.94,
+          headroom: 1,
+        },
+      );
+    } finally {
+      canvas.width = canvas.height = 1;
+    }
+  }
+  if (options.dpi) result = await setImageDensity(result, options.dpi);
+  throwIfCancelled(signal);
+  if (limit && result.size > limit)
+    throw Error(
+      "The selected output format cannot fit this size limit. Choose JPG, allow a larger size, or reduce dimensions.",
+    );
+  return result;
+}
+
 export default function ImageStudio({ heading }) {
   const [original, setOriginal] = useState(null),
     [current, setCurrent] = useState(null);
@@ -149,6 +204,8 @@ export default function ImageStudio({ heading }) {
     [filename, setFilename] = useState(""),
     [dimensions, setDimensions] = useState("");
   const [outputFormat, setOutputFormat] = useState("keep");
+  const [documentExport, setDocumentExport] = useState(null);
+  const exportOptions = useRef(new WeakMap());
   const [downloadBlob, setDownloadBlob] = useState(null),
     [downloadUrl, setDownloadUrl] = useState(""),
     [exportPending, setExportPending] = useState(false);
@@ -192,16 +249,14 @@ export default function ImageStudio({ heading }) {
       outputFormat === "keep" ? original?.type || "image/png" : outputFormat;
     setDownloadBlob(null);
     setExportPending(true);
-    const prepare =
-      format === current.type
-        ? Promise.resolve(current)
-        : processImage(
-            "convert-image",
-            [current],
-            { format, quality: "94" },
-            false,
-            abort.signal,
-          );
+    const prepare = documentExport
+      ? Promise.resolve(documentExport)
+      : prepareExport(
+          current,
+          format,
+          exportOptions.current.get(current) || {},
+          abort.signal,
+        );
     prepare
       .then((result) => {
         if (!stale) setDownloadBlob(result);
@@ -219,7 +274,7 @@ export default function ImageStudio({ heading }) {
       stale = true;
       abort.abort();
     };
-  }, [current, original, outputFormat]);
+  }, [current, original, outputFormat, documentExport]);
   useEffect(() => {
     if (!downloadBlob) {
       setDownloadUrl("");
@@ -249,6 +304,10 @@ export default function ImageStudio({ heading }) {
             if (stale) return;
             if (result.size > 100 * 1048576)
               throw Error("Result exceeds 100 MB. Try smaller dimensions.");
+            exportOptions.current.set(
+              result,
+              exportOptions.current.get(effectBase) || {},
+            );
             setCurrent(result);
             setEffectsPending(false);
             setStatus(
@@ -273,6 +332,7 @@ export default function ImageStudio({ heading }) {
   }, [adjust, effectBase]);
   function changeEffects(patch) {
     if (!current || busy || lock.current) return;
+    setDocumentExport(null);
     if (!effectBase) {
       setEffectBase(current);
       setHistory((h) => remember(h, current));
@@ -347,6 +407,7 @@ export default function ImageStudio({ heading }) {
         selected.map((image) => normalizeImageFile(image)),
       );
       if (!alive.current) return;
+      setDocumentExport(null);
       if (extra) setSecond(normalized);
       else {
         setOriginal(normalized[0]);
@@ -385,12 +446,36 @@ export default function ImageStudio({ heading }) {
     const abort = new AbortController();
     controller.current = abort;
     try {
+      const options = { ...exportOptions.current.get(current) };
+      if (["resize-image", "exam-photo", "passport-sheet"].includes(id))
+        options.dpi = Number(settings[id].dpi);
+      if (["resize-image", "name-date"].includes(id)) {
+        const value = settings[id].maxKB;
+        if (
+          value !== "" &&
+          value != null &&
+          (!Number.isFinite(Number(value)) ||
+            Number(value) < 1 ||
+            Number(value) > 25000)
+        )
+          throw Error(
+            "Enter a Max size between 1 and 25,000 KB, or leave it blank.",
+          );
+        options.maxKB = value ? Number(value) : null;
+        options.preserveDimensions = id === "resize-image";
+      } else if (["compress-image", "exam-photo"].includes(id)) {
+        options.maxKB = Number(settings[id].target);
+        options.preserveDimensions = id === "exam-photo";
+      }
       const result = await processImage(
         id,
         id === "join-images" ? [current, ...(second || [])] : [current],
         {
           ...settings[id],
-          ...(["name-date", "join-images", "passport-sheet"].includes(id)
+          // Enforce optional limits on the final selected format, not the
+          // lossless intermediate used for further edits.
+          ...(["resize-image", "name-date"].includes(id) ? { maxKB: "" } : {}),
+          ...(["name-date", "passport-sheet"].includes(id)
             ? { format: "image/png" }
             : {}),
         },
@@ -401,10 +486,26 @@ export default function ImageStudio({ heading }) {
       throwIfCancelled(abort.signal);
       if (result.size > 100 * 1048576)
         throw Error("Result exceeds 100 MB. Try smaller dimensions.");
+      if (result.type === "application/pdf") {
+        setDocumentExport(result);
+        setStatus(
+          "Your combined A4 PDF is ready to download. The current image remains available for further edits.",
+        );
+        return;
+      }
+      setDocumentExport(null);
+      exportOptions.current.set(result, options);
       setHistory((h) => remember(h, current));
       setFuture([]);
       setCurrent(result);
-      if (["compress-image", "convert-image"].includes(id))
+      if (
+        [
+          "compress-image",
+          "convert-image",
+          "exam-photo",
+          "join-images",
+        ].includes(id)
+      )
         setOutputFormat(result.type);
       resetCrop();
       clearEffects();
@@ -429,6 +530,7 @@ export default function ImageStudio({ heading }) {
   function travel(undo) {
     const stack = undo ? history : future;
     if (working || !stack.length) return;
+    setDocumentExport(null);
     (undo ? setFuture : setHistory)((h) => remember(h, current));
     setCurrent(stack[stack.length - 1]);
     (undo ? setHistory : setFuture)(stack.slice(0, -1));
@@ -438,11 +540,13 @@ export default function ImageStudio({ heading }) {
     setStatus(undo ? "Last edit undone." : "Edit restored.");
   }
   const extension =
-    downloadBlob?.type === "image/png"
-      ? "png"
-      : downloadBlob?.type === "image/webp"
-        ? "webp"
-        : "jpg";
+    downloadBlob?.type === "application/pdf"
+      ? "pdf"
+      : downloadBlob?.type === "image/png"
+        ? "png"
+        : downloadBlob?.type === "image/webp"
+          ? "webp"
+          : "jpg";
   const renderEffects = (keys) =>
     Object.entries(adjust)
       .filter(([key, v]) => keys.includes(key) && typeof v === "number")
@@ -597,6 +701,7 @@ export default function ImageStudio({ heading }) {
             <button
               disabled={working || !original}
               onClick={() => {
+                setDocumentExport(null);
                 setHistory((h) => remember(h, current));
                 setFuture([]);
                 setCurrent(original);
@@ -617,10 +722,16 @@ export default function ImageStudio({ heading }) {
               <span>Output format</span>
               <select
                 aria-label="Output format"
-                value={outputFormat}
+                value={documentExport ? "application/pdf" : outputFormat}
                 disabled={working}
-                onChange={(event) => setOutputFormat(event.target.value)}
+                onChange={(event) => {
+                  setDocumentExport(null);
+                  setOutputFormat(event.target.value);
+                }}
               >
+                {documentExport && (
+                  <option value="application/pdf">A4 PDF</option>
+                )}
                 <option value="keep">Keep original</option>
                 <option value="image/jpeg">JPG</option>
                 <option value="image/png">PNG</option>
@@ -643,7 +754,7 @@ export default function ImageStudio({ heading }) {
               href={downloadUrl}
               download={downloadName(
                 filename,
-                `${(original?.name || "image").replace(/\.[^.]+$/, "")}_edited.${extension}`,
+                `${(original?.name || "image").replace(/\.[^.]+$/, "")}_${documentExport ? "joined" : "edited"}.${extension}`,
               )}
             >
               Download {extension.toUpperCase()} – free
@@ -659,7 +770,7 @@ export default function ImageStudio({ heading }) {
       </p>
       {current && (
         <p className="studio-file-info">
-          {original?.name} · {dimensions} ·{" "}
+          {original?.name} · {documentExport ? "1 A4 page" : dimensions} ·{" "}
           {size((downloadBlob || current).size)} · {extension.toUpperCase()}
         </p>
       )}

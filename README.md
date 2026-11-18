@@ -8,7 +8,7 @@ Open `/image-editor` for a single-screen image studio: crop, color adjustments, 
 
 Open `/pdf-toolkit` for all existing PDF operations. Choose an operation, upload files, adjust settings, and download. Compatible source uploads carry over when switching; single-file operations keep the first file. Settings and results reset on switching, so download first.
 
-The Image Editor accepts JPG, PNG and WebP. Background cleanup uses a brightness threshold. The PDF Toolkit includes merge, split, compression, image conversion, and page organization; it does not provide OCR, PDF text editing, or password management.
+The image tools accept JPG, PNG, WebP and HEIC/HEIF. HEIC decoding loads a self-hosted WASM decoder only when needed and uses the first image/frame. Background cleanup uses a feathered, edge-connected colour tolerance; signature paper cleanup has its own threshold. The PDF Toolkit includes merge, split, compression, image conversion, and page organization; it does not provide OCR, PDF text editing, or password management.
 
 ## Run
 
@@ -42,7 +42,7 @@ Deploy the project to a **Node.js-capable host** using those build and start com
 - `src/seo.js`: shared titles, canonical URLs and structured metadata.
 - `pages/api/contact.js` and `server/contact.js`: server-only SMTP contact API.
 
-Images and PDFs remain on the user's device. Preview effects cancel/discard stale work and release PDF documents, canvas resources and object URLs when files or routes change. Generic photo sizes are not official exam requirements. PDF compression creates image-only pages and does not preserve text, forms, links or digital signatures.
+Images and PDFs remain on the user's device. Preview effects cancel/discard stale work and release PDF documents, canvas resources and object URLs when files or routes change. Generic photo sizes are not official exam requirements. PDF compression first recompresses supported embedded images while preserving text and page content. Rasterization is a fallback for image-only PDFs; unsupported image streams stay unchanged. Size targets are not guaranteed, and edited PDFs must not be treated as retaining valid digital signatures.
 
 ## Contact delivery
 
@@ -54,7 +54,7 @@ Support receives the submitted message with the user's Reply-To address; the use
 
 ## Offline and PWA
 
-The production build precaches route HTML, Next.js page data, static chunks, icons and the PDF worker. Wait for **Ready offline** before disconnecting. Contact submissions and advertising require internet and are never cached. Updates wait for existing app windows to close, so active processing is not interrupted. Browser storage eviction may remove offline availability.
+The production build precaches route HTML, Next.js page data, static chunks, icons, the PDF worker and HEIC decoder. Wait for **✓ Works offline** before disconnecting. Contact submissions and advertising require internet and are never cached. Updates wait for existing app windows to close, so active processing is not interrupted. Activation removes caches other than the current version. Browser storage eviction may remove offline availability.
 
 AdSense publisher configuration is preserved. Complete applicable consent configuration and publisher approval in AdSense before serving ads where required.
 

@@ -121,7 +121,8 @@ export default function PdfWorkbench({
         </div>
         {files.length > 0 && (
           <span className="pdf-ready-count">
-            {files.length} PDFs · {pdf.entries.length} pages
+            {files.length} {files.length === 1 ? "PDF" : "PDFs"} ·{" "}
+            {pdf.entries.length} {pdf.entries.length === 1 ? "page" : "pages"}
           </span>
         )}
       </div>

@@ -1,7 +1,7 @@
 import TrustBadges from "./TrustBadges.js";
 import ExamLinks from "./ExamLinks.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -23,7 +23,7 @@ import {
 } from "../src/tool-settings.js";
 import { pageSeo } from "../src/seo.js";
 import { pageIndices } from "../src/page-indices.js";
-import { downloadName } from "../src/download-name.js";
+import { downloadName, toolOutputName } from "../src/download-name.js";
 
 const PdfQualityPreview = dynamic(() => import("./PdfQualityPreview.js"));
 const ImageEditor = dynamic(() => import("./ImageEditor.js"));
@@ -68,35 +68,20 @@ function Download({ result }) {
 }
 
 function DownloadActions({ outputs }) {
-  const [selected, setSelected] = useState(0);
-  const index = Math.min(selected, outputs.length - 1);
   return (
     <div className="download-actions">
-      {outputs.length > 1 && (
-        <label className="download-file-choice">
-          File
-          <select
-            aria-label="File to download"
-            value={index}
-            onChange={(event) => setSelected(Number(event.target.value))}
-          >
-            {outputs.map((result, i) => (
-              <option key={i} value={i}>
-                {result.name} · {size(result.blob.size)}
-              </option>
-            ))}
-          </select>
-        </label>
+      {outputs.length > 1 ? (
+        <ZipDownload outputs={outputs} busy={false} />
+      ) : (
+        <Download result={outputs[0]} />
       )}
-      <Download result={outputs[index]} />
-      {outputs.length > 1 && <ZipDownload outputs={outputs} busy={false} />}
     </div>
   );
 }
 
-function ResultPreview({ result }) {
+function ResultPreview({ result, individual }) {
   const image = result.blob.type.startsWith("image/");
-  const url = useResultUrl(image ? result.blob : null);
+  const url = useResultUrl(image || individual ? result.blob : null);
   return (
     <div className="output result-preview">
       {image && url && (
@@ -110,7 +95,22 @@ function ResultPreview({ result }) {
       <span>
         <strong>{result.name}</strong>
         <small>{size(result.blob.size)}</small>
+        {result.warnings?.map((warning) => (
+          <small className="result-warning" key={warning}>
+            {warning}
+          </small>
+        ))}
       </span>
+      {individual && url && (
+        <a
+          className="secondary"
+          href={url}
+          download={result.name}
+          aria-label={`Download ${result.name}`}
+        >
+          Download
+        </a>
+      )}
     </div>
   );
 }
@@ -118,13 +118,13 @@ const notices = {
   "exam-photo":
     "These are generic sizes, not verified exam requirements. Check the current official notification for dimensions, file size, and live-photo rules before submitting.",
   "compress-pdf":
-    "Compression creates image-only pages. Searchable text, links, forms, accessibility tags and digital signatures will not be preserved. A target size is not guaranteed.",
+    "Text is preserved when embedded images can be compressed. Scanned PDFs may be rebuilt as images. A target size is not guaranteed; inspect the result before submitting.",
   "white-background":
-    "For plain, light backgrounds only. This is a brightness threshold, not AI background removal.",
+    "Whiten a plain background connected to the image edges. Adjust tolerance to include similar colours; this is not AI subject segmentation.",
   "crop-image":
     "Drag the crop area or its corners above. Use the fields for precise ratio, rotation and zoom.",
   "join-images":
-    "Choose two images: photo first, signature second. Use the arrows to reorder.",
+    "Choose 2–6 images. Image 1 comes first; use the arrows to reorder. Choose the Aadhaar front + back preset for two sides of a document.",
 };
 export default function Workspace({
   tool,
@@ -217,12 +217,19 @@ export default function Workspace({
     setValidating(true);
     setStatus("Checking files…");
     try {
-      const next = validateFiles(Array.from(incoming), files, {
+      let next = validateFiles(Array.from(incoming), files, {
         pdf: isPdf,
         multi,
         replace: replacing,
       });
       await inspectFiles(Array.from(incoming), isPdf);
+      if (id === "join-images" && next.length > 6)
+        throw Error("Choose between 2 and 6 images to join.");
+      if (!isPdf) {
+        const { normalizeImageFile } =
+          await import("../src/image-processing.js");
+        next = await Promise.all(next.map(normalizeImageFile));
+      }
       if (!alive.current) return;
       setSettingsOpen(next.length > 0);
       setFiles(next);
@@ -260,9 +267,9 @@ export default function Workspace({
       count = values.pages.trim()
         ? pageIndices(values.pages, pdf.entries.length).length
         : 0;
-    } catch {
+    } catch (e) {
       count = 0;
-      rangeError = "Check the page range";
+      rangeError = pdf.ready ? e.message : "";
     }
   }
   const disabled =
@@ -288,7 +295,7 @@ export default function Workspace({
     let note = "",
       succeeded = false;
     let outputBytes = 0;
-    const output = (blob, name) => {
+    const output = (blob, name, metadata = {}) => {
       throwIfCancelled(signal);
       outputBytes += blob.size;
       if (outputBytes > 150 * 1048576)
@@ -300,6 +307,7 @@ export default function Workspace({
           ...out,
           {
             blob,
+            warnings: metadata.warnings || blob.warnings || [],
             name:
               batchTools.includes(id) && files.length > 1
                 ? `${out.length + 1}-${downloadName(values["output-name"] || "", name)}`
@@ -311,8 +319,8 @@ export default function Workspace({
       await new Promise((r) => setTimeout(r, 20));
       const { processImage, processPdf } = await import("../src/processing.js");
       throwIfCancelled(signal);
-      if (isPdf || id === "jpg-to-pdf")
-        await processPdf(id, files, values, {
+      if (isPdf || id === "jpg-to-pdf") {
+        const report = await processPdf(id, files, values, {
           signal,
           order: pdf.entries,
           onOutput: output,
@@ -321,7 +329,8 @@ export default function Workspace({
             if (alive.current) setStatus(text);
           },
         });
-      else {
+        if (report?.message) note = report.message;
+      } else {
         const batches = batchTools.includes(id)
           ? files.map((f) => [f])
           : [files];
@@ -329,10 +338,7 @@ export default function Workspace({
           throwIfCancelled(signal);
           setStatus(`Processing image ${index + 1} of ${batches.length}…`);
           const blob = await processImage(id, batch, values, false, signal);
-          output(
-            blob,
-            `mydocpro-${id}.${blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : "jpg"}`,
-          );
+          output(blob, toolOutputName(batch[0].name, id, values, blob.type));
         }
       }
       throwIfCancelled(signal);
@@ -374,6 +380,7 @@ export default function Workspace({
   const HelpContainer = isMerge || embedded ? "details" : "div";
   const PreferenceContainer = isMerge || embedded ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
+  const SettingsGroup = id === "compress-image" ? "div" : Fragment;
   const summary = settingsSummary(id, values);
   return (
     <Container
@@ -482,7 +489,7 @@ export default function Workspace({
               accept={
                 isPdf
                   ? "application/pdf,.pdf"
-                  : "image/jpeg,image/png,image/webp"
+                  : "image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
               }
               title={
                 isMerge
@@ -494,7 +501,7 @@ export default function Workspace({
                   ? "Select 2+ files · Up to 100 MB / 300 pages"
                   : isPdf
                     ? "PDF, up to 100 MB total / 300 pages"
-                    : "JPG, PNG or WebP, up to 25 MB per image"
+                    : "JPG, PNG, WebP or HEIC/HEIF, up to 25 MB per image"
               }
               buttonLabel={isPdf ? "Choose PDFs" : "Choose images"}
               onFiles={(incoming) => {
@@ -554,7 +561,10 @@ export default function Workspace({
                         <Icon name="file-text" />
                       </span>
                     )}
-                    <span>{file.name}</span>
+                    <span>
+                      {id === "join-images" ? `Image ${i + 1}: ` : ""}
+                      {file.name}
+                    </span>
                     <small>{size(file.size)}</small>
                     {files.length > 1 && (
                       <button
@@ -645,87 +655,125 @@ export default function Workspace({
                 </p>
               </div>
             )}
-            <details
-              className="settings-disclosure tool-settings-details"
-              hidden={embedded && !files.length}
-              open={files.length > 0 && settingsOpen}
-              onToggle={(e) =>
-                setSettingsOpen(files.length > 0 && e.currentTarget.open)
-              }
+            <SettingsGroup
+              {...(id === "compress-image"
+                ? { className: "compress-settings-panel" }
+                : {})}
             >
-              <summary
-                aria-disabled={!files.length}
-                onClick={(event) => {
-                  if (!files.length) event.preventDefault();
-                }}
-              >
-                Adjust settings
-                <span className="tool-settings-summary" title={summary}>
-                  {summary}
-                </span>
-              </summary>
-              <Settings
-                id={id}
-                values={values}
-                onChange={(key, value) => {
-                  const patch = { [key]: value };
-                  if (
-                    id === "resize-image" &&
-                    values.keepProportions &&
-                    ["width", "height"].includes(key) &&
-                    Number(value) > 0
-                  ) {
-                    const ratio = Number(values.width) / Number(values.height);
-                    if (Number.isFinite(ratio) && ratio > 0)
-                      patch[key === "width" ? "height" : "width"] = String(
-                        Number(
-                          (key === "width"
-                            ? Number(value) / ratio
-                            : Number(value) * ratio
-                          ).toFixed(values.unit === "px" ? 0 : 3),
-                        ),
-                      );
-                  }
-                  onValues(patch);
-                }}
-                busy={busy}
-              />
-              <PreferenceContainer className="merge-preferences">
-                {(isMerge || embedded) && (
-                  <summary>Preferences & reset</summary>
-                )}
-                <div className="settings-toolbar">
-                  <button
-                    className="secondary"
-                    disabled={busy || validating || !canUndo}
-                    onClick={undo}
-                  >
-                    Undo settings
-                  </button>
-                  <button
-                    className="secondary"
-                    disabled={busy || validating}
-                    onClick={reset}
-                  >
-                    Reset settings
-                  </button>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={remember}
-                      disabled={busy || validating}
-                      onChange={(e) => setRemember(e.target.checked)}
-                    />{" "}
-                    Remember settings on this device
-                  </label>
+              {id === "compress-image" && (
+                <div className="compress-quick-settings">
+                  <Settings
+                    id={id}
+                    values={values}
+                    busy={busy || validating}
+                    only={["target"]}
+                    onChange={(key, value) => onValues({ [key]: value })}
+                  />
                 </div>
-                <p className="preference-note" role="status">
-                  {storageNote}
-                </p>
-              </PreferenceContainer>
-            </details>
+              )}
+              <details
+                className="settings-disclosure tool-settings-details"
+                hidden={embedded && !files.length}
+                open={files.length > 0 && settingsOpen}
+                onToggle={(e) =>
+                  setSettingsOpen(files.length > 0 && e.currentTarget.open)
+                }
+              >
+                <summary
+                  aria-disabled={!files.length}
+                  onClick={(event) => {
+                    if (!files.length) event.preventDefault();
+                  }}
+                >
+                  Adjust settings
+                  <span className="tool-settings-summary" title={summary}>
+                    {summary}
+                  </span>
+                </summary>
+                <Settings
+                  id={id}
+                  exclude={id === "compress-image" ? ["target"] : []}
+                  values={values}
+                  onChange={(key, value) => {
+                    const patch = { [key]: value };
+                    if (
+                      id === "split-pdf" &&
+                      key === "mode" &&
+                      value === "every"
+                    )
+                      patch.pages = "all";
+                    if (
+                      id === "join-images" &&
+                      key === "preset" &&
+                      value === "aadhaar"
+                    )
+                      Object.assign(patch, {
+                        layout: "vertical",
+                        spacing: "16",
+                      });
+                    if (
+                      id === "resize-image" &&
+                      values.keepProportions &&
+                      ["width", "height"].includes(key) &&
+                      Number(value) > 0
+                    ) {
+                      const ratio =
+                        Number(values.width) / Number(values.height);
+                      if (Number.isFinite(ratio) && ratio > 0)
+                        patch[key === "width" ? "height" : "width"] = String(
+                          Number(
+                            (key === "width"
+                              ? Number(value) / ratio
+                              : Number(value) * ratio
+                            ).toFixed(values.unit === "px" ? 0 : 3),
+                          ),
+                        );
+                    }
+                    onValues(patch);
+                  }}
+                  busy={busy}
+                />
+                <PreferenceContainer className="merge-preferences">
+                  {(isMerge || embedded) && (
+                    <summary>Preferences & reset</summary>
+                  )}
+                  <div className="settings-toolbar">
+                    <button
+                      className="secondary"
+                      disabled={busy || validating || !canUndo}
+                      onClick={undo}
+                    >
+                      Undo settings
+                    </button>
+                    <button
+                      className="secondary"
+                      disabled={busy || validating}
+                      onClick={reset}
+                    >
+                      Reset settings
+                    </button>
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={remember}
+                        disabled={busy || validating}
+                        onChange={(e) => setRemember(e.target.checked)}
+                      />{" "}
+                      Remember settings on this device
+                    </label>
+                  </div>
+                  <p className="preference-note" role="status">
+                    {storageNote}
+                  </p>
+                </PreferenceContainer>
+              </details>
+            </SettingsGroup>
             {notices[id] && <p className="notice">{notices[id]}</p>}
-            <div className="process-actions" ref={actionsRef}>
+            <div
+              className="process-actions"
+              ref={actionsRef}
+              hidden={!files.length}
+            >
               <p
                 className="output-summary"
                 id="output-summary"
@@ -738,7 +786,7 @@ export default function Workspace({
                     ? "Choose a file above to get started."
                     : !isPdf
                       ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
-                      : pdf.error ||
+                      : (pdf.error ? "Choose another PDF to continue." : "") ||
                         (!pdf.ready
                           ? "Loading page previews…"
                           : (id === "merge-pdf" && files.length < 2
@@ -824,7 +872,8 @@ export default function Workspace({
                             (sum, r) => sum + r.blob.size,
                             0,
                           );
-                        return original
+                        return original &&
+                          ["compress-image", "compress-pdf"].includes(id)
                           ? ` · ${Math.abs((1 - total / original) * 100).toFixed(1)}% ${total <= original ? "smaller" : "larger"}`
                           : "";
                       })()}
@@ -836,7 +885,11 @@ export default function Workspace({
                 </div>
               )}
               {outputs.map((result, i) => (
-                <ResultPreview key={i} result={result} />
+                <ResultPreview
+                  key={i}
+                  result={result}
+                  individual={outputs.length > 1}
+                />
               ))}
             </div>
           </div>

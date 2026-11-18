@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { zipOutputs } from "../src/zip.js";
 export default function ZipDownload({ outputs, busy }) {
   const generation = useRef(0);
+  const downloadLink = useRef(null);
   const [url, setUrl] = useState(""),
     [packing, setPacking] = useState(false),
     [error, setError] = useState("");
@@ -19,11 +20,19 @@ export default function ZipDownload({ outputs, busy }) {
       generation.current++;
     };
   }, [outputs]);
+  useEffect(() => {
+    if (url) downloadLink.current?.click();
+  }, [url]);
   return (
     <div className="zip-download">
       {url ? (
-        <a className="primary" download="mydocpro-files.zip" href={url}>
-          Download ZIP ↓
+        <a
+          ref={downloadLink}
+          className="primary"
+          download="mydocpro-files.zip"
+          href={url}
+        >
+          Download all (ZIP)
         </a>
       ) : (
         <button
@@ -44,7 +53,7 @@ export default function ZipDownload({ outputs, busy }) {
             }
           }}
         >
-          {packing ? "Preparing ZIP…" : "Prepare all files as ZIP"}
+          {packing ? "Preparing ZIP…" : "Download all (ZIP)"}
         </button>
       )}
       <span role="status">{error || (url ? "ZIP ready." : "")}</span>

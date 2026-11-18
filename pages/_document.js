@@ -8,6 +8,14 @@ export default function Document() {
         <meta name="apple-mobile-web-app-title" content="MyDocPro" />
         <meta name="google-adsense-account" content="ca-pub-4905030687832208" />
         <link rel="manifest" href="/manifest.webmanifest" />
+        {/* Keep the font face in the initial head: deferred CSS must not
+            introduce a new heading font after the first paint. */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html:
+              '@font-face{font-family:"DM Sans Headings";font-style:normal;font-weight:100 1000;font-display:optional;src:url("/fonts/dm-sans-latin-variable.woff2") format("woff2")}',
+          }}
+        />
         <link
           rel="preload"
           href="/fonts/dm-sans-latin-variable.woff2"

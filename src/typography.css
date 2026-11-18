@@ -1,11 +1,6 @@
-/* Self-hosted Google Fonts DM Sans, licensed under SIL OFL 1.1. */
-@font-face {
-  font-family: "DM Sans Headings";
-  font-style: normal;
-  font-weight: 100 1000;
-  font-display: optional;
-  src: url("/fonts/dm-sans-latin-variable.woff2") format("woff2");
-}
+/* Self-hosted Google Fonts DM Sans, licensed under SIL OFL 1.1.
+   Its font face lives in the initial document head so deferred CSS cannot
+   activate a different heading font after the first paint. */
 
 /* Match the existing specific heading selectors without changing body type. */
 #app :is(h1, h2, h3, h4, h5, h6) {

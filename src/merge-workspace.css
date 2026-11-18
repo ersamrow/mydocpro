@@ -935,6 +935,111 @@
   font-weight: 400;
   color: #5d7468;
 }
+
+/* Keep cropping and its controls together, with the save bar across both. */
+.crop-workspace .has-files .merge-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  column-gap: 20px;
+  align-items: start;
+}
+.crop-workspace .has-files .merge-canvas {
+  display: contents;
+}
+.crop-workspace .has-files .merge-canvas > *,
+.crop-workspace .has-files .merge-controls > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.crop-workspace .has-files .merge-page-editor {
+  grid-column: 1;
+  grid-row: 3;
+}
+.crop-workspace .has-files .merge-controls > .tool-settings-details {
+  grid-column: 2;
+  grid-row: 3;
+  margin-bottom: 0;
+}
+.crop-workspace .crop-editor-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.crop-workspace .crop-editor-layout .image-result-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  gap: 4px 12px;
+  padding: 12px;
+}
+.crop-workspace .image-result-panel > :not(.image-result-display) {
+  grid-column: 1;
+  min-width: 0;
+}
+.crop-workspace .image-result-panel h2,
+.crop-workspace .image-result-panel .image-preview-note {
+  margin: 0;
+}
+.crop-workspace .image-result-panel .compare-toggle {
+  justify-self: start;
+  margin: 0;
+}
+.crop-workspace .image-result-panel > .image-result-display {
+  grid-column: 2;
+  grid-row: 1 / 5;
+  align-self: center;
+  min-width: 0;
+}
+.crop-workspace .image-result-panel > details[open],
+.crop-workspace .image-result-panel > .before-after {
+  grid-column: 1 / -1;
+  grid-row: auto;
+}
+.crop-workspace .image-result-display:not(.before-after) .image-edit-stage {
+  min-height: 110px;
+  padding: 4px;
+}
+.crop-workspace .image-result-display:not(.before-after) img {
+  max-height: 110px;
+}
+.crop-workspace .workpanel .settings {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 12px;
+  max-width: none;
+}
+.crop-workspace .settings > .range-field,
+.crop-workspace .settings > label[for="output-name"] {
+  grid-column: 1 / -1;
+}
+.crop-workspace .workpanel .settings .range-field {
+  padding: 10px 12px;
+}
+.crop-workspace .workpanel .settings select {
+  padding-inline: 8px;
+}
+.crop-workspace .settings-toolbar {
+  gap: 8px;
+  margin-top: 12px;
+}
+.crop-workspace .settings-toolbar button {
+  flex: 1;
+  padding-inline: 8px;
+}
+.crop-workspace .settings-toolbar label {
+  flex-basis: 100%;
+}
+@media (max-width: 950px) {
+  .crop-workspace .has-files .merge-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .crop-workspace .has-files .merge-page-editor,
+  .crop-workspace .has-files .merge-controls > .tool-settings-details {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .crop-workspace .crop-editor-layout .manipulator-board {
+    min-height: 180px;
+    padding: 12px;
+  }
+}
 @media (max-width: 800px) {
   .tool-workspace .studio-toolbar.process-actions {
     top: 154px;

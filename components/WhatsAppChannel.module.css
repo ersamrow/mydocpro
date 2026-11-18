@@ -18,10 +18,10 @@
   max-width: 100%;
   min-height: 48px;
   padding: 10px 14px;
-  border: 1px solid #b9d8c7;
-  border-radius: 10px;
-  background: #edf7f0;
-  color: #14543c;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-soft);
+  color: var(--ui-green);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
@@ -34,11 +34,11 @@
 }
 
 .slot .button:hover {
-  border-color: #6da886;
-  background: #e1f0e6;
+  border-color: var(--ui-green);
+  background: var(--ui-hover);
 }
 
 .slot .button:focus-visible {
-  outline: 3px solid #18644e;
-  outline-offset: 3px;
+  outline: 2px solid var(--ui-focus);
+  outline-offset: var(--ui-focus-offset);
 }

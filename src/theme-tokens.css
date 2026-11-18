@@ -1,0 +1,23 @@
+/* Shared palette: pages and CSS modules use the same roles and states. */
+:root {
+  --ui-ink: #183b33;
+  --ui-muted: #61766e;
+  --ui-green: #18644e;
+  --ui-green-hover: #12523f;
+  --ui-border: #dde7e1;
+  --ui-input-border: #adc4b7;
+  --ui-surface: #ffffff;
+  --ui-page: #f5f8f5;
+  --ui-soft: #edf5ef;
+  --ui-hover: #e3eee7;
+  --ui-focus: #18644e;
+  --ui-focus-inverse: #b7e3c7;
+  --ui-focus-offset: 3px;
+  --ui-radius-control: 10px;
+  --ui-radius-card: 16px;
+  --ui-danger: #a4342c;
+  --ui-danger-soft: #fff2f0;
+  --ui-warning: #80601c;
+  --ui-warning-soft: #fff8e8;
+  --ui-success: #18644e;
+}

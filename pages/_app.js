@@ -1,3 +1,4 @@
+import "../src/theme-tokens.css";
 import "../src/trust-badges.css";
 import "../src/content.css";
 import "../src/style.css";
@@ -15,6 +16,7 @@ import "../src/interface.css";
 import "../src/combined-workspace.css";
 import "../src/image-studio.css";
 import "../src/merge-workspace.css";
+import "../src/shared-ui.css";
 import "../src/typography.css";
 import Header from "../components/Header.js";
 import SiteScripts from "../components/SiteScripts.js";

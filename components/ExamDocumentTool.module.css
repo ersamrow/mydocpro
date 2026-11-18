@@ -1,9 +1,9 @@
 .panel {
   padding: clamp(16px, 3vw, 28px);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  color: #223c34;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
 }
 .panel h2,
 .panel h3,
@@ -26,17 +26,25 @@
 }
 .buttons button {
   min-height: 44px;
-  border: 1px solid #c0cfc4;
-  border-radius: 8px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
   padding: 7px 14px;
-  color: #204438;
-  background: #fff;
+  color: var(--ui-ink);
+  background: var(--ui-surface);
   text-align: left;
 }
 .buttons button[aria-pressed="true"] {
-  color: #fff;
-  background: var(--green);
-  border-color: var(--green);
+  color: var(--ui-green);
+  background: var(--ui-soft);
+  border-color: var(--ui-green);
+  box-shadow: inset 0 0 0 1px var(--ui-green);
+}
+.buttons button:hover:enabled {
+  border-color: var(--ui-green);
+  background: var(--ui-hover);
+}
+.buttons button[aria-pressed="true"]:hover:enabled {
+  background: var(--ui-hover);
 }
 .form {
   display: grid;
@@ -57,9 +65,9 @@
   min-height: 44px;
   padding: 8px;
   margin-top: 4px;
-  border: 1px solid #b7c8be;
-  border-radius: 8px;
-  background: #fff;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
   color: inherit;
 }
 .settings {
@@ -85,11 +93,11 @@
 .check input {
   width: 18px;
   height: 18px;
-  accent-color: var(--green);
+  accent-color: var(--ui-green);
 }
 .specs,
 .figure figcaption {
-  color: #405b4f;
+  color: var(--ui-muted);
   font-size: 0.9rem;
 }
 .figure {
@@ -101,10 +109,10 @@
 .preview {
   display: grid;
   position: relative;
-  background: #fff;
+  background: var(--ui-surface);
   width: min(100%, 28rem, calc(20rem * var(--exam-aspect)));
   aspect-ratio: var(--exam-aspect);
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
 }
 .preview img,
 .rows {
@@ -121,10 +129,10 @@
   display: grid;
   place-items: center;
   font-size: 0.8rem;
-  color: #495c51;
+  color: var(--ui-muted);
 }
 .rows span + span {
-  border-top: 1px dashed #637e70;
+  border-top: 1px dashed var(--ui-muted);
 }
 .result {
   display: grid;
@@ -138,15 +146,18 @@
   object-fit: contain;
   width: auto;
   height: auto;
-  border: 1px solid var(--line);
+  border: 1px solid var(--ui-border);
 }
 .success {
-  color: #165c38;
+  color: var(--ui-success);
 }
 .textLink {
-  color: var(--green);
+  color: var(--ui-green);
   text-decoration: underline;
 }
 .warning {
-  color: #98381e;
+  color: var(--ui-warning);
+}
+.warning[role="alert"] {
+  color: var(--ui-danger);
 }

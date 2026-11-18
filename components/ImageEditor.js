@@ -106,7 +106,11 @@ export default function ImageEditor({ files, id, values, onValues, busy }) {
                 the batch.
               </p>
             )}
-            <div className={compare ? "before-after" : ""}>
+            <div
+              className={
+                "image-result-display" + (compare ? " before-after" : "")
+              }
+            >
               {compare && (
                 <figure>
                   <figcaption>Before</figcaption>

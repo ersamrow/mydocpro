@@ -538,18 +538,15 @@ export default function ImageStudio({ heading }) {
                 Cancel edit
               </button>
             )}
-            <details className="studio-save-options">
-              <summary>File name</summary>
-              <label className="studio-filename">
-                Filename
-                <input
-                  aria-label="Download filename"
-                  value={filename}
-                  maxLength={120}
-                  onChange={(e) => setFilename(e.target.value)}
-                />
-              </label>
-            </details>
+            <label className="studio-filename">
+              <span>File name</span>
+              <input
+                aria-label="Download filename"
+                value={filename}
+                maxLength={120}
+                onChange={(e) => setFilename(e.target.value)}
+              />
+            </label>
           </>
           {current && !working && (
             <a

@@ -1,0 +1,270 @@
+/* Common controls override legacy page skins; layout stays with each page. */
+:root {
+  --green: var(--ui-green);
+  --muted: var(--ui-muted);
+  --line: var(--ui-border);
+  color: var(--ui-ink);
+  background: var(--ui-page);
+}
+body {
+  background: var(--ui-page);
+}
+
+#app :is(button, input, select, textarea) {
+  font-family: inherit;
+}
+#app
+  :is(
+    input:not(
+      [type="hidden"],
+      [type="file"],
+      [type="range"],
+      [type="checkbox"],
+      [type="radio"],
+      [type="color"],
+      [type="button"],
+      [type="submit"],
+      [type="reset"],
+      [type="image"]
+    ),
+    select,
+    textarea
+  ) {
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+  box-shadow: none;
+}
+#app :is(input, textarea)::placeholder {
+  color: var(--ui-muted);
+  opacity: 1;
+}
+#app :is(input, select, textarea):hover:not(:disabled):not([readonly]) {
+  border-color: var(--ui-green);
+}
+#app :is(input, select, textarea):focus {
+  border-color: var(--ui-focus);
+  box-shadow: none;
+}
+#app :is(input, select, textarea):disabled {
+  cursor: not-allowed;
+}
+#app
+  :is(
+    input[type="checkbox"],
+    input[type="radio"],
+    input[type="range"],
+    progress
+  ) {
+  accent-color: var(--ui-green);
+}
+#app input[aria-invalid="true"],
+#app select[aria-invalid="true"],
+#app textarea[aria-invalid="true"] {
+  border-color: var(--ui-danger);
+}
+
+/* Visible keyboard focus is consistent, including links and disclosures. */
+#app
+  :is(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+#app .site-header {
+  --ui-focus: var(--ui-focus-inverse);
+}
+#app .site-header dialog {
+  --ui-focus: var(--ui-green);
+}
+#app
+  :is(.page-thumbnail, .studio-upload, .pdf-workbench-upload):has(
+    input:focus-visible
+  ) {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: var(--ui-focus-offset);
+}
+
+/* The PDF page editor still has a native-file-input dropzone. */
+#app .pdf-workbench-upload {
+  border-color: var(--ui-input-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-page);
+  color: var(--ui-ink);
+}
+#app .pdf-workbench-upload:is(:hover, :focus-within) {
+  border-color: var(--ui-green);
+  background: var(--ui-hover);
+}
+#app .pdf-workbench-upload::after {
+  border-radius: var(--ui-radius-control);
+}
+#app :is(.pwa-dialog, .page-zoom-dialog, .page-move-dialog) {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+}
+
+#app :is(.primary, .merge-bar-download) {
+  background: var(--ui-green);
+  color: var(--ui-surface);
+  border-color: var(--ui-green);
+  border-radius: var(--ui-radius-control);
+}
+#app
+  :is(.primary, .merge-bar-download):hover:not(:disabled):not(
+    [aria-disabled="true"]
+  ) {
+  background: var(--ui-green-hover);
+  border-color: var(--ui-green-hover);
+}
+#app
+  :is(
+    .secondary,
+    .back,
+    .chip,
+    .setting-presets button,
+    .image-studio button:not(.primary, .image-handle),
+    .pdf-workbench .page-toolbar button
+  ) {
+  background: var(--ui-surface);
+  color: var(--ui-green);
+  border-color: var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+}
+#app
+  :is(
+    .secondary,
+    .back,
+    .chip,
+    .setting-presets button,
+    .image-studio button:not(.primary, .image-handle),
+    .pdf-task-grid button
+  ):hover:not(:disabled) {
+  background: var(--ui-hover);
+  border-color: var(--ui-green);
+}
+#app
+  :is(
+    .setting-presets button,
+    .image-studio button,
+    .pdf-task-grid button
+  )[aria-pressed="true"] {
+  background: var(--ui-soft);
+  color: var(--ui-green);
+  border-color: var(--ui-green);
+  box-shadow: inset 0 0 0 1px var(--ui-green);
+}
+#app button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#app
+  :is(
+    .workpanel,
+    .studio-card,
+    .combined-start,
+    .pdf-workbench,
+    .information-content,
+    .tool-guide,
+    .not-found-page,
+    .card,
+    .process-actions,
+    .result-preview,
+    .quality-preview
+  ) {
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background-color: var(--ui-surface);
+}
+#app
+  :is(
+    .tool-settings-details,
+    .settings .range-field,
+    .image-result-panel,
+    .quick,
+    .trust,
+    .sidebar-note,
+    .results-summary
+  ) {
+  border-color: var(--ui-border);
+  background: var(--ui-soft);
+  color: var(--ui-ink);
+}
+#app
+  :is(
+    .file-list li,
+    .merge-page-editor,
+    .studio-more,
+    .information-sidebar nav,
+    .footer-projects a
+  ) {
+  border-color: var(--ui-border);
+  background: var(--ui-surface);
+}
+#app .card:hover {
+  border-color: var(--ui-green);
+}
+#app :is(.eyebrow, .tool-icon, .tag) {
+  background: var(--ui-soft);
+  color: var(--ui-green);
+  border-color: var(--ui-border);
+}
+#app .filter {
+  color: var(--ui-muted);
+  border-radius: var(--ui-radius-control);
+}
+#app .filter:hover {
+  background: var(--ui-hover);
+}
+#app .filter.active {
+  background: var(--ui-green);
+  color: var(--ui-surface);
+}
+#app :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ui-ink);
+}
+#app
+  :is(
+    .intro,
+    .field-hint,
+    .range-scale,
+    .range-hint,
+    .image-preview-note,
+    .preview-help,
+    .preference-note,
+    .tool-settings-summary,
+    .card p,
+    .hero p,
+    .steps p
+  ) {
+  color: var(--ui-muted);
+}
+#app
+  :is(.settings label, .studio-field, .studio-filename, .contact-form label) {
+  color: var(--ui-ink);
+}
+#app :is(.status.error, .studio-error) {
+  color: var(--ui-danger);
+}
+#app .notice {
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+  border-color: var(--ui-warning);
+}
+#app .workpanel input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--ui-input-border);
+}
+#app .workpanel input[type="range"]::-moz-range-track {
+  background: var(--ui-input-border);
+}
+#app .workpanel input[type="range"]::-webkit-slider-thumb {
+  background: var(--ui-green);
+  border-color: var(--ui-surface);
+}
+#app .workpanel input[type="range"]::-moz-range-thumb {
+  background: var(--ui-green);
+  border-color: var(--ui-surface);
+}

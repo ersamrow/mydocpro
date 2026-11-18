@@ -379,6 +379,7 @@ export default function Workspace({
     <Container
       className={
         (isMerge ? "merge-workspace " : "") +
+        (id === "crop-image" ? "crop-workspace " : "") +
         (embedded
           ? "tool-workspace combined-operation"
           : "workspace tool-workspace")

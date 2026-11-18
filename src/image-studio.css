@@ -95,10 +95,20 @@
   max-width: 240px;
 }
 .studio-filename input {
-  width: 160px;
+  width: 220px;
+  min-height: 44px;
+  flex: 1;
 }
 .studio-filename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 300px;
+  min-width: 0;
   margin-left: auto;
+}
+.studio-filename > span {
+  white-space: nowrap;
 }
 .image-studio input[type="range"] {
   accent-color: var(--ui-green, #087b75);
@@ -236,6 +246,9 @@
     width: 100%;
     margin-left: 0;
   }
+  .studio-filename {
+    flex-basis: 100%;
+  }
   .studio-toolbar {
     padding: 12px;
   }
@@ -307,18 +320,11 @@
   border-top: 1px solid var(--ui-border);
   padding-top: 8px;
 }
-.studio-advanced summary,
-.studio-save-options summary {
+.studio-advanced summary {
   cursor: pointer;
   padding: 10px 0;
   font-size: 13px;
   color: var(--ui-green);
-}
-.studio-save-options {
-  margin-left: auto;
-}
-.studio-save-options .studio-filename {
-  margin: 0;
 }
 .studio-toolbar > .studio-download {
   margin-left: auto;
@@ -388,9 +394,6 @@
 .studio-upload:has(input:disabled) {
   opacity: 0.5;
   cursor: default;
-}
-.studio-save-options {
-  margin-left: auto;
 }
 .studio-toolbar > .studio-download {
   margin-left: 8px;

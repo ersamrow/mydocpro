@@ -4,7 +4,7 @@
 
 .guide {
   margin-top: 28px;
-  color: #3d564b;
+  color: var(--ui-ink);
   font-size: 15px;
   line-height: 1.65;
 }
@@ -57,7 +57,7 @@
   background: var(--ui-soft);
   border: 1px solid var(--ui-border);
   border-left: 4px solid var(--ui-green);
-  border-radius: 10px;
+  border-radius: var(--ui-radius-card);
 }
 
 .guide .live h2 {
@@ -67,7 +67,7 @@
 .tableFrame {
   overflow: hidden;
   border: 1px solid var(--ui-border);
-  border-radius: 12px;
+  border-radius: var(--ui-radius-card);
   background: var(--ui-surface);
 }
 

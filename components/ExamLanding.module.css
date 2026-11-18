@@ -1,0 +1,191 @@
+.page {
+  overflow-wrap: anywhere;
+}
+
+.guide {
+  margin-top: 28px;
+  color: #3d564b;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.guide > section {
+  margin: 0;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.guide h2 {
+  margin: 0 0 12px;
+  color: var(--ui-ink);
+  font-size: clamp(20px, 3vw, 25px);
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+}
+
+.guide p,
+.guide ul,
+.guide ol,
+.guide dl,
+.guide dd {
+  margin: 0;
+}
+
+.guide p + ul,
+.guide .tableFrame + p,
+.guide p + p {
+  margin-top: 10px;
+}
+
+.guide ul,
+.guide ol {
+  padding-left: 1.3em;
+}
+
+.guide li + li {
+  margin-top: 5px;
+}
+
+.guide a {
+  color: var(--ui-green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.guide .live {
+  padding: 18px 22px;
+  background: var(--ui-soft);
+  border: 1px solid var(--ui-border);
+  border-left: 4px solid var(--ui-green);
+  border-radius: 10px;
+}
+
+.guide .live h2 {
+  font-size: 19px;
+}
+
+.tableFrame {
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--ui-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.table th,
+.table td {
+  vertical-align: top;
+  padding: 12px;
+}
+
+.table thead th {
+  background: var(--ui-soft);
+  color: var(--ui-ink);
+}
+
+.table tbody th {
+  width: 17%;
+  color: var(--ui-ink);
+}
+
+.table tbody td:nth-child(3),
+.table tbody td:nth-child(4) {
+  min-width: 7em;
+}
+
+.table tbody tr {
+  border-top: 1px solid var(--ui-border);
+}
+
+.cellLabel {
+  display: none;
+}
+
+.faq dt {
+  margin: 18px 0 4px;
+  font-weight: 650;
+  color: var(--ui-ink);
+}
+
+.guide .related ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.guide .related ul + ul {
+  margin-top: 10px;
+}
+
+.related li + li {
+  margin-top: 0;
+}
+
+.related a {
+  display: inline-block;
+  padding: 4px 0;
+}
+
+@media (max-width: 650px) {
+  .guide {
+    margin-top: 20px;
+  }
+
+  .guide > section {
+    padding: 20px 0;
+  }
+
+  .guide .live {
+    padding: 15px;
+  }
+
+  .table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .table tbody,
+  .table tbody tr {
+    display: block;
+  }
+
+  .table tbody tr:first-child {
+    border-top: 0;
+  }
+
+  .table tbody th {
+    display: block;
+    width: auto;
+    padding: 10px 12px;
+    background: var(--ui-soft);
+  }
+
+  .table tbody td {
+    display: grid;
+    grid-template-columns: 6.5em minmax(0, 1fr);
+    gap: 8px;
+    padding: 6px 12px;
+  }
+
+  .table tbody td:last-child {
+    padding-bottom: 12px;
+  }
+
+  .cellLabel {
+    display: inline;
+    color: var(--ui-ink);
+    font-weight: 600;
+  }
+}

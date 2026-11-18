@@ -24,7 +24,7 @@ const blob = (c, type = "image/jpeg", q = 0.92) =>
       q,
     ),
   );
-async function loadImage(f) {
+export async function loadImage(f) {
   const url = URL.createObjectURL(f);
   try {
     const im = new Image();
@@ -37,7 +37,7 @@ async function loadImage(f) {
     URL.revokeObjectURL(url);
   }
 }
-function draw(im, w = im.width, h = im.height, fit = "contain") {
+export function draw(im, w = im.width, h = im.height, fit = "contain") {
   const c = canvas(w, h),
     x = c.getContext("2d");
   x.fillStyle = "#fff";
@@ -58,11 +58,17 @@ function draw(im, w = im.width, h = im.height, fit = "contain") {
   }
   return c;
 }
-async function compress(c, kb, preserveDimensions = false, signal) {
+export async function compress(
+  c,
+  kb,
+  preserveDimensions = false,
+  signal,
+  maxQuality = 0.98,
+) {
   const max = kb * 1024;
   for (let attempt = 0; attempt < 24; attempt++) {
     let low = 0.03,
-      high = 0.98,
+      high = maxQuality,
       best = null;
     for (let i = 0; i < 11; i++) {
       await checkpoint(signal);
@@ -81,6 +87,26 @@ async function compress(c, kb, preserveDimensions = false, signal) {
     c = draw(c, Math.max(1, c.width * 0.85), Math.max(1, c.height * 0.85));
   }
   throw Error("Cannot reach the requested size. Try a larger limit.");
+}
+export { blob as encodeCanvas };
+
+export function whitenPaper(c, threshold, darkenInk = false) {
+  const context = c.getContext("2d");
+  const pixels = context.getImageData(0, 0, c.width, c.height);
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const light =
+      0.299 * pixels.data[i] +
+      0.587 * pixels.data[i + 1] +
+      0.114 * pixels.data[i + 2];
+    if (light >= threshold)
+      pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = 255;
+    else if (darkenInk)
+      pixels.data[i] =
+        pixels.data[i + 1] =
+        pixels.data[i + 2] =
+          Math.max(0, light * 0.5);
+  }
+  context.putImageData(pixels, 0, 0);
 }
 export async function pdfRenderer(f, signal) {
   const pdfjs = await import("pdfjs-dist");
@@ -238,23 +264,7 @@ export async function processImage(id, files, values, preview = false, signal) {
     );
   } else if (id === "signature" || id === "white-background") {
     c = draw(im);
-    const x = c.getContext("2d"),
-      pixels = x.getImageData(0, 0, c.width, c.height),
-      threshold = num("threshold", 0, 255);
-    for (let i = 0; i < pixels.data.length; i += 4) {
-      const light =
-        0.299 * pixels.data[i] +
-        0.587 * pixels.data[i + 1] +
-        0.114 * pixels.data[i + 2];
-      if (light >= threshold)
-        pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = 255;
-      else if (id === "signature")
-        pixels.data[i] =
-          pixels.data[i + 1] =
-          pixels.data[i + 2] =
-            Math.max(0, light * 0.5);
-    }
-    x.putImageData(pixels, 0, 0);
+    whitenPaper(c, num("threshold", 0, 255), id === "signature");
   } else if (id === "passport-sheet") {
     c = canvas(1200, 1800);
     const x = c.getContext("2d");

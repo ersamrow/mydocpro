@@ -1,8 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { routeIds } from "../src/routes.js";
-import { pageSeo } from "../src/seo.js";
+import { routeIds, publicPageSeo as pageSeo } from "../src/routes.js";
 import { guides } from "../src/tool-guides.js";
 const root = new URL("../.next/server/pages/", import.meta.url);
 test("every page is pre-rendered with unique SEO, content and valid links", async () => {

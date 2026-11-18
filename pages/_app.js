@@ -41,10 +41,10 @@ export default function App({ Component, pageProps }) {
   }, []);
   return (
     <div id="app">
-      <SiteScripts />
-      <Header id={pageProps.id} />
+      {!pageProps.exam && <SiteScripts />}
+      <Header id={pageProps.exam ? "exam-photo" : pageProps.id} />
       <Component {...pageProps} />
-      <Footer />
+      <Footer examLinks={pageProps.examLinks} />
     </div>
   );
 }

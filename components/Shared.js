@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ExamLinks from "./ExamLinks.js";
 import {
   Files,
   ShieldCheck,
@@ -108,7 +109,7 @@ export function Breadcrumb({ title }) {
     </nav>
   );
 }
-export function Footer() {
+export function Footer({ examLinks }) {
   return (
     <footer className="site-footer">
       <div className="footer-identity">
@@ -129,6 +130,7 @@ export function Footer() {
           </a>
         </div>
       </nav>
+      <ExamLinks exams={examLinks} footer />
       <div className="footer-bottom">
         <nav className="foot-links" aria-label="MyDocPro information">
           <ContentLinks />

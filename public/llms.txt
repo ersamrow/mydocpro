@@ -27,3 +27,9 @@
 - [Contact Us](https://mydocpro.co.in/contact): Questions, feedback or a tool request? Get in touch with the MyDocPro team.
 - [Help & FAQ – How to Use MyDocPro Tools](https://mydocpro.co.in/help): Find help with image dimensions and file size limits, PDF processing, downloads and using MyDocPro offline.
 - [What’s New](https://mydocpro.co.in/updates): The latest tools, features and improvements added to MyDocPro.
+- [NEET UG Photo, Signature & Thumb Resizer](https://mydocpro.co.in/exam-photo/neet-ug): Prepare JPGs of your passport photo, signature and hand impressions for NEET UG 2026. Check the file sizes privately before uploading them to NTA.
+- [JEE Main Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/jee-main): Resize photo (10–200KB) and signature (10–100KB) for JEE Main 2027 in JPG format. Free, no sign-up, no upload.
+- [UPSC Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/upsc): Resize your UPSC photo (20–200KB) and triple signature (20–100KB) in JPG. Free, private, works on mobile. Files never leave your device.
+- [SSC Signature Resizer (CGL, CHSL, MTS, GD)](https://mydocpro.co.in/exam-photo/ssc): Prepare a 10–20 KB JPG signature for SSC forms. Check your scan, read live photo tips and resize privately in your browser.
+- [IBPS Photo, Signature, Thumb & Declaration Resizer](https://mydocpro.co.in/exam-photo/ibps): Resize your IBPS photo, signature, thumb impression or handwritten declaration. Use the scanned image presets and check your recruitment’s instructions.
+- [RRB NTPC Signature Resizer](https://mydocpro.co.in/exam-photo/rrb-ntpc): Resize your signature for RRB NTPC 2026: 30–49KB JPG, min 140×60 px. Photo is captured live. Free, no upload.

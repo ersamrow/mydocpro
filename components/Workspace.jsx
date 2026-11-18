@@ -1,4 +1,5 @@
 import TrustBadges from "./TrustBadges.js";
+import ExamLinks from "./ExamLinks.js";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
@@ -24,6 +25,7 @@ import { downloadName } from "../src/download-name.js";
 const PdfQualityPreview = dynamic(() => import("./PdfQualityPreview.js"));
 const ImageEditor = dynamic(() => import("./ImageEditor.js"));
 const PdfEditor = dynamic(() => import("./PdfEditor.js"));
+const UpscSignaturePreset = dynamic(() => import("./UpscSignaturePreset.js"));
 
 function Download({ result, compact = false }) {
   const [url, setUrl] = useState("");
@@ -69,6 +71,7 @@ const notices = {
 };
 export default function Workspace({
   tool,
+  examLinks,
   embedded = false,
   initialFiles = [],
   onFilesChange,
@@ -86,6 +89,7 @@ export default function Workspace({
     [pdf, setPdf] = useState({ entries: [], ready: false, error: "" }),
     [dragging, setDragging] = useState(false),
     [settingsOpen, setSettingsOpen] = useState(tool[0] !== "merge-pdf");
+  const [tripleSignature, setTripleSignature] = useState(false);
   const resultsRef = useRef(null),
     controller = useRef(null),
     selecting = useRef(false);
@@ -350,7 +354,30 @@ export default function Workspace({
         </p>
         {!embedded && <TrustBadges toolId={id} />}
       </div>
+      {!embedded && id === "exam-photo" && <ExamLinks exams={examLinks} />}
+      {!embedded && id === "signature" && (
+        <label className="settings">
+          Signature preset
+          <select
+            disabled={busy || validating}
+            value={tripleSignature ? "upsc" : "standard"}
+            onChange={(event) =>
+              setTripleSignature(event.target.value === "upsc")
+            }
+          >
+            <option value="standard">Standard signature cleanup</option>
+            <option value="upsc">UPSC triple signature</option>
+          </select>
+        </label>
+      )}
+      {tripleSignature && (
+        <UpscSignaturePreset
+          initialFile={files[0]}
+          onFileChange={(file) => changeFiles([file])}
+        />
+      )}
       <section
+        hidden={tripleSignature}
         className={
           "workpanel tool-panel " +
           (files.length ? "has-files " : "") +

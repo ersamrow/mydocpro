@@ -1,11 +1,12 @@
 import TrustBadges from "./TrustBadges.js";
+import ExamLinks from "./ExamLinks.js";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
 import ToolCards from "./ToolCards.js";
 import { tools } from "../src/tools.js";
-export default function Home({ heading, cards }) {
+export default function Home({ heading, cards, examLinks }) {
   const router = useRouter();
   const [filter, setFilter] = useState("all"),
     [search, setSearch] = useState("");
@@ -158,6 +159,7 @@ export default function Home({ heading, cards }) {
             </div>
           )}
         </ToolCards>
+        <ExamLinks exams={examLinks} />
         <div className="trust">
           <span className="tool-icon">
             <Icon name="shield-check" />

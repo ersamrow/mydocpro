@@ -1,12 +1,11 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { writeFile } from "node:fs/promises";
-import { routeIds } from "../src/routes.js";
+import { routeIds, publicPageSeo } from "../src/routes.js";
 import { sitePages } from "../src/site-content.js";
-import { pageSeo } from "../src/seo.js";
 
 const output = new URL("../public/", import.meta.url);
-const pages = routeIds.map(pageSeo);
+const pages = routeIds.map(publicPageSeo);
 const links = pages
   .slice(1)
   .map((page) => `- [${page.name}](${page.url}): ${page.description}`);
@@ -22,18 +21,18 @@ const markdown = [
 ].join("\n");
 // Use source history so rebuilding an unchanged site preserves modification dates.
 const root = fileURLToPath(new URL("../", import.meta.url));
-function contentDate(paths) {
+function contentDate(paths, firstPublished = "2026-11-16") {
   try {
     return (
       execFileSync("git", ["log", "-1", "--format=%cs", "--", ...paths], {
         cwd: root,
         encoding: "utf8",
         stdio: ["ignore", "pipe", "ignore"],
-      }).trim() || "2026-11-16"
+      }).trim() || firstPublished
     );
   } catch {
-    // Source archives may omit Git. This release revised all public page metadata.
-    return "2026-11-16";
+    // Source archives may omit Git history.
+    return firstPublished;
   }
 }
 const shared = ["src/seo.js", "components/Shared.js", "components/Header.js"];
@@ -53,12 +52,23 @@ const toolDate = contentDate([
   "components/Pdf*.js",
 ]);
 const homeDate = contentDate([...shared, "components/Home.js", "src/tools.js"]);
+const examDate = contentDate(
+  [
+    "src/data/exams.js",
+    "src/exam-seo.js",
+    "components/Exam*.js",
+    "src/exam-output.js",
+  ],
+  "2026-11-17",
+);
 const entries = routeIds.map((id, index) => {
   const date = !id
     ? homeDate
     : Object.hasOwn(sitePages, id)
       ? infoDate
-      : toolDate;
+      : id.startsWith("exam-photo/")
+        ? examDate
+        : toolDate;
   return `  <url><loc>${pages[index].url}</loc><lastmod>${date}</lastmod></url>`;
 });
 await Promise.all([

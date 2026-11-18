@@ -8,7 +8,11 @@ import ToolGuide from "./ToolGuide.js";
 import { tools } from "../src/tools.js";
 import { defaults, fields, size, validateFiles } from "../src/tool-settings.js";
 import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
-import { processImage, adjustImage } from "../src/processing.js";
+import {
+  processImage,
+  adjustImage,
+  normalizeImageFile,
+} from "../src/processing.js";
 import { downloadName } from "../src/download-name.js";
 import { cropBox } from "../src/image-geometry.js";
 
@@ -55,11 +59,11 @@ const notes = {
   "compress-image":
     "Creates a JPG; dimensions may shrink to meet the target. Compress after other edits.",
   "white-background":
-    "Whitens light pixels. Best for plain backgrounds; this is not AI background removal.",
+    "Whiten background connected to the image edges. Tolerance controls which similar colours are included.",
   signature: "Darkens signature strokes and whitens light paper.",
   "exam-photo": "Generic sizes. Check the receiving form’s requirements.",
   "passport-sheet":
-    "4 × 6 inch sheet at 300 DPI. Eight copies use smaller photo areas.",
+    "Photos keep their selected physical size. Choose enough paper for the requested copies.",
   "name-date": "Adds a white text strip below the image.",
 };
 
@@ -142,8 +146,12 @@ export default function ImageStudio({ heading }) {
     [status, setStatus] = useState("Upload an image to start editing."),
     [error, setError] = useState(false);
   const [url, setUrl] = useState(""),
-    [filename, setFilename] = useState("edited-image"),
+    [filename, setFilename] = useState(""),
     [dimensions, setDimensions] = useState("");
+  const [outputFormat, setOutputFormat] = useState("keep");
+  const [downloadBlob, setDownloadBlob] = useState(null),
+    [downloadUrl, setDownloadUrl] = useState(""),
+    [exportPending, setExportPending] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const uploadInput = useRef(null);
   const lock = useRef(false),
@@ -173,6 +181,54 @@ export default function ImageStudio({ heading }) {
       URL.revokeObjectURL(u);
     };
   }, [current]);
+  useEffect(() => {
+    if (!current) {
+      setDownloadBlob(null);
+      return;
+    }
+    let stale = false;
+    const abort = new AbortController();
+    const format =
+      outputFormat === "keep" ? original?.type || "image/png" : outputFormat;
+    setDownloadBlob(null);
+    setExportPending(true);
+    const prepare =
+      format === current.type
+        ? Promise.resolve(current)
+        : processImage(
+            "convert-image",
+            [current],
+            { format, quality: "94" },
+            false,
+            abort.signal,
+          );
+    prepare
+      .then((result) => {
+        if (!stale) setDownloadBlob(result);
+      })
+      .catch((error) => {
+        if (!stale && error.name !== "AbortError") {
+          setError(true);
+          setStatus(error.message);
+        }
+      })
+      .finally(() => {
+        if (!stale) setExportPending(false);
+      });
+    return () => {
+      stale = true;
+      abort.abort();
+    };
+  }, [current, original, outputFormat]);
+  useEffect(() => {
+    if (!downloadBlob) {
+      setDownloadUrl("");
+      return;
+    }
+    const next = URL.createObjectURL(downloadBlob);
+    setDownloadUrl(next);
+    return () => URL.revokeObjectURL(next);
+  }, [downloadBlob]);
   useEffect(() => {
     if (!effectBase) return;
     let stale = false;
@@ -216,7 +272,7 @@ export default function ImageStudio({ heading }) {
     };
   }, [adjust, effectBase]);
   function changeEffects(patch) {
-    if (!current || busy) return;
+    if (!current || busy || lock.current) return;
     if (!effectBase) {
       setEffectBase(current);
       setHistory((h) => remember(h, current));
@@ -233,7 +289,7 @@ export default function ImageStudio({ heading }) {
     setEffectsPending(false);
     setAdjust(adjustments);
   }
-  const working = busy || effectsPending;
+  const working = busy || effectsPending || exportPending;
   const update = (id, patch) =>
     setSettings((s) => {
       const next = { ...s[id], ...patch };
@@ -280,13 +336,19 @@ export default function ImageStudio({ heading }) {
     setBusy(true);
     setError(false);
     try {
-      validateFiles([file], [], { pdf: false, multi: false });
-      await inspectFiles([file], false);
+      const selected = extra ? Array.from(file).slice(0, 5) : [file];
+      validateFiles(selected, [], { pdf: false, multi: extra });
+      await inspectFiles(selected, false);
+      const normalized = await Promise.all(
+        selected.map((image) => normalizeImageFile(image)),
+      );
       if (!alive.current) return;
-      if (extra) setSecond(file);
+      if (extra) setSecond(normalized);
       else {
-        setOriginal(file);
-        setCurrent(file);
+        setOriginal(normalized[0]);
+        setCurrent(normalized[0]);
+        setFilename("");
+        setOutputFormat("keep");
         setSettingsOpen(true);
         setHistory([]);
         setFuture([]);
@@ -296,7 +358,7 @@ export default function ImageStudio({ heading }) {
       }
       setStatus(
         extra
-          ? "Second image ready to join."
+          ? `${normalized.length} additional ${normalized.length === 1 ? "image" : "images"} ready to join.`
           : "Ready to edit. Start with crop, colors or size; changes stay on this page.",
       );
     } catch (e) {
@@ -310,7 +372,7 @@ export default function ImageStudio({ heading }) {
     }
   }
   async function apply(id) {
-    if (!current || lock.current || effectsPending) return;
+    if (!current || lock.current || effectsPending || exportPending) return;
     lock.current = true;
     setBusy(true);
     setError(false);
@@ -321,7 +383,7 @@ export default function ImageStudio({ heading }) {
     try {
       const result = await processImage(
         id,
-        id === "join-images" ? [current, second].filter(Boolean) : [current],
+        id === "join-images" ? [current, ...(second || [])] : [current],
         {
           ...settings[id],
           ...(["name-date", "join-images", "passport-sheet"].includes(id)
@@ -338,10 +400,13 @@ export default function ImageStudio({ heading }) {
       setHistory((h) => remember(h, current));
       setFuture([]);
       setCurrent(result);
+      if (["compress-image", "convert-image"].includes(id))
+        setOutputFormat(result.type);
       resetCrop();
       clearEffects();
       setStatus(
-        "Edit applied. Continue editing or download the current image.",
+        result.warnings?.join(" ") ||
+          "Edit applied. Continue editing or download the current image.",
       );
     } catch (e) {
       if (alive.current) {
@@ -369,9 +434,9 @@ export default function ImageStudio({ heading }) {
     setStatus(undo ? "Last edit undone." : "Edit restored.");
   }
   const extension =
-    current?.type === "image/png"
+    downloadBlob?.type === "image/png"
       ? "png"
-      : current?.type === "image/webp"
+      : downloadBlob?.type === "image/webp"
         ? "webp"
         : "jpg";
   const renderEffects = (keys) =>
@@ -446,22 +511,28 @@ export default function ImageStudio({ heading }) {
       )}
       {id === "join-images" && (
         <label className="studio-field">
-          Second image
+          Images 2–6
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+            multiple
             onChange={(e) => {
-              upload(e.target.files[0], true);
+              upload(Array.from(e.target.files), true);
               e.target.value = "";
             }}
           />
-          <span>{second?.name || "Choose a signature or another photo."}</span>
+          <span>
+            {second?.map((file) => file.name).join(", ") ||
+              "Choose up to five more images."}
+          </span>
         </label>
       )}
       {notes[id] && <p>{notes[id]}</p>}
       <button
         className="primary"
-        disabled={id === "join-images" && !second}
+        disabled={
+          working || !current || (id === "join-images" && !second?.length)
+        }
         onClick={() => apply(id)}
       >
         Apply {tools.find((t) => t[0] === id)[1].toLowerCase()}
@@ -492,9 +563,9 @@ export default function ImageStudio({ heading }) {
         inputRef={uploadInput}
         hidden={Boolean(current)}
         disabled={working}
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
         title="Choose an image or drop it here"
-        hint="JPG, PNG or WebP · up to 25 MB per image"
+        hint="JPG, PNG, WebP or HEIC · up to 25 MB per image"
         buttonLabel="Choose image"
         onFiles={(files) => upload(files[0])}
       />
@@ -539,6 +610,20 @@ export default function ImageStudio({ heading }) {
               </button>
             )}
             <label className="studio-filename">
+              <span>Output format</span>
+              <select
+                aria-label="Output format"
+                value={outputFormat}
+                disabled={working}
+                onChange={(event) => setOutputFormat(event.target.value)}
+              >
+                <option value="keep">Keep original</option>
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WebP</option>
+              </select>
+            </label>
+            <label className="studio-filename">
               <span>File name</span>
               <input
                 aria-label="Download filename"
@@ -548,11 +633,14 @@ export default function ImageStudio({ heading }) {
               />
             </label>
           </>
-          {current && !working && (
+          {downloadUrl && !working && (
             <a
               className="primary studio-download"
-              href={url}
-              download={downloadName(filename, `edited-image.${extension}`)}
+              href={downloadUrl}
+              download={downloadName(
+                filename,
+                `${(original?.name || "image").replace(/\.[^.]+$/, "")}_edited.${extension}`,
+              )}
             >
               Download {extension.toUpperCase()} – free
             </a>
@@ -567,8 +655,8 @@ export default function ImageStudio({ heading }) {
       </p>
       {current && (
         <p className="studio-file-info">
-          {original?.name} · {dimensions} · {size(current.size)} ·{" "}
-          {extension.toUpperCase()}
+          {original?.name} · {dimensions} ·{" "}
+          {size((downloadBlob || current).size)} · {extension.toUpperCase()}
         </p>
       )}
       {current && (

@@ -47,10 +47,11 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
     if (!next) return;
     const signal = start();
     try {
+      const { inspectExamInput } = await import("../src/exam-output.js");
+      await inspectExamInput(next);
+      if (signal.aborted) return;
       const { normalizeImageFile } = await import("../src/image-processing.js");
       const normalized = await normalizeImageFile(next, signal);
-      const { inspectExamInput } = await import("../src/exam-output.js");
-      await inspectExamInput(normalized);
       if (signal.aborted) return;
       setFrameRatio(null);
       setFile(normalized);

@@ -120,17 +120,42 @@ const path = require("node:path");
         await page.setViewportSize({ width: 1280, height: 900 });
       }
       await page.locator("#process").click();
-      await page
-        .locator("#outputs a[download]")
-        .first()
-        .waitFor({ timeout: 60000 });
       await page.waitForFunction(
-        () => !document.querySelector("#process").disabled,
+        () =>
+          !document.querySelector(".processing-progress") &&
+          (!!document.querySelector(".result-preview") ||
+            document
+              .querySelector("#status")
+              ?.textContent.includes("already small") ||
+            document.querySelector("#status")?.classList.contains("error")),
         {},
         { timeout: 60000 },
       );
+      assert.equal(
+        await page.locator("#status.error").count(),
+        0,
+        await page.locator("#status").innerText(),
+      );
+      if (
+        id === "compress-pdf" &&
+        (await page.locator("#status").innerText()).includes("already small")
+      ) {
+        assert.equal(
+          await page
+            .locator(".process-actions a[download], #outputs a[download]")
+            .count(),
+          0,
+          "A PDF that did not shrink must not offer a download",
+        );
+        console.log("compress-pdf: already-small output correctly withheld");
+        continue;
+      }
+      await page
+        .locator(".process-actions a[download], #outputs a[download]")
+        .first()
+        .waitFor({ timeout: 60000 });
       const results = await page
-        .locator("#outputs a")
+        .locator(".process-actions a[download], #outputs a[download]")
         .evaluateAll(async (links) =>
           Promise.all(
             links.map(async (a) => {
@@ -167,7 +192,18 @@ const path = require("node:path");
           id,
         );
       }
-      if (id === "pdf-to-image") assert.equal(results.length, 2);
+      if (id === "pdf-to-image") {
+        assert.equal(results.length, 2);
+        assert.ok(
+          await page
+            .getByRole("button", { name: "Download all (ZIP)", exact: true })
+            .isVisible(),
+        );
+        assert.doesNotMatch(
+          await page.locator(".results-summary").innerText(),
+          /% larger/,
+        );
+      }
       if (id === "passport-sheet")
         assert.deepEqual(
           await page.locator("#outputs img").evaluate(async (im) => {
@@ -182,14 +218,15 @@ const path = require("node:path");
     await page.locator("#search").waitFor();
     await page.waitForFunction(
       () =>
-        document.querySelector("[data-app-status]")?.textContent ===
-        "Ready offline",
+        document
+          .querySelector("[data-app-status]")
+          ?.textContent.includes("Works offline"),
       {},
       { timeout: 60000 },
     );
     await context.setOffline(true);
     await page.locator('.card[href="/resize-image"]').click();
-    await page.locator("#width").waitFor();
+    await page.locator("#upload").waitFor();
     assert.equal(await page.evaluate(() => window.navigationSentinel), 42);
     await page.locator(".brand").first().click();
     await page.locator("#search").waitFor();

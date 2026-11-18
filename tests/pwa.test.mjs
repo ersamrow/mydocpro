@@ -102,8 +102,9 @@ test("offline cache contains route-specific React HTML, page data and Next chunk
   const w = worker();
   await w.event("install");
   await w.event("activate");
-  assert.ok(w.stores.has("other-app"));
+  assert.ok(!w.stores.has("other-app"));
   assert.ok(!w.stores.has("mydocpro-old"));
+  assert.equal(w.stores.size, 1, "activation retains only the current cache");
   let report;
   await w.event("message", {
     data: { type: "OFFLINE_STATUS" },

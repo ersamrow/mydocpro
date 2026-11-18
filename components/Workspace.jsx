@@ -303,17 +303,23 @@ export default function Workspace({
           "Results exceed 150 MB. Download the completed files, then process a smaller batch.",
         );
       if (alive.current)
-        setOutputs((out) => [
-          ...out,
-          {
-            blob,
-            warnings: metadata.warnings || blob.warnings || [],
-            name:
-              batchTools.includes(id) && files.length > 1
-                ? `${out.length + 1}-${downloadName(values["output-name"] || "", name)}`
-                : downloadName(values["output-name"] || "", name),
-          },
-        ]);
+        setOutputs((out) => {
+          const requested = downloadName(values["output-name"] || "", name);
+          const extension = requested.slice(requested.lastIndexOf("."));
+          const stem = requested.slice(0, -extension.length);
+          let unique = requested,
+            suffix = 2;
+          while (out.some((result) => result.name === unique))
+            unique = `${stem}_${suffix++}${extension}`;
+          return [
+            ...out,
+            {
+              blob,
+              name: unique,
+              warnings: metadata.warnings || blob.warnings || [],
+            },
+          ];
+        });
     };
     try {
       await new Promise((r) => setTimeout(r, 20));

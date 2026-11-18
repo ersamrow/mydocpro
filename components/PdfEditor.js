@@ -163,6 +163,7 @@ export default function PdfEditor({
     skipSort = useRef(false),
     previousPages = useRef(values.pages);
   const workbench = id === "pdf-workbench";
+  const organize = id === "organize-pdf";
   const selectionKey = (e) => (workbench ? e.key : e.index);
   const split = ["split-pdf", "organize-pdf", "pdf-to-image"].includes(id),
     readOnly = id === "compress-pdf",
@@ -181,7 +182,11 @@ export default function PdfEditor({
   const selected = workbench
       ? new Set(entries.filter((e) => e.selected !== false).map((e) => e.key))
       : new Set(indices),
-    rotation = id === "organize-pdf" ? Number(values.rotation) : 0;
+    rotation = organize ? Number(values.rotation || 0) : 0;
+  const rotationFor = (entry) =>
+    workbench
+      ? Number(entry.rotation || 0)
+      : (rotation + Number(values.pageRotations?.[entry.index] || 0)) % 360;
   useEffect(() => {
     if (!compact) return;
     const media = window.matchMedia("(max-width: 650px)");
@@ -198,6 +203,7 @@ export default function PdfEditor({
       task,
       doc;
     onPdf({ entries: [], ready: false, error: "" });
+    if (organize) onValues({ pageRotations: {} });
     setHistory([]);
     setZoom(null);
     setMoving(null);
@@ -293,7 +299,11 @@ export default function PdfEditor({
   function remember() {
     setHistory((h) => [
       ...h.slice(-49),
-      { entries: [...entries], pages: values.pages },
+      {
+        entries: [...entries],
+        pages: values.pages,
+        pageRotations: { ...values.pageRotations },
+      },
     ]);
   }
   function commit(next, pages) {
@@ -359,7 +369,9 @@ export default function PdfEditor({
       {compact ? (
         <div className="merge-preview-heading">
           <h2>Page order</h2>
-          <span className="merge-page-count">{entries.length} pages</span>
+          <span className="merge-page-count">
+            {entries.length} {entries.length === 1 ? "page" : "pages"}
+          </span>
         </div>
       ) : (
         <h2>
@@ -388,7 +400,7 @@ export default function PdfEditor({
           (!pdf.ready
             ? "Loading page previews…"
             : status ||
-              `${ordered.length} pages ${split || workbench ? "selected" : readOnly ? "to compress" : "to merge"}`)}
+              `${ordered.length} ${ordered.length === 1 ? "page" : "pages"} ${split || workbench ? "selected" : readOnly ? "to compress" : "to merge"}`)}
       </p>
       {!compact &&
         !workbench &&
@@ -433,6 +445,7 @@ export default function PdfEditor({
             const prev = history.at(-1);
             setHistory((h) => h.slice(0, -1));
             commit(prev.entries, prev.pages);
+            if (organize) onValues({ pageRotations: prev.pageRotations });
             setStatus("Previous change restored.");
           }}
         >
@@ -502,9 +515,7 @@ export default function PdfEditor({
       <div className="page-thumbnails">
         {visibleEntries.map((entry, localIndex) => {
           const i = previewStart + localIndex;
-          const pageRotation = workbench
-            ? Number(entry.rotation || 0)
-            : rotation;
+          const pageRotation = rotationFor(entry);
           return (
             <figure
               key={entry.key}
@@ -608,20 +619,32 @@ export default function PdfEditor({
                   "Preview unavailable"
                 )}
               </button>
-              {workbench && (
+              {(workbench || organize) && (
                 <button
                   className="secondary"
                   disabled={disabled}
                   aria-label={`Rotate ${entry.file.name} page ${entry.index + 1} clockwise`}
                   onClick={() => {
                     remember();
-                    commit(
-                      entries.map((e) =>
-                        e.key === entry.key
-                          ? { ...e, rotation: ((e.rotation || 0) + 90) % 360 }
-                          : e,
-                      ),
-                    );
+                    if (workbench) {
+                      commit(
+                        entries.map((e) =>
+                          e.key === entry.key
+                            ? { ...e, rotation: ((e.rotation || 0) + 90) % 360 }
+                            : e,
+                        ),
+                      );
+                    } else {
+                      onValues({
+                        pageRotations: {
+                          ...values.pageRotations,
+                          [entry.index]:
+                            (Number(values.pageRotations?.[entry.index] || 0) +
+                              90) %
+                            360,
+                        },
+                      });
+                    }
                   }}
                 >
                   ↻ Rotate 90°
@@ -705,11 +728,9 @@ export default function PdfEditor({
       {zoom && (
         <Zoom
           entry={zoom}
-          rotation={
-            workbench
-              ? entries.find((e) => e.key === zoom.key)?.rotation || 0
-              : rotation
-          }
+          rotation={rotationFor(
+            entries.find((e) => e.key === zoom.key) || zoom,
+          )}
           onClose={() => setZoom(null)}
         />
       )}

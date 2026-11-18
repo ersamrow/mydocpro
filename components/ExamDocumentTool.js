@@ -6,6 +6,7 @@ import {
 } from "../src/exam-requirements.js";
 import styles from "./ExamDocumentTool.module.css";
 import Dropzone from "./Dropzone.js";
+import { downloadName } from "../src/download-name.js";
 
 function useFileUrl(file) {
   const [url, setUrl] = useState("");
@@ -23,7 +24,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
   const id = useId();
   const [file, setFile] = useState(initialFile || null);
   const [fit, setFit] = useState(doc.type === "photo" ? "cover" : "contain");
-  const [whitePaper, setWhitePaper] = useState(false);
+  const [whitePaper, setWhitePaper] = useState(doc.type !== "photo");
   const [output, setOutput] = useState(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,13 +47,15 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
     if (!next) return;
     const signal = start();
     try {
+      const { normalizeImageFile } = await import("../src/image-processing.js");
+      const normalized = await normalizeImageFile(next, signal);
       const { inspectExamInput } = await import("../src/exam-output.js");
-      await inspectExamInput(next);
+      await inspectExamInput(normalized);
       if (signal.aborted) return;
       setFrameRatio(null);
-      setFile(next);
+      setFile(normalized);
       setSettingsOpen(true);
-      onFileChange?.(next);
+      onFileChange?.(normalized);
     } catch (error) {
       if (!signal.aborted) setStatus(error.message);
     } finally {
@@ -123,14 +126,14 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
       )}
       <Dropzone
         id={id}
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
         disabled={busy}
         title={
           file
             ? "Choose another image or drop it here"
             : "Choose an image or drop it here"
         }
-        hint="JPG, PNG or WebP · up to 25 MB per image"
+        hint="JPG, PNG, WebP or HEIC · up to 25 MB per image"
         buttonLabel={file ? "Replace image" : "Choose image"}
         onFiles={(files) => choose(files[0])}
       />
@@ -218,31 +221,39 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
                 disabled={busy}
                 onChange={(e) => changeSetting(setWhitePaper, e.target.checked)}
               />
-              Whiten light paper
+              Whiten paper
             </label>
           )}
         </details>
       )}
-      <div className="process-actions">
-        {output && outputUrl && !busy ? (
-          <a
-            className="primary"
-            href={outputUrl}
-            download={doc.filename || `${slug}-${doc.type}.jpg`}
-          >
-            Download JPG
-          </a>
-        ) : (
-          <button
-            className="primary"
-            type="button"
-            disabled={!file || busy}
-            onClick={prepareJpeg}
-          >
-            {busy ? "Working…" : "Prepare JPG"}
-          </button>
-        )}
-      </div>
+      {file && (
+        <div className="process-actions">
+          {output && outputUrl && !busy ? (
+            <a
+              className="primary"
+              href={outputUrl}
+              download={
+                doc.filename ||
+                downloadName(
+                  `${file.name.replace(/\.[^.]+$/, "")}_${slug}`,
+                  `${doc.type}_${slug}.jpg`,
+                )
+              }
+            >
+              Download JPG
+            </a>
+          ) : (
+            <button
+              className="primary"
+              type="button"
+              disabled={!file || busy}
+              onClick={prepareJpeg}
+            >
+              {busy ? "Working…" : "Prepare JPG"}
+            </button>
+          )}
+        </div>
+      )}
       {status && (
         <p role="alert" className={styles.warning}>
           {status}
@@ -261,30 +272,18 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
                   : "JPG prepared — confirm limits in the notice"}
             </strong>
             <p>
-              {(output.blob.size / 1024).toFixed(2)} KB · {output.width} ×{" "}
+              {(output.blob.size / 1000).toFixed(2)} KB · {output.width} ×{" "}
               {output.height} px · JPG
             </p>
+            {output.paddedBytes > 0 && (
+              <p className={styles.success}>
+                ✓ padded to {(output.blob.size / 1000).toFixed(2)} KB · image
+                pixels unchanged
+              </p>
+            )}
             {output.issues.map((issue) => (
               <p key={issue}>{issue}</p>
             ))}
-            {slug === "ibps" &&
-              doc.type === "signature" &&
-              output.blob.size < doc.minKB * 1024 && (
-                <p>
-                  If your notice permits dimensions above {doc.widthPx} ×{" "}
-                  {doc.heightPx} px, open your original scan in the{" "}
-                  <Link
-                    className={styles.textLink}
-                    prefetch={false}
-                    href="/resize-image"
-                  >
-                    image resizer
-                  </Link>
-                  . Select <strong>Keep proportions</strong>, try a higher pixel
-                  resolution and check the saved JPG against{" "}
-                  {formatExamFileRange(doc)}.
-                </p>
-              )}
             {outputUrl && (
               <img
                 src={outputUrl}
@@ -351,7 +350,7 @@ function CertificatePreset({ doc }) {
                   : "PDF exceeds the file-size limit"}
             </strong>
             <p>
-              {(result.bytes / 1024).toFixed(2)} KB · {result.pages}{" "}
+              {(result.bytes / 1000).toFixed(2)} KB · {result.pages}{" "}
               {result.pages === 1 ? "page" : "pages"}
             </p>
           </>

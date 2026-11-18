@@ -1,13 +1,20 @@
 import {
-  compress,
+  compressCanvasToTarget,
   draw,
   encodeCanvas,
   loadImage,
-  pdfRenderer,
   whitenPaper,
-} from "./processing.js";
+} from "./image-processing.js";
+import { pdfRenderer } from "./processing.js";
 import { inspectFiles, throwIfCancelled } from "./file-validation.js";
 import { validateFiles } from "./tool-settings.js";
+import {
+  jpegSampling,
+  padJpegToBytes,
+  setImageDensity,
+} from "./image-metadata.js";
+
+const wideRange = (doc) => doc.minKB > 0 && doc.maxKB >= doc.minKB * 5;
 
 export function examFrame(doc, width, height) {
   if (doc.widthPx && doc.heightPx)
@@ -27,6 +34,10 @@ export function examFrame(doc, width, height) {
     (doc.maxWidthPx || 12000) / width,
     (doc.maxHeightPx || 12000) / height,
     Math.sqrt(25000000 / (width * height)),
+    wideRange(doc)
+      ? Math.max(1200, doc.minWidthPx || 0, doc.minHeightPx || 0) /
+          Math.max(width, height)
+      : Infinity,
   );
   return {
     width:
@@ -47,7 +58,7 @@ export async function inspectCertificate(file, doc, signal) {
   await inspectFiles([file], true);
   const pdf = await pdfRenderer(file, signal);
   try {
-    const limit = doc.maxKB == null ? Infinity : doc.maxKB * 1024;
+    const limit = doc.maxKB == null ? Infinity : doc.maxKB * 1000;
     const fits = doc.maxExclusive ? file.size < limit : file.size <= limit;
     return { bytes: file.size, pages: pdf.numPages, fits };
   } finally {
@@ -55,80 +66,95 @@ export async function inspectCertificate(file, doc, signal) {
   }
 }
 
-// The JFIF header records output density. The quality of the original paper
-// scan still needs to be checked by its owner.
-async function setJpegDensity(blob, pixelsPerInch) {
-  const header = new Uint8Array(await blob.slice(0, 18).arrayBuffer());
-  if (header[0] !== 255 || header[1] !== 216)
-    throw Error("Could not encode a JPG.");
-  const hasJfif =
-    header[2] === 255 &&
-    header[3] === 224 &&
-    String.fromCharCode(...header.slice(6, 11)) === "JFIF\0";
-  const density = Uint8Array.of(
-    1,
-    pixelsPerInch >> 8,
-    pixelsPerInch & 255,
-    pixelsPerInch >> 8,
-    pixelsPerInch & 255,
-  );
-  if (hasJfif) {
-    return new Blob([blob.slice(0, 13), density, blob.slice(18)], {
-      type: "image/jpeg",
-    });
-  }
-  const marker = Uint8Array.of(
-    255,
-    224,
-    0,
-    16,
-    74,
-    70,
-    73,
-    70,
-    0,
-    1,
-    1,
-    ...density,
-    0,
-    0,
-  );
-  return new Blob([blob.slice(0, 2), marker, blob.slice(2)], {
-    type: "image/jpeg",
-  });
+function borderBrightness(canvas) {
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  const edges = [
+    context.getImageData(0, 0, canvas.width, 1).data,
+    context.getImageData(0, canvas.height - 1, canvas.width, 1).data,
+    context.getImageData(0, 0, 1, canvas.height).data,
+    context.getImageData(canvas.width - 1, 0, 1, canvas.height).data,
+  ];
+  let light = 0;
+  let count = 0;
+  for (const edge of edges)
+    for (let i = 0; i < edge.length; i += 4) {
+      light += 0.299 * edge[i] + 0.587 * edge[i + 1] + 0.114 * edge[i + 2];
+      count++;
+    }
+  return light / count;
+}
+
+async function fullQualityJpeg(canvas, signal) {
+  const native = await encodeCanvas(canvas, "image/jpeg", 1);
+  if ((await jpegSampling(native)) === "4:4:4") return native;
+  throwIfCancelled(signal);
+  // Canvas has no portable sampling control. Only load the fallback encoder
+  // when the browser's quality-100 output still subsamples chroma.
+  const { default: encode } = await import("jpeg-js/lib/encoder.js");
+  const pixels = canvas
+    .getContext("2d")
+    .getImageData(0, 0, canvas.width, canvas.height);
+  const result = encode(pixels, 100);
+  throwIfCancelled(signal);
+  return new Blob([result.data], { type: "image/jpeg" });
 }
 
 export async function processExamDocument(
   file,
   doc,
-  { fit = "contain", whitePaper = false } = {},
+  { fit = "contain", whitePaper = doc.type !== "photo" } = {},
   signal,
 ) {
   throwIfCancelled(signal);
   const source = await loadImage(file);
   const frame = examFrame(doc, source.width, source.height);
   const rendered = draw(source, frame.width, frame.height, fit);
-  if (whitePaper) whitenPaper(rendered, 225);
+  if (whitePaper)
+    whitenPaper(
+      rendered,
+      Math.max(135, Math.min(225, borderBrightness(rendered) - 16)),
+    );
   let encoded = await encodeCanvas(rendered);
-  if (doc.minKB && encoded.size < doc.minKB * 1024)
-    encoded = await encodeCanvas(rendered, "image/jpeg", 1);
+  const minimum = (doc.minKB || 0) * 1000;
+  const maximum = doc.maxKB ? doc.maxKB * 1000 : Infinity;
+  const safeMaximum = Math.max(minimum, Math.floor(maximum * 0.97));
+  const target = Math.min(
+    safeMaximum,
+    Math.max(minimum, maximum * (wideRange(doc) ? 0.55 : 0.97)),
+  );
+  if (minimum && encoded.size < minimum)
+    encoded = await fullQualityJpeg(rendered, signal);
   const physical = !!(doc.widthMm && doc.heightMm);
-  if (doc.maxKB && encoded.size > doc.maxKB * 1024) {
+  if (encoded.size > target - 18) {
     const fixed = !!(doc.widthPx || doc.heightPx || physical);
-    encoded = await compress(rendered, doc.maxKB, fixed, signal, 1);
+    encoded = await compressCanvasToTarget(rendered, (target - 18) / 1000, {
+      preserveDimensions: fixed,
+      signal,
+      maxQuality: 1,
+      headroom: 1,
+    });
   }
   // Release the drawing buffer before decoding the actual downloadable file.
   rendered.width = rendered.height = 1;
-  if (doc.dpi) encoded = await setJpegDensity(encoded, doc.dpi);
+  if (doc.dpi) encoded = await setImageDensity(encoded, doc.dpi);
+  let paddedBytes = 0;
+  if (encoded.size < minimum) {
+    const padded = await padJpegToBytes(
+      encoded,
+      Math.min(minimum + 1000, safeMaximum),
+    );
+    paddedBytes = padded.size - encoded.size;
+    encoded = padded;
+  }
   throwIfCancelled(signal);
   const image = await loadImage(encoded);
   const { width, height } = image;
   const issues = [];
-  if (doc.minKB && encoded.size < doc.minKB * 1024)
+  if (doc.minKB && encoded.size < minimum)
     issues.push(
       `Below the ${doc.minKB} KB minimum even at full JPG quality. Choose a sharper original scan with more detail.`,
     );
-  if (doc.maxKB && encoded.size > doc.maxKB * 1024)
+  if (doc.maxKB && encoded.size > safeMaximum)
     issues.push(`Above the ${doc.maxKB} KB limit. Try a tighter crop.`);
   if (
     (doc.widthPx && width !== doc.widthPx) ||
@@ -144,6 +170,23 @@ export async function processExamDocument(
     );
   if (encoded.type !== "image/jpeg")
     issues.push("This browser could not produce a JPG.");
+  let backgroundAverage = null;
+  if (doc.type !== "photo") {
+    const check = draw(image);
+    backgroundAverage = borderBrightness(check);
+    check.width = check.height = 1;
+    if (backgroundAverage < 235)
+      issues.push(
+        "The paper background is not near-white. Check for shadows, enable Whiten paper, or use a brighter scan before submitting.",
+      );
+  }
   throwIfCancelled(signal);
-  return { blob: encoded, width, height, issues };
+  return {
+    blob: encoded,
+    width,
+    height,
+    issues,
+    paddedBytes,
+    backgroundAverage,
+  };
 }

@@ -2,9 +2,9 @@
 export const guideDetails = {
   "compress-image": {
     steps: [
-      "Add the JPG, PNG or WebP photo you want to make smaller.",
-      "Enter Maximum size (KB) and a Maximum width (px) that still meets the receiving form’s minimum dimensions.",
-      "Process the image, then download the JPG result. For several selected images, check each output separately.",
+      "Add the JPG, PNG, WebP or HEIC photo you want to make smaller.",
+      "Use a 20, 50, 100 or 200 KB quick preset, or enter Maximum size (KB). Set a Maximum width (px) that meets the form’s minimum dimensions.",
+      "Process the image, then download the JPG. For a batch, use Download all (ZIP) or an individual download and check each output separately.",
     ],
     checks:
       "Compare the downloaded JPG’s size with the upload limit and inspect fine details such as eyes and signature strokes. Compression may reduce dimensions, so check the output width and height too.",
@@ -12,13 +12,13 @@ export const guideDetails = {
   },
   "convert-image": {
     steps: [
-      "Choose a supported JPG, PNG or WebP source image.",
+      "Choose a JPG, PNG, WebP, HEIC or HEIF source image.",
       "Select Output format to match the file types accepted by the website or app where you will use it.",
       "For JPG or WebP, choose the quality level; lowering it can reduce size while losing detail. The quality control does not change PNG compression.",
       "Process and download the converted file with its new extension.",
     ],
     checks:
-      "Open the converted download and inspect small text, edges and any formerly transparent areas. Check both the actual output format and file size; changing formats does not guarantee a smaller file.",
+      "Open the converted download and inspect small text and edges. PNG and WebP retain transparency; JPG uses a white background. Check the actual format and file size because changing formats does not guarantee a smaller file.",
     related: ["resize-image", "compress-image", "jpg-to-pdf"],
   },
   "crop-image": {
@@ -46,9 +46,9 @@ export const guideDetails = {
   "split-pdf": {
     steps: [
       "Add one PDF and identify the positions of the pages you want to keep.",
-      "Enter Pages to extract with commas and ascending ranges, such as 1-3, 8.",
-      "Choose One PDF to combine the selection or Separate PDF per page for individual files.",
-      "Process the selection and download every output you need.",
+      "Enter Pages to extract with commas and ranges, such as 1-3, 8. A reversed range such as 5-2 keeps that reverse order.",
+      "Choose One PDF, Separate PDF per page, or Split every N pages and set the number of pages per file.",
+      "Check the selected page range, process it, then download all files as ZIP or choose individual outputs.",
     ],
     checks:
       "For 1-3, 8, expect four selected pages. Open the download or individual files and confirm their contents and order, using file positions rather than printed page labels.",
@@ -56,21 +56,21 @@ export const guideDetails = {
   },
   "compress-pdf": {
     steps: [
-      "Choose a PDF whose pages can be converted to images; keep an untouched original.",
-      "Start with Render resolution (DPI) at 110 and JPEG quality at 65.",
-      "Process and download the new PDF, then compare its size and readability with the source.",
-      "If necessary, lower DPI or quality gradually and retry from the original, keeping small text readable.",
+      "Choose a PDF and keep an untouched original.",
+      "Choose a 100 KB, 200 KB, 500 KB or 1 MB target for automatic quality and resolution search, or leave the target blank and set DPI and quality manually.",
+      "Process the file. Supported embedded images are recompressed while retaining real text; image-only documents may use a rendered-page fallback.",
+      "Download the smaller result and inspect it. If no smaller file can be produced, keep the original; if the target is missed, check the reported output size.",
     ],
     checks:
-      "Inspect the smallest text, stamps and signatures in the downloaded PDF. Compare page count and file size, and confirm that image-only output is acceptable before replacing a searchable or interactive document.",
+      "Inspect small text, stamps and signatures. Compare page count, selectable text and file size with the original. Check links or form fields if those matter; keep signed originals because editing can invalidate their signatures.",
     related: ["split-pdf", "pdf-to-image", "merge-pdf"],
   },
   "jpg-to-pdf": {
     steps: [
-      "Add the JPG, PNG or WebP images that belong in the document.",
+      "Add the JPG, PNG, WebP or HEIC images that belong in the document.",
       "Arrange the images in reading order; each image becomes one PDF page.",
-      "Choose A4, Letter or Fit to image. For A4 or Letter, select a suitable portrait or landscape orientation.",
-      "Create the PDF and download it with a descriptive filename.",
+      "Choose A4, Letter or Fit to image, set margins, and use Auto orientation per image or force portrait or landscape.",
+      "Set image quality and optionally a maximum PDF size, then create the PDF and check any size warning before downloading.",
     ],
     checks:
       "Check that the downloaded PDF has one page per selected image, in the intended order. Zoom in on receipt totals, dates and small print, and check for excessive blank margins or sideways pages.",
@@ -101,20 +101,20 @@ export const guideDetails = {
   "passport-sheet": {
     steps: [
       "Choose a photo with suitable framing and check the receiving authority’s photo requirements.",
-      "Select four, six or eight copies. Use four or six when you need the larger approximately 35 × 45 mm photo areas.",
-      "Create and download the 1,200 × 1,800 pixel sheet.",
-      "Print on 4 × 6 inch paper at actual size, with automatic fit or enlargement disabled.",
+      "Choose the required photo size: 35 × 45 mm, 2 × 2 inches, 25 × 35 mm or 20 × 25 mm stamp.",
+      "Select 4 × 6 inch or A4 paper, DPI, copy count and optional cut guides. Choose fewer copies if they do not fit.",
+      "Download and print on the selected paper at actual size, with automatic fit or enlargement disabled.",
     ],
     checks:
-      "Print a trial and measure an individual photo with a ruler before cutting the sheet. Check face framing and print quality; eight copies use smaller photo areas than four or six.",
+      "Print a trial and measure an individual photo with a ruler before cutting. Photo dimensions stay fixed when copy count changes. Check face framing, margins and print quality before using the sheet.",
     related: ["exam-photo", "crop-image", "resize-image"],
   },
   "pdf-to-image": {
     steps: [
       "Add one PDF and select JPG, PNG or WebP as the output format.",
       "Enter all or a page selection such as 1-3, 5, using positions in the PDF.",
-      "Start at 150 DPI for general viewing, increasing resolution only when the extra detail is needed.",
-      "Render the selection and download the image for each required page.",
+      "Start at 150 DPI for general viewing. Optionally set Max size per image (KB); this can reduce quality or dimensions to fit.",
+      "Render the selection and download all images as ZIP, or choose the individual page downloads.",
     ],
     checks:
       "Count the exported images against your selected pages and inspect small text at full size. Check the actual image dimensions and format, and save completed outputs before processing another range.",
@@ -124,7 +124,7 @@ export const guideDetails = {
     steps: [
       "Add a PDF and wait for its thumbnails to load.",
       "Reorder or remove pages using the controls, or enter their positions in Pages in output order, such as 3, 1, 2.",
-      "Apply rotation where needed and inspect the resulting page sequence before processing.",
+      "Use each page card’s Rotate button to turn that page, or apply the shared Rotation setting to all selected pages.",
       "Download the organized PDF under a new filename so the original remains available.",
     ],
     checks:
@@ -134,9 +134,9 @@ export const guideDetails = {
   "name-date": {
     steps: [
       "Check that the receiving form permits or requires a name and date strip, then choose your photo.",
-      "Enter the name exactly as required and choose the requested date.",
+      "Enter the name and date, then select DD-MM-YYYY, DD/MM/YYYY or YYYY-MM-DD.",
       "Inspect the strip below the photo, especially the spelling and the fit of a long name.",
-      "Process and download the result; resize the complete image afterward if fixed final dimensions are required.",
+      "Optionally set Max size (KB), then process and download. Resize the complete image afterward if fixed final dimensions are required, and recheck its size.",
     ],
     checks:
       "Open the download and read the name and date at its intended display size. Check the overall dimensions after the strip is added, and recheck text readability after any resizing or compression.",
@@ -144,20 +144,20 @@ export const guideDetails = {
   },
   "join-images": {
     steps: [
-      "Choose exactly two images, placing the photo first and the signature second.",
-      "Crop excess white margins from the signature beforehand if they would make the combined image too tall or wide.",
-      "Select Photo above signature for a vertical arrangement or Side by side for a horizontal arrangement.",
-      "Process and download the combined image, then resize it if the receiving form specifies final dimensions.",
+      "Choose two to six images and arrange Image 1, Image 2 and the remaining files in reading order.",
+      "Crop excess margins first. For a front-and-back pair, choose the Aadhaar front + back preset when it matches your intended layout.",
+      "Choose vertical, horizontal or grid layout, then set spacing between images.",
+      "Export JPG or a single A4 PDF page and check that every image remains readable at the final size.",
     ],
     checks:
-      "Confirm that both images appear in the intended order and that the signature is readable at the final size. Check that the receiving form wants one combined file rather than two separate uploads.",
+      "Confirm that every image appears in the intended order with no cropped details. Check that the receiving form accepts a combined JPG or PDF rather than separate uploads.",
     related: ["signature", "crop-image", "resize-image"],
   },
   "white-background": {
     steps: [
-      "Choose an image with a plain, light background; a patterned or strongly shadowed background may not clean evenly.",
-      "Start White threshold near 225 and adjust gradually while inspecting the preview.",
-      "Increase the threshold if bright subject details disappear; lower it only when you can keep those details intact.",
+      "Choose an image whose plain background reaches the outer edges; patterned or strongly shadowed backgrounds may not clean evenly.",
+      "Adjust Background tolerance gradually while inspecting the preview. The fill starts at the border and follows similar colours.",
+      "Lower tolerance if subject details connected to the background are affected; raise it cautiously to include more background shades.",
       "Choose an accepted output format, process and download the result.",
     ],
     checks:

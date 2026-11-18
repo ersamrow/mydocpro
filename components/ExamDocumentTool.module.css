@@ -49,8 +49,7 @@
   font-weight: 600;
   max-width: 100%;
 }
-.form select,
-.file {
+.form select {
   display: block;
   width: 100%;
   min-width: 0;
@@ -63,8 +62,15 @@
   background: #fff;
   color: inherit;
 }
-.file {
-  margin: 0;
+.settings {
+  width: 100%;
+}
+.settings > label {
+  display: block;
+  margin-top: 12px;
+}
+.settings > label.check {
+  display: inline-flex;
 }
 .filename {
   max-width: 100%;

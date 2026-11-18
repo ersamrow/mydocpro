@@ -15,8 +15,10 @@ import "../src/interface.css";
 import "../src/combined-workspace.css";
 import "../src/image-studio.css";
 import "../src/merge-workspace.css";
+import "../src/typography.css";
 import Header from "../components/Header.js";
 import SiteScripts from "../components/SiteScripts.js";
+import DownloadFollowPrompt from "../components/DownloadFollowPrompt.js";
 import { Footer } from "../components/Shared.js";
 import { useEffect } from "react";
 import { catalogTool, listDocumentTools } from "../src/agent-catalog.js";
@@ -45,6 +47,7 @@ export default function App({ Component, pageProps }) {
       <Header id={pageProps.exam ? "exam-photo" : pageProps.id} />
       <Component {...pageProps} />
       <Footer examLinks={pageProps.examLinks} />
+      <DownloadFollowPrompt />
     </div>
   );
 }

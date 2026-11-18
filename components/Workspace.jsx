@@ -11,6 +11,8 @@ import ZipDownload from "./ZipDownload.js";
 import { inspectFiles, throwIfCancelled } from "../src/file-validation.js";
 import { actionLabels } from "../src/ui-copy.js";
 import Settings from "./Settings.js";
+import Dropzone from "./Dropzone.js";
+import { settingsSummary } from "../src/settings-ui.js";
 import ToolGuide from "./ToolGuide.js";
 import {
   batchTools,
@@ -28,34 +30,88 @@ const ImageEditor = dynamic(() => import("./ImageEditor.js"));
 const PdfEditor = dynamic(() => import("./PdfEditor.js"));
 const UpscSignaturePreset = dynamic(() => import("./UpscSignaturePreset.js"));
 
-function Download({ result, compact = false }) {
-  const [url, setUrl] = useState("");
+function useResultUrl(blob) {
+  const [resource, setResource] = useState(null);
   useEffect(() => {
-    const u = URL.createObjectURL(result.blob);
-    setUrl(u);
+    if (!blob) return;
+    const u = URL.createObjectURL(blob);
+    setResource({ blob, url: u });
     return () => URL.revokeObjectURL(u);
-  }, [result]);
+  }, [blob]);
+  return resource?.blob === blob ? resource.url : "";
+}
+
+function Download({ result }) {
+  const url = useResultUrl(result.blob);
+  const format =
+    result.blob.type === "application/pdf"
+      ? "PDF"
+      : result.blob.type === "image/jpeg"
+        ? "JPG"
+        : result.blob.type.split("/")[1]?.toUpperCase() || "file";
+  if (!url)
+    return (
+      <button className="primary" disabled>
+        Preparing download…
+      </button>
+    );
   return (
     <a
-      className={compact ? "merge-bar-download" : "output result-download"}
+      className="merge-bar-download"
       href={url}
       download={result.name}
+      aria-label={`Download ${result.name}`}
     >
-      {!compact && result.blob.type.startsWith("image/") && url && (
-        <img src={url} alt="Processed image preview" />
+      Download {format} ↓
+    </a>
+  );
+}
+
+function DownloadActions({ outputs }) {
+  const [selected, setSelected] = useState(0);
+  const index = Math.min(selected, outputs.length - 1);
+  return (
+    <div className="download-actions">
+      {outputs.length > 1 && (
+        <label className="download-file-choice">
+          File
+          <select
+            aria-label="File to download"
+            value={index}
+            onChange={(event) => setSelected(Number(event.target.value))}
+          >
+            {outputs.map((result, i) => (
+              <option key={i} value={i}>
+                {result.name} · {size(result.blob.size)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <Download result={outputs[index]} />
+      {outputs.length > 1 && <ZipDownload outputs={outputs} busy={false} />}
+    </div>
+  );
+}
+
+function ResultPreview({ result }) {
+  const image = result.blob.type.startsWith("image/");
+  const url = useResultUrl(image ? result.blob : null);
+  return (
+    <div className="output result-preview">
+      {image && url && (
+        <img
+          src={url}
+          width="64"
+          height="64"
+          alt={`Preview of ${result.name}`}
+        />
       )}
       <span>
-        {!compact && (
-          <>
-            <strong>{result.name}</strong>
-            <small>{size(result.blob.size)}</small>
-          </>
-        )}
-        <span className="download-label">
-          {compact ? "Download PDF ↓" : "Download file ↓"}
-        </span>
+        <strong>{result.name}</strong>
+        <small>{size(result.blob.size)}</small>
       </span>
-    </a>
+    </div>
   );
 }
 const notices = {
@@ -88,10 +144,9 @@ export default function Workspace({
     [error, setError] = useState(false),
     [outputs, setOutputs] = useState([]),
     [pdf, setPdf] = useState({ entries: [], ready: false, error: "" }),
-    [dragging, setDragging] = useState(false),
-    [settingsOpen, setSettingsOpen] = useState(tool[0] !== "merge-pdf");
+    [settingsOpen, setSettingsOpen] = useState(initialFiles.length > 0);
   const [tripleSignature, setTripleSignature] = useState(false);
-  const resultsRef = useRef(null),
+  const actionsRef = useRef(null),
     controller = useRef(null),
     selecting = useRef(false);
   useEffect(() => {
@@ -169,7 +224,7 @@ export default function Workspace({
       });
       await inspectFiles(Array.from(incoming), isPdf);
       if (!alive.current) return;
-      setSettingsOpen(id !== "merge-pdf");
+      setSettingsOpen(next.length > 0);
       setFiles(next);
       setOutputs([]);
       setError(false);
@@ -193,7 +248,7 @@ export default function Workspace({
   }
   function changeFiles(next) {
     if (busy || validating) return;
-    setSettingsOpen(id !== "merge-pdf");
+    setSettingsOpen(next.length > 0);
     setFiles(next);
     setOutputs([]);
     setPdf({ entries: [], ready: false, error: "" });
@@ -285,7 +340,7 @@ export default function Workspace({
       if (alive.current)
         setStatus(
           note ||
-            "Done! Your download is ready below. Check the result before submitting.",
+            "Done! Download from the action bar and check the result before submitting.",
         );
     } catch (e) {
       if (alive.current) {
@@ -304,9 +359,9 @@ export default function Workspace({
         if (succeeded && window.matchMedia("(max-width: 600px)").matches) {
           setSettingsOpen(false);
           requestAnimationFrame(() =>
-            resultsRef.current?.scrollIntoView({
+            actionsRef.current?.scrollIntoView({
               behavior: "auto",
-              block: "start",
+              block: "center",
             }),
           );
         }
@@ -319,6 +374,7 @@ export default function Workspace({
   const HelpContainer = isMerge || embedded ? "details" : "div";
   const PreferenceContainer = isMerge || embedded ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
+  const summary = settingsSummary(id, values);
   return (
     <Container
       className={
@@ -330,10 +386,6 @@ export default function Workspace({
     >
       <div className="tool-heading">
         <div className="tool-heading-meta">
-          <Link className="back" href="/">
-            <Icon name="arrow-left" />
-            All tools
-          </Link>
           <span className="eyebrow">
             {tool[3] === "pdf"
               ? "PDF TOOLS"
@@ -341,6 +393,10 @@ export default function Workspace({
                 ? "PHOTO PRESETS"
                 : "IMAGE TOOLS"}
           </span>
+          <Link className="back" href="/">
+            <Icon name="grid2x2" />
+            All tools
+          </Link>
         </div>
         <div className="page-intro-heading">
           <span className="page-emblem">
@@ -412,59 +468,35 @@ export default function Workspace({
         </ol>
         <div className="merge-layout">
           <div className="merge-canvas">
-            <label
-              className={"dropzone " + (dragging ? "dragover" : "")}
-              id="dropzone"
+            <Dropzone
+              id="upload"
+              inputRef={upload}
               hidden={files.length > 0}
-              onDragOver={(e) => {
-                e.preventDefault();
-                if (!busy) setDragging(true);
+              disabled={busy || validating}
+              multiple={multi}
+              accept={
+                isPdf
+                  ? "application/pdf,.pdf"
+                  : "image/jpeg,image/png,image/webp"
+              }
+              title={
+                isMerge
+                  ? "Drop your PDFs here"
+                  : `Choose ${isPdf ? "PDFs" : "images"} or drop them here`
+              }
+              hint={
+                isMerge
+                  ? "Select 2+ files · Up to 100 MB / 300 pages"
+                  : isPdf
+                    ? "PDF, up to 100 MB total / 300 pages"
+                    : "JPG, PNG or WebP, up to 25 MB per image"
+              }
+              buttonLabel={isPdf ? "Choose PDFs" : "Choose images"}
+              onFiles={(incoming) => {
+                choose(incoming, replace.current);
+                replace.current = false;
               }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragging(false);
-                choose(e.dataTransfer.files);
-              }}
-            >
-              <Icon name="upload" />
-              <div className="upload-copy">
-                <strong>
-                  {isMerge
-                    ? "Drop your PDFs here"
-                    : `Choose ${isPdf ? "PDFs" : "images"} or drop them here`}
-                </strong>
-                <span>
-                  {isMerge
-                    ? "Select 2+ files · Up to 100 MB / 300 pages"
-                    : isPdf
-                      ? "PDF, up to 100 MB total / 300 pages"
-                      : "JPG, PNG or WebP, up to 25 MB per image"}
-                </span>
-              </div>
-              <input
-                ref={upload}
-                id="upload"
-                type="file"
-                accept={
-                  isPdf
-                    ? "application/pdf,.pdf"
-                    : "image/jpeg,image/png,image/webp"
-                }
-                multiple={multi}
-                disabled={busy || validating}
-                onChange={(e) => {
-                  choose(e.target.files, replace.current);
-                  replace.current = false;
-                  e.target.value = "";
-                }}
-              />
-              {isMerge && (
-                <span className="merge-upload-button" aria-hidden="true">
-                  Choose PDFs <span>＋</span>
-                </span>
-              )}
-            </label>
+            />
             <div className="upload-actions" hidden={!files.length}>
               <span className="upload-summary" role="status">
                 {files.length} {files.length === 1 ? "file" : "files"} selected
@@ -609,15 +641,22 @@ export default function Workspace({
               </div>
             )}
             <details
-              className="settings-disclosure"
+              className="settings-disclosure tool-settings-details"
               hidden={embedded && !files.length}
-              open={settingsOpen}
-              onToggle={(e) => setSettingsOpen(e.currentTarget.open)}
+              open={files.length > 0 && settingsOpen}
+              onToggle={(e) =>
+                setSettingsOpen(files.length > 0 && e.currentTarget.open)
+              }
             >
-              <summary>
-                Adjust settings{" "}
-                <span>
-                  {settingsOpen ? "Hide" : "Adjust and process again"}
+              <summary
+                aria-disabled={!files.length}
+                onClick={(event) => {
+                  if (!files.length) event.preventDefault();
+                }}
+              >
+                Adjust settings
+                <span className="tool-settings-summary" title={summary}>
+                  {summary}
                 </span>
               </summary>
               <Settings
@@ -681,24 +720,26 @@ export default function Workspace({
               </PreferenceContainer>
             </details>
             {notices[id] && <p className="notice">{notices[id]}</p>}
-            <div className="process-actions">
+            <div className="process-actions" ref={actionsRef}>
               <p
                 className="output-summary"
                 id="output-summary"
                 aria-live="polite"
                 hidden={false}
               >
-                {!files.length
-                  ? "Choose a file above to get started."
-                  : !isPdf
-                    ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
-                    : pdf.error ||
-                      (!pdf.ready
-                        ? "Loading page previews…"
-                        : (id === "merge-pdf" && files.length < 2
-                            ? "Add one more PDF to merge."
-                            : rangeError) ||
-                          `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
+                {outputs.length > 0 && !busy
+                  ? `${outputs.length} ${outputs.length === 1 ? "file" : "files"} ready to download${error ? " · Some files could not be completed" : ""}`
+                  : !files.length
+                    ? "Choose a file above to get started."
+                    : !isPdf
+                      ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
+                      : pdf.error ||
+                        (!pdf.ready
+                          ? "Loading page previews…"
+                          : (id === "merge-pdf" && files.length < 2
+                              ? "Add one more PDF to merge."
+                              : rangeError) ||
+                            `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
               </p>
               {isMerge && (
                 <button
@@ -716,7 +757,7 @@ export default function Workspace({
               <button
                 className="primary"
                 id="process"
-                hidden={isMerge && outputs.length > 0 && !busy}
+                hidden={outputs.length > 0 && !busy && !error}
                 disabled={disabled}
                 onClick={run}
                 aria-describedby="output-summary"
@@ -724,8 +765,8 @@ export default function Workspace({
                 <Icon name="wand-sparkles" />
                 {busy ? "Processing…" : actionLabels[id] || "Save result"}
               </button>
-              {isMerge && outputs.length > 0 && !busy && (
-                <Download result={outputs[0]} compact />
+              {outputs.length > 0 && !busy && (
+                <DownloadActions outputs={outputs} />
               )}
               {busy && (
                 <button
@@ -755,12 +796,7 @@ export default function Workspace({
             >
               {status}
             </div>
-            <div
-              className="outputs"
-              id="outputs"
-              ref={resultsRef}
-              tabIndex={-1}
-            >
+            <div className="outputs" id="outputs" tabIndex={-1}>
               {outputs.length > 0 && (
                 <div className="results-summary">
                   <h2>
@@ -794,18 +830,10 @@ export default function Workspace({
                   </small>
                 </div>
               )}
-              {outputs.length > 1 && (
-                <ZipDownload
-                  key={outputs.map((o) => o.name).join("|")}
-                  outputs={outputs}
-                  busy={busy}
-                />
-              )}
               {outputs.map((result, i) => (
-                <Download key={i} result={result} />
+                <ResultPreview key={i} result={result} />
               ))}
             </div>
-            <WhatsAppChannel visible={outputs.length > 0 && !busy && !error} />
           </div>
         </div>
       </section>

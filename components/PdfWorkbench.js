@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PdfEditor from "./PdfEditor.js";
-import WhatsAppChannel from "./WhatsAppChannel.js";
 import { validateFiles } from "../src/tool-settings.js";
 import { inspectFiles } from "../src/file-validation.js";
 import { processPdf } from "../src/processing.js";
@@ -126,7 +125,7 @@ export default function PdfWorkbench({
           </span>
         )}
       </div>
-      <ol className="pdf-workbench-steps">
+      <ol className="pdf-workbench-steps workflow-steps">
         <li aria-current={!files.length ? "step" : undefined}>1. Add PDFs</li>
         <li aria-current={files.length && !result ? "step" : undefined}>
           2. Choose & arrange pages
@@ -210,7 +209,7 @@ export default function PdfWorkbench({
       )}
       <p role="status">{status}</p>
       {files.length > 0 && (
-        <div className="pdf-workbench-actions">
+        <div className="pdf-workbench-actions process-actions">
           <strong>
             {selected.length} of {pdf.entries.length} pages selected
           </strong>
@@ -235,7 +234,6 @@ export default function PdfWorkbench({
           )}
         </div>
       )}
-      <WhatsAppChannel visible={Boolean(result && url && !busy && !loading)} />
     </section>
   );
 }

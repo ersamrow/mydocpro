@@ -1,5 +1,6 @@
 import { isBackdropClick } from "./dialog.js";
 import { useEffect, useRef, useState } from "react";
+import styles from "./PwaControls.module.css";
 export default function PwaControls() {
   const [ready, setReady] = useState(false),
     [failed, setFailed] = useState(false),
@@ -146,16 +147,24 @@ export default function PwaControls() {
   return (
     <>
       <div className="app-controls">
+        <div className={styles.installSlot}>
+          {(installed || prompt) && (
+            <button
+              className="install-button"
+              data-install-app={prompt && !installed ? true : undefined}
+              onClick={() => dialog.current.showModal()}
+            >
+              {installed ? "App & offline" : "Install app"}
+            </button>
+          )}
+        </div>
         <button
-          className="install-button"
-          data-install-app
+          className={`app-status ${styles.statusButton}`}
+          aria-label={`App and offline status: ${status}`}
           onClick={() => dialog.current.showModal()}
         >
-          {installed ? "App & offline" : "Install app"}
+          <span data-app-status role="status" key={status}>{status}</span>
         </button>
-        <span className="app-status" data-app-status role="status">
-          <span key={status}>{status}</span>
-        </span>
       </div>
       <dialog
         ref={dialog}

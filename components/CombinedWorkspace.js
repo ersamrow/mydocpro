@@ -53,10 +53,11 @@ export default function CombinedWorkspace({ heading }) {
     setSelected(next);
   }
   return (
-    <main className="workspace combined-workspace pdf-toolkit">
+    <main className="workspace tool-workspace combined-workspace pdf-toolkit">
       <div className="tool-heading">
         <Link className="back" href="/">
-          ← All tools
+          <Icon name="grid2x2" />
+          All tools
         </Link>
 
         <h1>{heading}</h1>

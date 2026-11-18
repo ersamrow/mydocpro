@@ -5,7 +5,7 @@ import {
   formatExamFileRange,
 } from "../src/exam-requirements.js";
 import styles from "./ExamDocumentTool.module.css";
-import WhatsAppChannel from "./WhatsAppChannel.js";
+import Dropzone from "./Dropzone.js";
 
 function useFileUrl(file) {
   const [url, setUrl] = useState("");
@@ -27,6 +27,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
   const [output, setOutput] = useState(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(Boolean(initialFile));
   const [frameRatio, setFrameRatio] = useState(null);
   const active = useRef(null);
   const sourceUrl = useFileUrl(file);
@@ -50,6 +51,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
       if (signal.aborted) return;
       setFrameRatio(null);
       setFile(next);
+      setSettingsOpen(true);
       onFileChange?.(next);
     } catch (error) {
       if (!signal.aborted) setStatus(error.message);
@@ -119,18 +121,18 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
           showing all three signatures.
         </p>
       )}
-      <label htmlFor={id}>Choose an image</label>
-      <input
+      <Dropzone
         id={id}
-        className={styles.file}
-        type="file"
         accept="image/jpeg,image/png,image/webp"
         disabled={busy}
-        onChange={(event) => {
-          const next = event.target.files?.[0];
-          event.target.value = "";
-          choose(next);
-        }}
+        title={
+          file
+            ? "Choose another image or drop it here"
+            : "Choose an image or drop it here"
+        }
+        hint="JPG, PNG or WebP · up to 25 MB per image"
+        buttonLabel={file ? "Replace image" : "Choose image"}
+        onFiles={(files) => choose(files[0])}
       />
       {file && <p className={styles.filename}>{file.name}</p>}
       {(sourceUrl || triple) && (
@@ -167,40 +169,80 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
           </figcaption>
         </figure>
       )}
-      {!!hasFrame && (
-        <label>
-          Framing
-          <select
-            value={fit}
-            disabled={busy}
-            onChange={(e) => changeSetting(setFit, e.target.value)}
+      {(hasFrame || doc.type !== "photo") && (
+        <details
+          className={`tool-settings-details ${styles.settings}`}
+          open={Boolean(file) && settingsOpen}
+          onToggle={(event) =>
+            setSettingsOpen(Boolean(file) && event.currentTarget.open)
+          }
+        >
+          <summary
+            aria-disabled={!file}
+            onClick={(event) => {
+              if (!file) event.preventDefault();
+            }}
           >
-            <option value="contain">
-              Keep the entire image (white padding)
-            </option>
-            <option value="cover">Centre crop to the preset shape</option>
-          </select>
-        </label>
+            Settings
+            <span className="tool-settings-summary">
+              {[
+                hasFrame &&
+                  (fit === "contain" ? "Keep entire image" : "Centre crop"),
+                doc.type !== "photo" &&
+                  `Whiten paper: ${whitePaper ? "on" : "off"}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+          </summary>
+          {!!hasFrame && (
+            <label>
+              Framing
+              <select
+                value={fit}
+                disabled={busy}
+                onChange={(e) => changeSetting(setFit, e.target.value)}
+              >
+                <option value="contain">
+                  Keep the entire image (white padding)
+                </option>
+                <option value="cover">Centre crop to the preset shape</option>
+              </select>
+            </label>
+          )}
+          {doc.type !== "photo" && (
+            <label className={styles.check}>
+              <input
+                type="checkbox"
+                checked={whitePaper}
+                disabled={busy}
+                onChange={(e) => changeSetting(setWhitePaper, e.target.checked)}
+              />
+              Whiten light paper
+            </label>
+          )}
+        </details>
       )}
-      {doc.type !== "photo" && (
-        <label className={styles.check}>
-          <input
-            type="checkbox"
-            checked={whitePaper}
-            disabled={busy}
-            onChange={(e) => changeSetting(setWhitePaper, e.target.checked)}
-          />
-          Whiten light paper
-        </label>
-      )}
-      <button
-        className="primary"
-        type="button"
-        disabled={!file || busy}
-        onClick={prepareJpeg}
-      >
-        {busy ? "Working…" : "Prepare JPG"}
-      </button>
+      <div className="process-actions">
+        {output && outputUrl && !busy ? (
+          <a
+            className="primary"
+            href={outputUrl}
+            download={doc.filename || `${slug}-${doc.type}.jpg`}
+          >
+            Download JPG
+          </a>
+        ) : (
+          <button
+            className="primary"
+            type="button"
+            disabled={!file || busy}
+            onClick={prepareJpeg}
+          >
+            {busy ? "Working…" : "Prepare JPG"}
+          </button>
+        )}
+      </div>
       {status && (
         <p role="alert" className={styles.warning}>
           {status}
@@ -244,29 +286,17 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
                 </p>
               )}
             {outputUrl && (
-              <>
-                <img
-                  src={outputUrl}
-                  width={output.width}
-                  height={output.height}
-                  alt="Final JPG"
-                  className={styles.resultImage}
-                />
-                <a
-                  className="secondary"
-                  href={outputUrl}
-                  download={doc.filename || `${slug}-${doc.type}.jpg`}
-                >
-                  Download JPG
-                </a>
-              </>
+              <img
+                src={outputUrl}
+                width={output.width}
+                height={output.height}
+                alt="Final JPG"
+                className={styles.resultImage}
+              />
             )}
           </div>
         )}
       </div>
-      <WhatsAppChannel
-        visible={Boolean(output && outputUrl && !busy && !output.issues.length)}
-      />
     </div>
   );
 }
@@ -300,17 +330,14 @@ function CertificatePreset({ doc }) {
     <div className={styles.form}>
       <h3>{doc.label}</h3>
       <p>{doc.rules.join(" ")}</p>
-      <label htmlFor={id}>Check your PDF size</label>
-      <input
+      <Dropzone
         id={id}
-        className={styles.file}
-        type="file"
         accept="application/pdf,.pdf"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          e.target.value = "";
-          check(f);
-        }}
+        disabled={busy}
+        title="Check your PDF size"
+        hint="Choose your certificate PDF or drop it here."
+        buttonLabel="Choose PDF"
+        onFiles={(files) => check(files[0])}
       />
       <div role="status">
         {busy && "Checking PDF…"}

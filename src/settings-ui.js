@@ -1,3 +1,19 @@
+import { fields } from "./tool-settings.js";
+
+export function settingsSummary(id, values) {
+  return fields(id)
+    .filter((field) => visibleField(field.id, values))
+    .map((field) => {
+      const value = values[field.id] ?? field.value;
+      if (field.id === "output-name" && !value) return "Default filename";
+      const label = field.options?.find(
+        ([option]) => String(option) === String(value),
+      )?.[1];
+      return `${field.label}: ${label ?? (value === "" ? "Not set" : value)}`;
+    })
+    .join(" · ");
+}
+
 export function sliderBounds(key, field, values) {
   let max = field.max;
   if (key === "target") max = 1000;

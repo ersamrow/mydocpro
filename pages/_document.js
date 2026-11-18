@@ -8,6 +8,13 @@ export default function Document() {
         <meta name="apple-mobile-web-app-title" content="MyDocPro" />
         <meta name="google-adsense-account" content="ca-pub-4905030687832208" />
         <link rel="manifest" href="/manifest.webmanifest" />
+        <link
+          rel="preload"
+          href="/fonts/dm-sans-latin-variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
       </Head>

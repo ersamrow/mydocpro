@@ -1488,7 +1488,7 @@ nav.exam-links a {
   font-size: 12px;
   color: #4b6657;
 }
-.tool-workspace .result-download {
+.tool-workspace .result-preview {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1500,28 +1500,18 @@ nav.exam-links a {
   min-width: 0;
   max-width: 100%;
 }
-.result-download > span {
+.result-preview > span {
   display: grid;
   gap: 8px;
   overflow-wrap: anywhere;
 }
-.result-download strong {
+.result-preview strong {
   font-size: 14px;
 }
-.result-download small {
+.result-preview small {
   color: #4b6657;
 }
-.result-download .download-label {
-  display: block;
-  padding: 12px 18px;
-  min-height: 44px;
-  background: #18644e;
-  color: white;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 700;
-}
-.tool-workspace .result-download img {
+.tool-workspace .result-preview img {
   max-width: 100%;
   max-height: 220px;
   object-fit: contain;

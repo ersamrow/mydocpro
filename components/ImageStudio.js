@@ -1,7 +1,8 @@
 import TrustBadges from "./TrustBadges.js";
-import WhatsAppChannel from "./WhatsAppChannel.js";
+import Dropzone from "./Dropzone.js";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Icon } from "./Shared.js";
 import ImageManipulator from "./ImageManipulator.js";
 import ToolGuide from "./ToolGuide.js";
 import { tools } from "../src/tools.js";
@@ -143,6 +144,8 @@ export default function ImageStudio({ heading }) {
   const [url, setUrl] = useState(""),
     [filename, setFilename] = useState("edited-image"),
     [dimensions, setDimensions] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const uploadInput = useRef(null);
   const lock = useRef(false),
     controller = useRef(null),
     alive = useRef(true);
@@ -284,6 +287,7 @@ export default function ImageStudio({ heading }) {
       else {
         setOriginal(file);
         setCurrent(file);
+        setSettingsOpen(true);
         setHistory([]);
         setFuture([]);
         setSecond(null);
@@ -465,10 +469,11 @@ export default function ImageStudio({ heading }) {
     </fieldset>
   );
   return (
-    <main className="workspace image-studio">
+    <main className="workspace tool-workspace image-studio">
       <div className="tool-heading">
         <Link href="/" className="back">
-          ← All tools
+          <Icon name="grid2x2" />
+          All tools
         </Link>
         <h1>{heading}</h1>
         <p>
@@ -477,26 +482,30 @@ export default function ImageStudio({ heading }) {
         </p>
         <TrustBadges toolId="image-editor" />
       </div>
-      <ol className="studio-steps" aria-label="Editing steps">
+      <ol className="studio-steps workflow-steps" aria-label="Editing steps">
         <li aria-current={!current ? "step" : undefined}>1. Upload a photo</li>
         <li aria-current={current ? "step" : undefined}>2. Edit your photo</li>
         <li>3. Download</li>
       </ol>
-      <div className="studio-toolbar">
-        <label className="studio-upload">
-          {current ? "Replace image" : "Upload image"}
-          <input
-            id="studio-upload"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
+      <Dropzone
+        id="studio-upload"
+        inputRef={uploadInput}
+        hidden={Boolean(current)}
+        disabled={working}
+        accept="image/jpeg,image/png,image/webp"
+        title="Choose an image or drop it here"
+        hint="JPG, PNG or WebP · up to 25 MB per image"
+        buttonLabel="Choose image"
+        onFiles={(files) => upload(files[0])}
+      />
+      {current && (
+        <div className="studio-toolbar process-actions">
+          <button
             disabled={working}
-            onChange={(e) => {
-              upload(e.target.files[0]);
-              e.target.value = "";
-            }}
-          />
-        </label>
-        {current && (
+            onClick={() => uploadInput.current?.click()}
+          >
+            Replace image
+          </button>
           <>
             <button
               disabled={working || !history.length}
@@ -542,37 +551,23 @@ export default function ImageStudio({ heading }) {
               </label>
             </details>
           </>
-        )}
-        {current && !working && (
-          <a
-            className="primary studio-download"
-            href={url}
-            download={downloadName(filename, `edited-image.${extension}`)}
-          >
-            Download {extension.toUpperCase()} – free
-          </a>
-        )}
-      </div>
+          {current && !working && (
+            <a
+              className="primary studio-download"
+              href={url}
+              download={downloadName(filename, `edited-image.${extension}`)}
+            >
+              Download {extension.toUpperCase()} – free
+            </a>
+          )}
+        </div>
+      )}
       <p
         className={error ? "studio-status studio-error" : "studio-status"}
         role={error ? "alert" : "status"}
       >
         {status}
       </p>
-      <WhatsAppChannel visible={Boolean(current && url && !working && !error)} />
-      {!current && (
-        <div
-          className="studio-empty"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            upload(e.dataTransfer.files[0]);
-          }}
-        >
-          <strong>Drop an image here</strong>
-          <p>JPG, PNG or WebP · up to 25 MB</p>
-        </div>
-      )}
       {current && (
         <p className="studio-file-info">
           {original?.name} · {dimensions} · {size(current.size)} ·{" "}
@@ -580,7 +575,24 @@ export default function ImageStudio({ heading }) {
         </p>
       )}
       {current && (
-        <div className="studio-layout">
+        <details
+          className="studio-layout tool-settings-details"
+          open={settingsOpen}
+          onToggle={(event) => setSettingsOpen(event.currentTarget.open)}
+        >
+          <summary>
+            Settings
+            <span className="tool-settings-summary">
+              Crop:{" "}
+              {fields("crop-image")
+                .find((field) => field.id === "ratio")
+                .options.find(
+                  ([value]) => value === settings["crop-image"].ratio,
+                )?.[1] || "Custom"}
+              {" · "}Resize: {settings["resize-image"].width} ×{" "}
+              {settings["resize-image"].height} {settings["resize-image"].unit}
+            </span>
+          </summary>
           <section
             className="studio-controls"
             aria-label="All image editing controls"
@@ -637,7 +649,7 @@ export default function ImageStudio({ heading }) {
               compress near the end.
             </p>
           </section>
-        </div>
+        </details>
       )}
       <ToolGuide id="image-editor" />
     </main>

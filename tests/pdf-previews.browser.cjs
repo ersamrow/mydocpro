@@ -95,6 +95,8 @@ const { version } = require("pdfjs-dist/package.json");
         await page.getByRole("button", { name: "↶ Undo", exact: true }).click();
         assert.equal(await page.locator("#pages").inputValue(), "2");
       }
+      if (tool === "merge-pdf")
+        await page.locator(".merge-page-editor > summary").click();
       await page.locator(".thumbnail-image").first().click();
       await page.locator(".page-zoom-dialog canvas").waitFor();
       await page.getByRole("button", { name: "Close", exact: true }).click();

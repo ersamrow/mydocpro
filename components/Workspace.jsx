@@ -380,6 +380,10 @@ export default function Workspace({
       className={
         (isMerge ? "merge-workspace " : "") +
         (id === "crop-image" ? "crop-workspace " : "") +
+        (id === "compress-image" ? "compress-workspace " : "") +
+        (["crop-image", "compress-image"].includes(id)
+          ? "preview-settings-workspace "
+          : "") +
         (embedded
           ? "tool-workspace combined-operation"
           : "workspace tool-workspace")

@@ -936,26 +936,29 @@
   color: #5d7468;
 }
 
-/* Keep cropping and its controls together, with the save bar across both. */
-.crop-workspace .has-files .merge-layout {
+/* Keep the image and its controls together, with the save bar across both. */
+.preview-settings-workspace .has-files .merge-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   column-gap: 20px;
   align-items: start;
 }
-.crop-workspace .has-files .merge-canvas {
+.preview-settings-workspace .has-files .merge-canvas {
   display: contents;
 }
-.crop-workspace .has-files .merge-canvas > *,
-.crop-workspace .has-files .merge-controls > * {
+.preview-settings-workspace .has-files .merge-canvas > *,
+.preview-settings-workspace .has-files .merge-controls > * {
   grid-column: 1 / -1;
   min-width: 0;
 }
-.crop-workspace .has-files .merge-page-editor {
+.preview-settings-workspace .has-files .merge-page-editor {
   grid-column: 1;
   grid-row: 3;
 }
-.crop-workspace .has-files .merge-controls > .tool-settings-details {
+.preview-settings-workspace
+  .has-files
+  .merge-controls
+  > .tool-settings-details {
   grid-column: 2;
   grid-row: 3;
   margin-bottom: 0;
@@ -1009,35 +1012,107 @@
 .crop-workspace .settings > label[for="output-name"] {
   grid-column: 1 / -1;
 }
-.crop-workspace .workpanel .settings .range-field {
+.preview-settings-workspace .workpanel .settings .range-field {
   padding: 10px 12px;
 }
 .crop-workspace .workpanel .settings select {
   padding-inline: 8px;
 }
-.crop-workspace .settings-toolbar {
+.preview-settings-workspace .settings-toolbar {
   gap: 8px;
   margin-top: 12px;
 }
-.crop-workspace .settings-toolbar button {
+.preview-settings-workspace .settings-toolbar button {
   flex: 1;
   padding-inline: 8px;
 }
-.crop-workspace .settings-toolbar label {
+.preview-settings-workspace .settings-toolbar label {
   flex-basis: 100%;
 }
+.compress-workspace .has-files .merge-layout {
+  grid-template-columns: minmax(0, 1fr) 400px;
+}
+.compress-workspace .tool-panel.has-files .file-list {
+  max-height: 144px;
+}
+.compress-workspace .workpanel .settings {
+  max-width: none;
+  gap: 12px;
+}
+.compress-workspace .setting-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.compress-workspace .setting-presets button {
+  padding-inline: 4px;
+}
+.compress-workspace .image-previews {
+  margin-block: 12px;
+}
+.compress-workspace .image-previews .image-result-panel {
+  padding: 12px;
+}
+.compress-workspace .image-result-panel .compare-toggle {
+  margin-block: 6px 12px;
+}
 @media (max-width: 950px) {
-  .crop-workspace .has-files .merge-layout {
+  .preview-settings-workspace .has-files .merge-layout {
     grid-template-columns: minmax(0, 1fr);
   }
-  .crop-workspace .has-files .merge-page-editor,
-  .crop-workspace .has-files .merge-controls > .tool-settings-details {
+  .preview-settings-workspace .has-files .merge-page-editor,
+  .preview-settings-workspace
+    .has-files
+    .merge-controls
+    > .tool-settings-details {
     grid-column: 1;
     grid-row: auto;
   }
   .crop-workspace .crop-editor-layout .manipulator-board {
     min-height: 180px;
     padding: 12px;
+  }
+  .compress-workspace .image-previews .image-result-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 80px;
+    gap: 4px 12px;
+  }
+  .compress-workspace .image-result-panel > :not(.image-result-display) {
+    grid-column: 1;
+    min-width: 0;
+    margin-block: 0;
+  }
+  .compress-workspace .image-result-panel .compare-toggle {
+    justify-self: start;
+  }
+  .compress-workspace .image-result-panel > .image-result-display {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    align-self: center;
+    min-width: 0;
+  }
+  .compress-workspace
+    .image-result-panel
+    > :is(
+      .image-preview-note,
+      .preview-batch-note,
+      details[open],
+      .before-after
+    ) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .compress-workspace
+    .image-previews
+    .image-result-display:not(.before-after)
+    .image-edit-stage {
+    min-height: 80px;
+    padding: 4px;
+  }
+  .compress-workspace
+    .image-previews
+    .image-result-display:not(.before-after)
+    img {
+    max-height: 80px;
   }
 }
 @media (max-width: 800px) {

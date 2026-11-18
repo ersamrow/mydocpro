@@ -61,7 +61,7 @@ export default function PdfQualityPreview({ file, values, busy }) {
       disposed = true;
       clearTimeout(timer);
     };
-  }, [file, values.dpi, values.quality, busy]);
+  }, [file, values.dpi, values.quality, values.target, busy]);
   return (
     <details className="quality-preview">
       <summary>Live PDF quality preview</summary>
@@ -71,7 +71,11 @@ export default function PdfQualityPreview({ file, values, busy }) {
           alt="First PDF page with current JPEG quality and resolution"
         />
       )}
-      <p role="status">{status}</p>
+      <p role="status">
+        {values.target
+          ? "Illustrative first-page sample. Automatic size targeting searches resolution and quality; inspect the downloaded PDF for the final result."
+          : status}
+      </p>
     </details>
   );
 }

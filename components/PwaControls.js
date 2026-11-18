@@ -11,10 +11,7 @@ export default function PwaControls() {
   const dialog = useRef(null);
   useEffect(() => {
     let disposed = false,
-      registration,
-      checkedWorker,
-      statusPort,
-      statusTimer;
+      registration;
     const cleanups = [];
     const listen = (target, type, fn) => {
       target.addEventListener(type, fn);
@@ -25,57 +22,27 @@ export default function PwaControls() {
       matchMedia("(display-mode: standalone)").matches ||
         !!navigator.standalone,
     );
-    function closeStatusChannel() {
-      clearTimeout(statusTimer);
-      statusPort?.close();
-      statusPort = null;
-    }
-    function check(refresh = false) {
-      const worker =
-        navigator.serviceWorker?.controller || registration?.active;
-      if (!worker) {
-        closeStatusChannel();
-        checkedWorker = null;
-        setReady(false);
-        return;
-      }
-      if (checkedWorker === worker && (statusPort || !refresh)) return;
-      closeStatusChannel();
-      checkedWorker = worker;
-      const channel = new MessageChannel();
-      statusPort = channel.port1;
-      function finish(available) {
-        if (statusPort !== channel.port1) return;
-        closeStatusChannel();
-        if (!available) checkedWorker = null;
-        setReady(available);
-        setFailed(!available);
-      }
-      statusTimer = setTimeout(
-        () => finish(worker.state === "activated"),
-        10000,
+    function check() {
+      const available = !!(
+        navigator.serviceWorker?.controller || registration?.active
       );
-      statusPort.onmessage = (e) => finish(e.data?.ready === true);
-      try {
-        worker.postMessage({ type: "OFFLINE_STATUS" }, [channel.port2]);
-      } catch {
-        finish(worker.state === "activated");
-      }
+      setReady(available);
+      if (available) setFailed(false);
+      return available;
     }
     listen(window, "online", () => {
       setOnline(true);
-      check(true);
+      check();
       registration?.update().catch(() => {});
     });
     listen(window, "offline", () => {
       setOnline(false);
-      check(true);
+      check();
     });
     listen(window, "pageshow", (event) => {
       if (event.persisted) {
         setOnline(navigator.onLine);
-        closeStatusChannel();
-        check(true);
+        check();
       }
     });
     listen(window, "beforeinstallprompt", (e) => {
@@ -93,13 +60,9 @@ export default function PwaControls() {
         navigator.serviceWorker.ready.then((reg) => {
           if (disposed) return;
           registration = reg;
-          if (reg.active || navigator.serviceWorker.controller) {
-            setReady(true);
-            setFailed(false);
-            check();
-          }
+          check();
         });
-        listen(navigator.serviceWorker, "controllerchange", () => check());
+        listen(navigator.serviceWorker, "controllerchange", check);
         const register = () =>
           navigator.serviceWorker
             .register("/sw.js", { scope: "/", updateViaCache: "none" })
@@ -113,7 +76,7 @@ export default function PwaControls() {
                     if (worker.state === "installed")
                       setWaiting(!!navigator.serviceWorker.controller);
                     if (worker.state === "activated") check();
-                    if (worker.state === "redundant" && !reg.active)
+                    if (worker.state === "redundant" && !check())
                       setFailed(true);
                   });
               };
@@ -141,7 +104,6 @@ export default function PwaControls() {
     }
     return () => {
       disposed = true;
-      closeStatusChannel();
       cleanups.forEach((fn) => fn());
     };
   }, []);

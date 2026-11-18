@@ -336,7 +336,11 @@ export default function ImageStudio({ heading }) {
     setBusy(true);
     setError(false);
     try {
-      const selected = extra ? Array.from(file).slice(0, 5) : [file];
+      const selected = extra ? Array.from(file) : [file];
+      if (extra && selected.length > 5)
+        throw Error(
+          "Choose at most five additional images (six images in total).",
+        );
       validateFiles(selected, [], { pdf: false, multi: extra });
       await inspectFiles(selected, false);
       const normalized = await Promise.all(

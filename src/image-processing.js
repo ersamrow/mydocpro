@@ -1,5 +1,6 @@
 import { throwIfCancelled, checkpoint } from "./file-validation.js";
 import { setImageDensity } from "./image-metadata.js";
+import heifPackage from "libheif-js/package.json" with { type: "json" };
 function canvas(w, h) {
   w = Math.round(w);
   h = Math.round(h);
@@ -24,6 +25,19 @@ const blob = (c, type = "image/jpeg", q = 0.92) =>
     ),
   );
 const normalizedImages = new WeakMap();
+let heifDecoder;
+function loadHeifDecoder() {
+  if (!heifDecoder) {
+    const decoderUrl = `/heic-decoder-${heifPackage.version}.js`;
+    heifDecoder = import(/* webpackIgnore: true */ decoderUrl)
+      .then((module) => module.default())
+      .catch((error) => {
+        heifDecoder = null;
+        throw error;
+      });
+  }
+  return heifDecoder;
+}
 export function isHeif(file) {
   return (
     /image\/(heic|heif)/i.test(file.type) ||
@@ -35,8 +49,7 @@ export async function normalizeImageFile(file, signal) {
   if (!isHeif(file)) return file;
   if (normalizedImages.has(file)) return normalizedImages.get(file);
   const conversion = (async () => {
-    const module = await import("libheif-js/wasm-bundle.js");
-    const libheif = module.default || module;
+    const libheif = await loadHeifDecoder();
     const decoder = new libheif.HeifDecoder();
     const images = decoder.decode(new Uint8Array(await file.arrayBuffer()));
     if (!images.length)

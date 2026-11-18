@@ -15,3 +15,17 @@ await copyFile(
 );
 // Remove the obsolete generated file so the offline installer never fetches it.
 await rm(new URL("public/pdf.worker.min.mjs", root), { force: true });
+// Serve libheif's unmodified browser/WASM bundle directly. Its universal
+// require shim is not intended to be transformed by a second bundler.
+// build-pwa includes these local files in the versioned offline cache.
+const { version: heifVersion } = JSON.parse(
+  await readFile(new URL("node_modules/libheif-js/package.json", root), "utf8"),
+);
+await copyFile(
+  new URL("node_modules/libheif-js/libheif-wasm/libheif-bundle.mjs", root),
+  new URL(`public/heic-decoder-${heifVersion}.js`, root),
+);
+await copyFile(
+  new URL("node_modules/libheif-js/LICENSE", root),
+  new URL("public/heic-decoder-LICENSE.txt", root),
+);

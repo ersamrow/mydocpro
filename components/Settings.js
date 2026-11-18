@@ -5,13 +5,25 @@ import {
   visibleField,
   settingPresets,
 } from "../src/settings-ui.js";
-export default function Settings({ id, values, onChange, busy }) {
+export default function Settings({
+  id,
+  values,
+  onChange,
+  busy,
+  exclude = [],
+  only,
+}) {
   return (
     <div className="settings">
       {fields(id).map(({ id: key, label, options, value, ...props }) => {
-        if (!visibleField(key, values)) return null;
+        if (
+          !visibleField(key, values) ||
+          exclude.includes(key) ||
+          (only && !only.includes(key))
+        )
+          return null;
         const bounds = sliderBounds(key, props, values);
-        const presets = settingPresets(key);
+        const presets = settingPresets(key, id);
         const numeric = props.type === "number";
         const slider = numeric || props.type === "range";
         const sliderId = numeric ? key + "-slider" : key;
@@ -79,7 +91,9 @@ export default function Settings({ id, values, onChange, busy }) {
               )}
               {key === "threshold" && (
                 <span className="range-hint">
-                  Lower values whiten more of the image.
+                  {id === "white-background"
+                    ? "Higher tolerance includes more border-connected background colours."
+                    : "Lower values whiten more of the paper."}
                 </span>
               )}
             </div>

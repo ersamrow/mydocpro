@@ -56,6 +56,7 @@ export function fields(id) {
         ["stretch", "Stretch"],
       ]),
       format(),
+      number("maxKB", "Max size (KB, optional)", "", 1, 25000),
     ],
     "convert-image": [
       format(),
@@ -69,6 +70,11 @@ export function fields(id) {
         ["0.7777778", "Passport 35:45"],
         ["1.3333333", "4:3"],
         ["1.7777778", "16:9"],
+        ["0.75", "3:4"],
+        ["0.8", "4:5"],
+        ["0.5625", "9:16"],
+        ["0.8695652174", "Exam photo 200 × 230"],
+        ["2.3333333333", "Signature 140 × 60"],
       ]),
       rotation(),
       number("zoom", "Crop zoom (%)", 100, 100, 500),
@@ -91,12 +97,27 @@ export function fields(id) {
     ],
     "white-background": [
       {
-        ...number("threshold", "White threshold (0–255)", 225, 0, 255, 1),
+        ...number("threshold", "Background tolerance (0–255)", 35, 0, 255, 1),
         type: "range",
       },
       format(),
     ],
     "passport-sheet": [
+      select("photoSize", "Photo size", [
+        ["35,45", "35 × 45 mm"],
+        ["50.8,50.8", "2 × 2 inches"],
+        ["25,35", "25 × 35 mm"],
+        ["20,25", "20 × 25 mm stamp"],
+      ]),
+      select("paper", "Paper", [
+        ["4x6", "4 × 6 inches"],
+        ["a4", "A4"],
+      ]),
+      number("dpi", "DPI", 300, 72, 600),
+      select("cutGuides", "Cut guides", [
+        ["no", "Off"],
+        ["yes", "On"],
+      ]),
       select("copies", "Photos per sheet", [
         ["6", "6 photos"],
         ["4", "4 photos"],
@@ -106,11 +127,27 @@ export function fields(id) {
     "name-date": [
       text("name", "Name", "", "Your name", 60),
       { id: "date", label: "Date", value: "", type: "date" },
+      select("dateFormat", "Date format", [
+        ["DD-MM-YYYY", "DD-MM-YYYY"],
+        ["DD/MM/YYYY", "DD/MM/YYYY"],
+        ["YYYY-MM-DD", "YYYY-MM-DD"],
+      ]),
+      number("maxKB", "Max size (KB, optional)", "", 1, 25000),
     ],
     "join-images": [
+      select("preset", "Preset", [
+        ["custom", "Custom"],
+        ["aadhaar", "Aadhaar front + back"],
+      ]),
       select("layout", "Arrangement", [
-        ["vertical", "Photo above signature"],
+        ["vertical", "Vertical"],
         ["horizontal", "Side by side"],
+        ["grid", "Grid"],
+      ]),
+      number("spacing", "Spacing (px)", 16, 0, 500),
+      select("format", "Output format", [
+        ["image/jpeg", "JPG"],
+        ["application/pdf", "A4 PDF"],
       ]),
     ],
     "split-pdf": [
@@ -118,7 +155,9 @@ export function fields(id) {
       select("mode", "Download as", [
         ["one", "One PDF"],
         ["each", "Separate PDF per page"],
+        ["every", "Split every N pages"],
       ]),
+      number("every", "Pages per PDF", 2, 1, 300),
     ],
     "organize-pdf": [
       text(
@@ -130,6 +169,7 @@ export function fields(id) {
       rotation(),
     ],
     "compress-pdf": [
+      number("target", "Max PDF size (KB, optional)", "", 1, 100000),
       number("dpi", "Render resolution (DPI)", 110, 36, 200),
       number("quality", "JPEG quality (1–100)", 65, 1, 100),
     ],
@@ -140,12 +180,17 @@ export function fields(id) {
         ["fit", "Fit to image"],
       ]),
       select("orientation", "Orientation", [
+        ["auto", "Auto — per image"],
         ["portrait", "Portrait"],
         ["landscape", "Landscape"],
       ]),
+      number("quality", "Image quality (1–100)", 92, 1, 100),
+      number("target", "Max PDF size (KB, optional)", "", 1, 100000),
+      number("margin", "Margin (mm)", 8.5, 0, 50, 0.5),
     ],
     "pdf-to-image": [
       format(),
+      number("target", "Max size per image (KB, optional)", "", 1, 25000),
       number("dpi", "Render resolution (DPI)", 150, 36, 300),
       text("pages", "Pages", "all", "all or 1-3, 5"),
     ],
@@ -180,12 +225,17 @@ export const multiTools = [
 export function validateFiles(incoming, current, { pdf, multi, replace }) {
   for (const f of incoming) {
     if (
-      pdf ? !/\.pdf$/i.test(f.name) : !/^image\/(jpeg|png|webp)$/.test(f.type)
+      pdf
+        ? !/\.pdf$/i.test(f.name)
+        : !(
+            /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) ||
+            /\.hei[cf]$/i.test(f.name)
+          )
     )
       throw Error(
         pdf
           ? "Please choose PDF files."
-          : "Please choose JPG, PNG or WebP images.",
+          : "Please choose JPG, PNG, WebP, HEIC or HEIF images.",
       );
     if (!f.size) throw Error(f.name + " is empty. Choose a file with content.");
     if (f.size > (pdf ? 100 : 25) * 1048576)
@@ -203,6 +253,6 @@ export function validateFiles(incoming, current, { pdf, multi, replace }) {
   return next;
 }
 export const size = (n) =>
-  n >= 1048576
-    ? (n / 1048576).toFixed(2) + " MB"
-    : (n / 1024).toFixed(1) + " KB";
+  n >= 1000000
+    ? (n / 1000000).toFixed(2) + " MB"
+    : (n / 1000).toFixed(1) + " KB";

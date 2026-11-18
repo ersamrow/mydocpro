@@ -29,16 +29,25 @@ export function sliderBounds(key, field, values) {
 export function visibleField(key, values) {
   return (
     !(key === "quality" && values.format === "image/png") &&
+    !(key === "every" && values.mode !== "every") &&
     !(key === "orientation" && values.pageSize === "fit")
   );
 }
-export function settingPresets(key) {
+export function settingPresets(key, tool) {
   return key === "target"
-    ? [
-        ["Under 50 KB", "50"],
-        ["Under 200 KB", "200"],
-        ["Under 500 KB", "500"],
-      ]
+    ? tool === "compress-pdf"
+      ? [
+          ["100 KB", "100"],
+          ["200 KB", "200"],
+          ["500 KB", "500"],
+          ["1 MB", "1000"],
+        ]
+      : [
+          ["20 KB", "20"],
+          ["50 KB", "50"],
+          ["100 KB", "100"],
+          ["200 KB", "200"],
+        ]
     : key === "quality"
       ? [
           ["Smaller", "50"],

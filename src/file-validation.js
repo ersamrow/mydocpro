@@ -27,10 +27,19 @@ export async function inspectFiles(files, pdf) {
       const webp =
         new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
         new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
-      if (!png && !jpg && !webp)
+      const header = new TextDecoder().decode(bytes.slice(4, 64));
+      const heif =
+        header.startsWith("ftyp") &&
+        /heic|heix|hevc|hevx|mif1|msf1/.test(header);
+      if (!png && !jpg && !webp && !heif)
         throw Error(
-          `${file.name} is not a supported image. Export it as JPG, PNG or WebP.`,
+          `${file.name} is not a supported image. Choose JPG, PNG, WebP, HEIC or HEIF.`,
         );
+      if (heif) {
+        const { normalizeImageFile } = await import("./image-processing.js");
+        await normalizeImageFile(file);
+        continue;
+      }
       const url = URL.createObjectURL(file);
       try {
         const img = new Image();

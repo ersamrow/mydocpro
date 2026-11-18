@@ -3,7 +3,10 @@ import { defaults, fields } from "../src/tool-settings.js";
 const prefix = "mydocpro:preferences:";
 function safePreferences(id, raw) {
   const result = {};
+  const legacyBackground =
+    id === "white-background" && raw?.backgroundMode !== "edge-connected";
   for (const f of fields(id)) {
+    if (legacyBackground && f.id === "threshold") continue;
     const v = raw?.[f.id];
     if (typeof v !== "string") continue;
     if (f.options?.some(([value]) => value === v)) result[f.id] = v;
@@ -16,6 +19,7 @@ function safePreferences(id, raw) {
     )
       result[f.id] = v;
   }
+  if (id === "white-background") result.backgroundMode = "edge-connected";
   return result;
 }
 export default function useToolSettings(id, onEdit) {

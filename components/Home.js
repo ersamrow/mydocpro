@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import TrustBadges from "./TrustBadges.js";
 import ExamLinks from "./ExamLinks.js";
 import { useEffect, useState } from "react";
@@ -101,7 +102,7 @@ export default function Home({ heading, cards, examLinks }) {
               onChange={(e) => setSearch(e.target.value)}
             />
             {search && (
-              <button
+              <Button
                 type="button"
                 className="clear-search"
                 aria-label="Clear search"
@@ -111,7 +112,7 @@ export default function Home({ heading, cards, examLinks }) {
                 }}
               >
                 ×
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -122,7 +123,7 @@ export default function Home({ heading, cards, examLinks }) {
             ["pdf", "PDF tools", "file-text"],
             ["special", "Photo essentials", "sparkles"],
           ].map(([id, label, icon]) => (
-            <button
+            <Button
               key={id}
               aria-pressed={filter === id}
               className={"filter " + (filter === id ? "active" : "")}
@@ -135,7 +136,7 @@ export default function Home({ heading, cards, examLinks }) {
                   ? tools.length
                   : tools.filter((t) => t[3] === id).length}
               </span>
-            </button>
+            </Button>
           ))}
           <span className="result-count" role="status">
             {shown.length} {shown.length === 1 ? "tool" : "tools"} available
@@ -146,7 +147,7 @@ export default function Home({ heading, cards, examLinks }) {
             <div className="empty">
               <h3>No matching tools</h3>
               <p>Try “photo” or “PDF”, or browse the full toolkit.</p>
-              <button
+              <Button
                 className="secondary"
                 onClick={() => {
                   setSearch("");
@@ -155,7 +156,7 @@ export default function Home({ heading, cards, examLinks }) {
                 }}
               >
                 Show all tools
-              </button>
+              </Button>
             </div>
           )}
         </ToolCards>

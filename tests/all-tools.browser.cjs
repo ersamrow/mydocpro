@@ -98,6 +98,8 @@ const path = require("node:path");
         await page.locator("#width").fill("240");
         assert.equal(Number(await page.locator("#height").inputValue()), 200);
       }
+      if (id === "convert-image")
+        await page.locator(".tool-settings-details > summary").click();
       await page.locator("#output-name").fill("converted");
       await page.waitForFunction(
         () => !document.querySelector("#process").disabled,
@@ -126,11 +128,22 @@ const path = require("node:path");
           1,
           "mobile remove control uses the delete icon",
         );
-        assert.deepEqual(removeStyle, {
-          color: "rgb(164, 52, 44)",
-          padding: "0px",
-        });
-        assert.ok(fileRow.height <= 56, "mobile file row stays compact");
+        assert.equal(
+          removeStyle.color,
+          await page
+            .locator(".workpanel .ui-button--secondary")
+            .first()
+            .evaluate((button) => getComputedStyle(button).color),
+          "Remove uses the common secondary button style within the workspace",
+        );
+        assert.ok(
+          fileRow.height <= 80,
+          "mobile file row stays compact with a 44px control and shared padding",
+        );
+        assert.ok(
+          await page.locator(".file-list .ui-file-row").count(),
+          "Selected files use the common row component",
+        );
         assert.ok(
           removeButton.width >= 44 && removeButton.height >= 44,
           "mobile remove button remains an accessible touch target",
@@ -152,7 +165,7 @@ const path = require("node:path");
       assert.equal(
         await page.locator("#status.error").count(),
         0,
-        await page.locator("#status").innerText(),
+        await page.locator("#status").textContent(),
       );
       if (
         id === "compress-pdf" &&

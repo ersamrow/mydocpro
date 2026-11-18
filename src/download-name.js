@@ -2,7 +2,7 @@ export function downloadName(requested, fallback) {
   const extension = fallback.slice(fallback.lastIndexOf("."));
   let base = requested
     .trim()
-    .replace(/\.(pdf|png|jpe?g|webp)$/i, "")
+    .replace(/\.(pdf|png|jpe?g|webp|avif|bmp|ico|gif)$/i, "")
     .replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-")
     .replace(/[. ]+$/g, "")
     .slice(0, 100);
@@ -25,6 +25,10 @@ export function toolOutputName(
       "image/jpeg": "jpg",
       "image/png": "png",
       "image/webp": "webp",
+      "image/avif": "avif",
+      "image/bmp": "bmp",
+      "image/x-icon": "ico",
+      "image/gif": "gif",
       "application/pdf": "pdf",
     }[mime] || "jpg";
   const suffix = tool === "compress-image" ? `${values.target}kb` : tool;

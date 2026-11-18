@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { ArrowUpRight, MessageCircle, X } from "lucide-react";
@@ -83,7 +84,7 @@ export default function DownloadFollowPrompt() {
         if (isBackdropClick(event)) close();
       }}
     >
-      <button
+      <Button
         className={styles.close}
         type="button"
         aria-label="Close WhatsApp channel suggestion"
@@ -91,7 +92,7 @@ export default function DownloadFollowPrompt() {
         autoFocus
       >
         <X width={20} height={20} aria-hidden="true" />
-      </button>
+      </Button>
       <div className={styles.icon} aria-hidden="true">
         <MessageCircle width={26} height={26} />
       </div>
@@ -101,7 +102,9 @@ export default function DownloadFollowPrompt() {
         and optional — you can download your files without joining.
       </p>
       <div className={styles.actions}>
-        <a
+        <Button
+          as="a"
+          variant="primary"
           className={styles.follow}
           href={channelUrl}
           target="_blank"
@@ -110,10 +113,10 @@ export default function DownloadFollowPrompt() {
         >
           Join WhatsApp channel
           <ArrowUpRight width={18} height={18} aria-hidden="true" />
-        </a>
-        <button className={styles.dismiss} type="button" onClick={close}>
+        </Button>
+        <Button className={styles.dismiss} type="button" onClick={close}>
           Not now
-        </button>
+        </Button>
       </div>
     </dialog>
   );

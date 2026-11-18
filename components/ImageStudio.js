@@ -1,3 +1,4 @@
+import { Button, Card, ToolLayout, ActionBar } from "./ui.js";
 import TrustBadges from "./TrustBadges.js";
 import Dropzone from "./Dropzone.js";
 import { useEffect, useRef, useState } from "react";
@@ -92,7 +93,7 @@ function Controls({ id, values, update, advanced = false }) {
             <legend>{label}</legend>
             <div>
               {options.map(([v, name]) => (
-                <button
+                <Button
                   type="button"
                   key={v}
                   aria-pressed={values[key] === v}
@@ -107,7 +108,7 @@ function Controls({ id, values, update, advanced = false }) {
                   }
                 >
                   {name}
-                </button>
+                </Button>
               ))}
             </div>
           </fieldset>
@@ -573,7 +574,8 @@ export default function ImageStudio({ heading }) {
         </label>
       ));
   const renderOperation = (id) => (
-    <fieldset
+    <Card
+      as="fieldset"
       className={`studio-card studio-${id}`}
       key={id}
       disabled={working || !current}
@@ -636,24 +638,24 @@ export default function ImageStudio({ heading }) {
         </label>
       )}
       {notes[id] && <p>{notes[id]}</p>}
-      <button
-        className="primary"
+      <Button
+        variant="primary"
         disabled={
           working || !current || (id === "join-images" && !second?.length)
         }
         onClick={() => apply(id)}
       >
         Apply {tools.find((t) => t[0] === id)[1].toLowerCase()}
-      </button>
-    </fieldset>
+      </Button>
+    </Card>
   );
   return (
-    <main className="workspace tool-workspace image-studio">
+    <ToolLayout className="workspace tool-workspace image-studio">
       <div className="tool-heading">
-        <Link href="/" className="back">
+        <Button as={Link} href="/" className="back">
           <Icon name="grid2x2" />
           All tools
-        </Link>
+        </Button>
         <h1>{heading}</h1>
         <p>
           Upload a photo, make your changes, and download. You can undo any
@@ -678,89 +680,74 @@ export default function ImageStudio({ heading }) {
         onFiles={(files) => upload(files[0])}
       />
       {current && (
-        <div className="studio-toolbar process-actions">
-          <button
-            disabled={working}
-            onClick={() => uploadInput.current?.click()}
-          >
-            Replace image
-          </button>
-          <>
-            <button
-              disabled={working || !history.length}
-              onClick={() => travel(true)}
+        <>
+          <div className="ui-control-group studio-edit-toolbar">
+            <Button
+              disabled={working}
+              onClick={() => uploadInput.current?.click()}
             >
-              Undo
-            </button>
-            <button
-              disabled={working || !future.length}
-              onClick={() => travel(false)}
-            >
-              Redo
-            </button>
-            <button
-              disabled={working || !original}
-              onClick={() => {
-                setDocumentExport(null);
-                setHistory((h) => remember(h, current));
-                setFuture([]);
-                setCurrent(original);
-                setSettings(initialSettings());
-                clearEffects();
-
-                setStatus("Original image restored.");
-              }}
-            >
-              Reset image
-            </button>
-            {busy && controller.current && (
-              <button onClick={() => controller.current?.abort()}>
-                Cancel edit
-              </button>
-            )}
-            <label className="studio-filename">
-              <span>Output format</span>
-              <select
-                aria-label="Output format"
-                value={documentExport ? "application/pdf" : outputFormat}
-                disabled={working}
-                onChange={(event) => {
+              Replace image
+            </Button>
+            <>
+              <Button
+                disabled={working || !history.length}
+                onClick={() => travel(true)}
+              >
+                Undo
+              </Button>
+              <Button
+                disabled={working || !future.length}
+                onClick={() => travel(false)}
+              >
+                Redo
+              </Button>
+              <Button
+                disabled={working || !original}
+                onClick={() => {
                   setDocumentExport(null);
-                  setOutputFormat(event.target.value);
+                  setHistory((h) => remember(h, current));
+                  setFuture([]);
+                  setCurrent(original);
+                  setSettings(initialSettings());
+                  clearEffects();
+
+                  setStatus("Original image restored.");
                 }}
               >
-                {documentExport && (
-                  <option value="application/pdf">A4 PDF</option>
-                )}
-                <option value="keep">Keep original</option>
-                <option value="image/jpeg">JPG</option>
-                <option value="image/png">PNG</option>
-                <option value="image/webp">WebP</option>
-              </select>
-            </label>
-            <label className="studio-filename">
-              <span>File name</span>
-              <input
-                aria-label="Download filename"
-                value={filename}
-                maxLength={120}
-                onChange={(e) => setFilename(e.target.value)}
-              />
-            </label>
-          </>
-          {downloadUrl && !working && (
-            <a
-              className="primary studio-download"
-              href={downloadUrl}
-              download={downloadName(
-                filename,
-                `${(original?.name || "image").replace(/\.[^.]+$/, "")}_${documentExport ? "joined" : "edited"}.${extension}`,
-              )}
-            >
-              Download {extension.toUpperCase()} – free
-            </a>
-          )}
-        </div>
+                Reset image
+              </Button>
+              <label className="studio-filename">
+                <span>Output format</span>
+                <select
+                  aria-label="Output format"
+                  value={documentExport ? "application/pdf" : outputFormat}
+                  disabled={working}
+                  onChange={(event) => {
+                    setDocumentExport(null);
+                    setOutputFormat(event.target.value);
+                  }}
+                >
+                  {documentExport && (
+                    <option value="application/pdf">A4 PDF</option>
+                  )}
+                  <option value="keep">Keep original</option>
+                  <option value="image/jpeg">JPG</option>
+                  <option value="image/png">PNG</option>
+                  <option value="image/webp">WebP</option>
+                </select>
+              </label>
+              <label className="studio-filename">
+                <span>File name</span>
+                <input
+                  aria-label="Download filename"
+                  value={filename}
+                  maxLength={120}
+                  onChange={(e) => setFilename(e.target.value)}
+                />
+              </label>
+            </>
+          </div>
+        </>
       )}
       <p
         className={error ? "studio-status studio-error" : "studio-status"}
@@ -799,7 +786,8 @@ export default function ImageStudio({ heading }) {
           >
             {renderOperation("crop-image")}
             <div className="studio-sidebar">
-              <fieldset
+              <Card
+                as="fieldset"
                 className="studio-card studio-effects"
                 disabled={busy || !current}
               >
@@ -810,26 +798,26 @@ export default function ImageStudio({ heading }) {
                   {renderEffects(["grayscale", "sepia", "blur"])}
                 </details>
                 <div className="studio-options">
-                  <button
+                  <Button
                     type="button"
                     aria-pressed={adjust.flipX}
                     onClick={() => changeEffects({ flipX: !adjust.flipX })}
                   >
                     Flip horizontal
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     aria-pressed={adjust.flipY}
                     onClick={() => changeEffects({ flipY: !adjust.flipY })}
                   >
                     Flip vertical
-                  </button>
+                  </Button>
                 </div>
                 <p>Effects update automatically as you adjust the controls.</p>
-                <button onClick={() => changeEffects(adjustments)}>
+                <Button onClick={() => changeEffects(adjustments)}>
                   Reset effects
-                </button>
-              </fieldset>
+                </Button>
+              </Card>
               {renderOperation("resize-image")}
             </div>
             <details className="studio-more">
@@ -851,7 +839,35 @@ export default function ImageStudio({ heading }) {
           </section>
         </details>
       )}
+      {current && (
+        <ActionBar>
+          <p className="output-summary">
+            {working
+              ? "Applying your changes…"
+              : `${extension.toUpperCase()} ready · ${size((downloadBlob || current).size)}`}
+          </p>
+          {busy && controller.current && (
+            <Button onClick={() => controller.current?.abort()}>
+              Cancel edit
+            </Button>
+          )}
+          {downloadUrl && !working && (
+            <Button
+              as="a"
+              variant="primary"
+              className="studio-download"
+              href={downloadUrl}
+              download={downloadName(
+                filename,
+                `${(original?.name || "image").replace(/\.[^.]+$/, "")}_${documentExport ? "joined" : "edited"}.${extension}`,
+              )}
+            >
+              Download {extension.toUpperCase()} – free
+            </Button>
+          )}
+        </ActionBar>
+      )}
       <ToolGuide id="image-editor" />
-    </main>
+    </ToolLayout>
   );
 }

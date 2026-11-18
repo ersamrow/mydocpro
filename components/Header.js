@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -19,7 +20,7 @@ export default function Header({ id }) {
         <Logo />
         <span className="header-tagline">A little less paperwork.</span>
       </div>
-      <button
+      <Button
         type="button"
         className="mobile-menu-toggle"
         aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -29,7 +30,7 @@ export default function Header({ id }) {
       >
         <Icon name="menu" />
         <span>Menu</span>
-      </button>
+      </Button>
       <nav
         id="main-navigation"
         className={menuOpen ? "mobile-nav-open" : ""}

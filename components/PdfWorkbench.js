@@ -1,3 +1,4 @@
+import { Button, Card, ActionBar, FileRow } from "./ui.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import PdfEditor from "./PdfEditor.js";
 import { validateFiles } from "../src/tool-settings.js";
@@ -113,7 +114,7 @@ export default function PdfWorkbench({
     }
   }
   return (
-    <section className="pdf-workbench" aria-label="PDF page workspace">
+    <Card className="pdf-workbench" aria-label="PDF page workspace">
       <div className="pdf-workbench-heading">
         <div>
           <span className="eyebrow">YOUR PDF WORKSPACE</span>
@@ -173,11 +174,11 @@ export default function PdfWorkbench({
             </p>
             <ul className="pdf-source-list">
               {files.map((file, i) => (
-                <li key={i}>
+                <FileRow key={i}>
                   <span>
                     {i + 1}. {file.name}
                   </span>
-                  <button
+                  <Button
                     disabled={busy || loading}
                     onClick={() =>
                       onFilesChange(files.filter((_, n) => n !== i))
@@ -185,8 +186,8 @@ export default function PdfWorkbench({
                     aria-label={`Remove ${file.name}`}
                   >
                     Remove
-                  </button>
-                </li>
+                  </Button>
+                </FileRow>
               ))}
             </ul>
           </details>
@@ -210,31 +211,36 @@ export default function PdfWorkbench({
       )}
       <p role="status">{status}</p>
       {files.length > 0 && (
-        <div className="pdf-workbench-actions process-actions">
+        <ActionBar className="pdf-workbench-actions process-actions">
           <strong>
             {selected.length} of {pdf.entries.length} pages selected
           </strong>
           {!result && (
-            <button
-              className="primary"
+            <Button
+              variant="primary"
               disabled={
                 busy || loading || !pdf.ready || !selected.length || !!pdf.error
               }
               onClick={download}
             >
               Create PDF from selected pages
-            </button>
+            </Button>
           )}
           {busy && abort.current && (
-            <button onClick={() => abort.current.abort()}>Cancel</button>
+            <Button onClick={() => abort.current.abort()}>Cancel</Button>
           )}
           {result && url && (
-            <a className="primary" href={url} download="edited-pages.pdf">
+            <Button
+              as="a"
+              variant="primary"
+              href={url}
+              download="edited-pages.pdf"
+            >
               Download PDF – free
-            </a>
+            </Button>
           )}
-        </div>
+        </ActionBar>
       )}
-    </section>
+    </Card>
   );
 }

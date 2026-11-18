@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { Icon } from "./Shared.js";
+import { Card } from "./ui.js";
 
 // Only used by getStaticProps. Card text and icons come from the local tool catalog.
 export function ToolCard({
   tool: [id, title, description, category, icon, tag],
 }) {
   return (
-    <a className={"card " + category} href={"/" + id}>
+    <Card as="a" className={"card " + category} href={"/" + id}>
       <div className="card-top">
         <span className="tool-icon">
           <Icon name={icon} />
@@ -19,7 +20,7 @@ export function ToolCard({
       <span className="go">
         <Icon name="arrow-up-right" />
       </span>
-    </a>
+    </Card>
   );
 }
 

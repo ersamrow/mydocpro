@@ -14,6 +14,7 @@ public/pdf.worker-*.js
 public/heic-decoder-*.js
 public/heic-decoder-LICENSE.txt
 public/~partytown/
+public/codecs/
 
 public/sw.js
 public/sitemap.xml

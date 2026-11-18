@@ -13,17 +13,22 @@ function canvas(w, h) {
   c.height = h;
   return c;
 }
-const blob = (c, type = "image/jpeg", q = 0.92) =>
-  new Promise((resolve, reject) =>
+const blob = async (c, type = "image/jpeg", q = 0.92, signal) => {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(type)) {
+    const { encodeRaster: encodeAdditionalFormat } = await import("./raster-output-codecs.js");
+    return encodeAdditionalFormat(c, type, q, signal);
+  }
+  return new Promise((resolve, reject) =>
     c.toBlob(
       (b) =>
-        b
+        b && b.type === type
           ? resolve(b)
           : reject(Error("This browser could not encode the image.")),
       type,
       q,
     ),
   );
+};
 const normalizedImages = new WeakMap();
 let heifDecoder;
 function loadHeifDecoder() {
@@ -601,6 +606,7 @@ export async function processImage(id, files, values, preview = false, signal) {
       c,
       outputType,
       id === "convert-image" ? num("quality", 1, 100) / 100 : 0.94,
+      signal,
     ));
   throwIfCancelled(signal);
   if (!preview && outputDpi) b = await setImageDensity(b, outputDpi);

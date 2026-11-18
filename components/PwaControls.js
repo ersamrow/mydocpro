@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import { isBackdropClick } from "./dialog.js";
 import { useEffect, useRef, useState } from "react";
 import styles from "./PwaControls.module.css";
@@ -121,26 +122,21 @@ export default function PwaControls() {
   return (
     <>
       <div className="app-controls">
-        <div className={styles.installSlot}>
-          {(installed || prompt) && (
-            <button
-              className="install-button"
-              data-install-app={prompt && !installed ? true : undefined}
-              onClick={() => dialog.current.showModal()}
-            >
-              {installed ? "App & offline" : "Install app"}
-            </button>
-          )}
-        </div>
-        <button
+        <Button
           className={`app-status ${styles.statusButton}`}
+          data-install-app={prompt && !installed ? true : undefined}
           aria-label={`App and offline status: ${status}`}
           onClick={() => dialog.current.showModal()}
         >
+          {(installed || prompt) && (
+            <span className={styles.installLabel}>
+              {installed ? "App & offline" : "Install app"}
+            </span>
+          )}
           <span data-app-status role="status" key={status}>
             {status}
           </span>
-        </button>
+        </Button>
       </div>
       <dialog
         ref={dialog}
@@ -180,7 +176,7 @@ export default function PwaControls() {
         </p>
         <div className="pwa-dialog-actions">
           {prompt && !installed && (
-            <button
+            <Button
               className="primary"
               onClick={async () => {
                 const event = prompt;
@@ -190,11 +186,11 @@ export default function PwaControls() {
               }}
             >
               Install MyDocPro
-            </button>
+            </Button>
           )}
-          <button className="secondary" onClick={() => dialog.current.close()}>
+          <Button className="secondary" onClick={() => dialog.current.close()}>
             Close
-          </button>
+          </Button>
         </div>
       </dialog>
     </>

@@ -21,7 +21,7 @@ const path=require('node:path');
   assert.ok(await page.locator('.process-actions a[download]').evaluate(async a=>(await (await fetch(a.href)).blob()).size>100));
   await page.waitForFunction(()=>document.querySelector('[data-app-status]')?.textContent==='✓ Works offline',{},{timeout:60000});
   await context.setOffline(true);
-  await page.goto(base+'/compress-image?kb=20');await page.locator('#target').waitFor();assert.equal(await page.locator('#target').inputValue(),'20');
+  await page.goto(base+'/compress-image?kb=20');await page.locator('#target').waitFor();await page.waitForFunction(()=>document.querySelector('#target')?.value==='20');assert.equal(await page.locator('#target').inputValue(),'20');
   await page.goto(base+'/help');await page.locator('.site-header').waitFor();assert.match(await page.locator('h1').innerText(),/help/i);
   await context.setOffline(false);
   assert.equal((await page.goto(base+'/does-not-exist')).status(),404);

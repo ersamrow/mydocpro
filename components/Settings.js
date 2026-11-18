@@ -1,3 +1,4 @@
+import { Button, Card } from "./ui.js";
 import { fieldHints } from "../src/ui-copy.js";
 import { fields } from "../src/tool-settings.js";
 import {
@@ -12,9 +13,10 @@ export default function Settings({
   busy,
   exclude = [],
   only,
+  compact = false,
 }) {
   return (
-    <div className="settings">
+    <div className={"settings" + (compact ? " ui-settings--compact" : "")}>
       {fields(id).map(({ id: key, label, options, value, ...props }) => {
         if (
           !visibleField(key, values) ||
@@ -27,9 +29,90 @@ export default function Settings({
         const numeric = props.type === "number";
         const slider = numeric || props.type === "range";
         const sliderId = numeric ? key + "-slider" : key;
+        if (compact)
+          return (
+            <div
+              key={key}
+              className={
+                "ui-setting" +
+                (key === "target" || key === "output-name"
+                  ? " ui-setting--wide"
+                  : "")
+              }
+            >
+              <div className="ui-setting-heading">
+                <label htmlFor={key}>{label}</label>
+                {!numeric && slider && (
+                  <output htmlFor={key}>{values[key]}</output>
+                )}
+                {numeric && (
+                  <input
+                    {...props}
+                    id={key}
+                    value={values[key]}
+                    disabled={busy}
+                    onChange={(event) => onChange(key, event.target.value)}
+                  />
+                )}
+              </div>
+              {options ? (
+                <select
+                  id={key}
+                  value={values[key]}
+                  disabled={busy}
+                  onChange={(event) => onChange(key, event.target.value)}
+                >
+                  {options.map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              ) : numeric ? (
+                <input
+                  type="range"
+                  id={sliderId}
+                  aria-label={label}
+                  min={bounds.min}
+                  max={bounds.max}
+                  step={bounds.step}
+                  value={values[key]}
+                  disabled={busy}
+                  onChange={(event) => onChange(key, event.target.value)}
+                />
+              ) : (
+                <input
+                  {...props}
+                  id={key}
+                  value={values[key]}
+                  disabled={busy}
+                  onChange={(event) => onChange(key, event.target.value)}
+                />
+              )}
+              {key === "target" && (
+                <div className="ui-control-group">
+                  {presets.map(([name, v]) => (
+                    <Button
+                      key={v}
+                      disabled={busy}
+                      aria-pressed={values[key] === v}
+                      onClick={() => onChange(key, v)}
+                    >
+                      {name}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
         if (slider)
           return (
-            <div key={key} className="range-field">
+            <Card
+              as="div"
+              variant={compact ? "flat" : undefined}
+              key={key}
+              className="range-field"
+            >
               <div className="range-heading">
                 <label htmlFor={sliderId}>{label}</label>
                 {numeric ? (
@@ -72,7 +155,7 @@ export default function Settings({
                   aria-label={label + " presets"}
                 >
                   {presets.map(([name, v]) => (
-                    <button
+                    <Button
                       type="button"
                       key={v}
                       disabled={busy}
@@ -80,7 +163,7 @@ export default function Settings({
                       onClick={() => onChange(key, v)}
                     >
                       {name}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -96,10 +179,15 @@ export default function Settings({
                     : "Lower values whiten more of the paper."}
                 </span>
               )}
-            </div>
+            </Card>
           );
         return (
-          <label key={key} htmlFor={key}>
+          <Card
+            as="label"
+            variant={compact ? "flat" : undefined}
+            key={key}
+            htmlFor={key}
+          >
             {label}
             {options ? (
               <select
@@ -129,7 +217,7 @@ export default function Settings({
                 {fieldHints[key]}
               </span>
             )}
-          </label>
+          </Card>
         );
       })}
     </div>

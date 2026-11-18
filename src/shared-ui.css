@@ -105,102 +105,16 @@ body {
   background: var(--ui-surface);
   color: var(--ui-ink);
 }
-
-#app :is(.primary, .merge-bar-download) {
-  background: var(--ui-green);
-  color: var(--ui-surface);
-  border-color: var(--ui-green);
-  border-radius: var(--ui-radius-control);
-}
-#app
-  :is(.primary, .merge-bar-download):hover:not(:disabled):not(
-    [aria-disabled="true"]
-  ) {
-  background: var(--ui-green-hover);
-  border-color: var(--ui-green-hover);
-}
-#app
-  :is(
-    .secondary,
-    .back,
-    .chip,
-    .setting-presets button,
-    .image-studio button:not(.primary, .image-handle),
-    .pdf-workbench .page-toolbar button
-  ) {
-  background: var(--ui-surface);
-  color: var(--ui-green);
-  border-color: var(--ui-input-border);
-  border-radius: var(--ui-radius-control);
-}
-#app
-  :is(
-    .secondary,
-    .back,
-    .chip,
-    .setting-presets button,
-    .image-studio button:not(.primary, .image-handle),
-    .pdf-task-grid button
-  ):hover:not(:disabled) {
-  background: var(--ui-hover);
-  border-color: var(--ui-green);
-}
-#app
-  :is(
-    .setting-presets button,
-    .image-studio button,
-    .pdf-task-grid button
-  )[aria-pressed="true"] {
-  background: var(--ui-soft);
-  color: var(--ui-green);
-  border-color: var(--ui-green);
-  box-shadow: inset 0 0 0 1px var(--ui-green);
-}
 #app button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
-#app
-  :is(
-    .workpanel,
-    .studio-card,
-    .combined-start,
-    .pdf-workbench,
-    .information-content,
-    .tool-guide,
-    .not-found-page,
-    .card,
-    .process-actions,
-    .result-preview,
-    .quality-preview
-  ) {
-  border-color: var(--ui-border);
-  border-radius: var(--ui-radius-card);
-  background-color: var(--ui-surface);
-}
-#app
-  :is(
-    .tool-settings-details,
-    .settings .range-field,
-    .image-result-panel,
-    .quick,
-    .trust,
-    .sidebar-note,
-    .results-summary
-  ) {
+#app :is(.image-result-panel, .quick, .trust, .sidebar-note) {
   border-color: var(--ui-border);
   background: var(--ui-soft);
   color: var(--ui-ink);
 }
-#app
-  :is(
-    .file-list li,
-    .merge-page-editor,
-    .studio-more,
-    .information-sidebar nav,
-    .footer-projects a
-  ) {
+#app :is(.information-sidebar nav, .footer-projects a) {
   border-color: var(--ui-border);
   background: var(--ui-surface);
 }
@@ -270,31 +184,14 @@ body {
 }
 
 /* Compact controls use the same sidebar as the live preview. */
-.preview-settings-workspace
-  .has-files
-  .merge-controls
-  > .compress-settings-panel {
-  grid-column: 2;
-  grid-row: 3;
-  min-width: 0;
-}
 .compress-quick-settings {
   margin-bottom: 12px;
 }
 .compress-quick-settings .settings {
   max-width: none;
 }
-.compress-workspace .setting-presets {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-.compress-workspace .compress-settings-panel .tool-settings-details {
-  margin: 0;
-}
 .result-warning {
   color: var(--ui-warning);
-}
-.tool-workspace .process-actions[hidden] {
-  display: none;
 }
 .dropzone-touch-title {
   display: none;
@@ -308,15 +205,6 @@ body {
   }
   .dropzone-touch-title {
     display: block;
-  }
-}
-@media (max-width: 950px) {
-  .preview-settings-workspace
-    .has-files
-    .merge-controls
-    > .compress-settings-panel {
-    grid-column: 1;
-    grid-row: auto;
   }
 }
 @media (max-width: 479px) {

@@ -1,11 +1,7 @@
 /* Shared upload and settings panel. */
 .tool-panel.has-files .upload-actions{padding:0 0 14px;align-items:center}
 .tool-panel .upload-summary{font-weight:600;color:#375643}
-.tool-panel .upload-buttons button{border-radius:9px;background:#f6f9f3;border-color:#dce6d5;font-weight:600}
 .tool-panel.has-files .file-list{margin:0 0 20px}
-.tool-panel.has-files .file-list li{padding:10px 0;gap:12px;color:#5c6f63}
-.tool-panel .file-list li>span{overflow-wrap:anywhere;font-weight:500}
-.tool-panel .file-list [data-remove]{border:0;background:#f5f7f2;border-radius:8px;font-size:17px}
 .tool-panel .image-previews:not(.crop-editor-layout) .image-result-panel{padding:18px;background:#fbfcf9;border:1px solid #e5ebe0;border-radius:14px}
 .tool-panel .image-previews:not(.crop-editor-layout) h2{font-size:15px;letter-spacing:-.2px;color:#294b38;margin-bottom:2px}
 .tool-panel .image-previews:not(.crop-editor-layout) summary{color:#55745f;font-size:12px;margin-bottom:8px}
@@ -13,14 +9,9 @@
 .tool-panel .image-previews:not(.crop-editor-layout) .image-edit-stage img{display:block;max-height:320px;border-radius:3px;box-shadow:0 3px 14px #253c3310}
 .tool-panel .image-previews:not(.crop-editor-layout) .image-preview-note{margin:12px 0 0;color:#6c7e6d;font-size:11px}
 .workpanel.tool-panel .settings{align-items:stretch;gap:12px;margin:20px 0}
-.workpanel.tool-panel .settings>label{padding:16px;border:1px solid #e3e9de;border-radius:12px;background:#fbfcf9}
-.workpanel.tool-panel .settings .range-field{background:#f1f7ec;border-color:#dae7d1}
 .tool-panel .range-heading{min-height:28px}
-.workpanel.tool-panel .settings>label:not(.range-field){padding-top:20px}
 .workpanel.tool-panel .settings input:not([type=range]),.workpanel.tool-panel .settings select{margin-top:14px}
-.workpanel.tool-panel .process-actions{display:flex;justify-content:flex-end;padding-top:16px}
-@media(max-width:650px){.tool-panel .image-previews:not(.crop-editor-layout) .image-result-panel{padding:12px}.tool-panel .image-previews:not(.crop-editor-layout) .image-edit-stage{min-height:170px;padding:16px}.workpanel.tool-panel .settings>label{padding:14px}.tool-panel .upload-buttons button{font-size:12px}.workpanel.tool-panel:not(.pdf-editor-panel) .process-actions{display:block}}
-.workspace .workpanel{padding:24px;border:1px solid #e0e8df;border-radius:20px;box-shadow:0 6px 24px #233c3406;font-family:'DM Sans',system-ui,sans-serif}
+@media(max-width:650px){.tool-panel .image-previews:not(.crop-editor-layout) .image-result-panel{padding:12px}.tool-panel .image-previews:not(.crop-editor-layout) .image-edit-stage{min-height:170px;padding:16px}}
 .workpanel .dropzone{padding:30px 20px;border:1.5px dashed #b4c9b5;border-radius:14px;background:linear-gradient(135deg,#f3f8f0,#fafcf8);transition:border-color .15s,background .15s}
 .workpanel .dropzone:hover,.workpanel .dropzone:focus-within{border-color:#287255;background:#edf5e9}
 .workpanel .dropzone>svg{width:40px;height:40px;padding:8px;background:#e4efdf;border-radius:12px;color:#367653;margin-bottom:10px}
@@ -43,8 +34,4 @@
 .workpanel input[type=range]::-moz-range-thumb{width:14px;height:14px;background:#1e6b52;border:3px solid white;border-radius:50%;box-shadow:0 1px 5px #1e6b5240}
 .range-scale{display:flex;justify-content:space-between;color:#7a8a76;font-size:10px;font-weight:400}
 .range-hint{display:block;margin-top:9px;color:#64765e;font-size:11px;font-weight:400;line-height:1.5}
-.workpanel .process-actions{padding-top:18px;border-top:1px solid #e8eee4}
-.workpanel .primary{min-height:46px;padding:12px 22px;border-radius:10px;font-weight:600;box-shadow:0 3px 8px #185c4614}
-@media(max-width:650px){.workspace .workpanel{padding:16px;border-radius:16px}.workpanel .settings{grid-template-columns:minmax(0,1fr);gap:16px;margin:20px 0}.workpanel .dropzone{padding:24px 12px}.workpanel .settings input[type=range]{height:44px;min-height:44px}.workpanel .settings .range-field{padding:14px}.workpanel .process-actions .primary{width:100%}}
-
-@media(max-width:600px){.workpanel.tool-panel.pdf-editor-panel.has-files .process-actions{display:flex;justify-content:space-between;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}.workpanel.tool-panel.pdf-editor-panel .process-actions .primary{width:auto}}
+@media(max-width:650px){.workpanel .settings{grid-template-columns:minmax(0,1fr);gap:16px;margin:20px 0}.workpanel .dropzone{padding:24px 12px}.workpanel .settings input[type=range]{height:44px;min-height:44px}.workpanel .settings .range-field{padding:14px}}

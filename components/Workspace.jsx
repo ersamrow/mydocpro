@@ -1,4 +1,5 @@
 import TrustBadges from "./TrustBadges.js";
+import { Button, Card, ToolLayout, ActionBar, FileRow } from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -24,6 +25,12 @@ import {
 import { pageSeo } from "../src/seo.js";
 import { pageIndices } from "../src/page-indices.js";
 import { downloadName, toolOutputName } from "../src/download-name.js";
+import {
+  conversionAccept,
+  conversionFormats,
+  conversionHints,
+  sourceImageType,
+} from "../src/image-formats.js";
 
 const PdfQualityPreview = dynamic(() => import("./PdfQualityPreview.js"));
 const ImageEditor = dynamic(() => import("./ImageEditor.js"));
@@ -51,20 +58,35 @@ function Download({ result }) {
         : result.blob.type.split("/")[1]?.toUpperCase() || "file";
   if (!url)
     return (
-      <button className="primary" disabled>
+      <Button className="primary" disabled>
         Preparing download…
-      </button>
+      </Button>
     );
   return (
-    <a
+    <Button
+      as="a"
+      variant="primary"
       className="merge-bar-download"
       href={url}
       download={result.name}
       aria-label={`Download ${result.name}`}
     >
       Download {format} ↓
-    </a>
+    </Button>
   );
+}
+
+function FileThumbnail({ file }) {
+  const url = useResultUrl(file);
+  return url ? (
+    <img
+      className="convert-file-thumbnail"
+      src={url}
+      alt=""
+      width="40"
+      height="40"
+    />
+  ) : null;
 }
 
 function DownloadActions({ outputs }) {
@@ -80,10 +102,18 @@ function DownloadActions({ outputs }) {
 }
 
 function ResultPreview({ result, individual }) {
-  const image = result.blob.type.startsWith("image/");
+  const image = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+    "image/bmp",
+    "image/x-icon",
+    "image/gif",
+  ].includes(result.blob.type);
   const url = useResultUrl(image || individual ? result.blob : null);
   return (
-    <div className="output result-preview">
+    <FileRow as="div" className="output result-preview ui-result-row">
       {image && url && (
         <img
           src={url}
@@ -102,16 +132,18 @@ function ResultPreview({ result, individual }) {
         ))}
       </span>
       {individual && url && (
-        <a
-          className="secondary"
+        <Button
+          as="a"
+          variant="primary"
+          className="primary result-file-download"
           href={url}
           download={result.name}
           aria-label={`Download ${result.name}`}
         >
-          Download
-        </a>
+          <span aria-hidden="true">↓</span> Download
+        </Button>
       )}
-    </div>
+    </FileRow>
   );
 }
 const notices = {
@@ -177,6 +209,14 @@ export default function Workspace({
     isMerge = id === "merge-pdf",
     multi = multiTools.includes(id),
     meta = pageSeo(id);
+  const sameSourceFormat = (format) =>
+    files.length > 0 && files.every((file) => sourceImageType(file) === format);
+  useEffect(() => {
+    if (id !== "convert-image" || !sameSourceFormat(values.format)) return;
+    onValues({
+      format: values.format === "image/jpeg" ? "image/png" : "image/jpeg",
+    });
+  }, [id, files, values.format, onValues]);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -258,7 +298,7 @@ export default function Workspace({
         next = await Promise.all(next.map(normalizeImageFile));
       }
       if (!alive.current) return;
-      setSettingsOpen(next.length > 0);
+      setSettingsOpen(id !== "convert-image" && next.length > 0);
       setFiles(next);
       setOutputs([]);
       setError(false);
@@ -282,7 +322,7 @@ export default function Workspace({
   }
   function changeFiles(next) {
     if (busy || validating) return;
-    setSettingsOpen(next.length > 0);
+    setSettingsOpen(id !== "convert-image" && next.length > 0);
     setFiles(next);
     setOutputs([]);
     setPdf({ entries: [], ready: false, error: "" });
@@ -407,23 +447,24 @@ export default function Workspace({
       }
     }
   }
-  const Container = embedded ? "section" : "main";
+  const Container = ToolLayout;
   const FileContainer = "div";
   const PreviewContainer = isMerge ? "details" : "div";
-  const HelpContainer = isMerge || embedded ? "details" : "div";
+  const HelpContainer = Card;
   const PreferenceContainer = isMerge || embedded ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
+  const compactSettings = !["convert-image", "merge-pdf"].includes(id);
+  const sideLayout = compactSettings;
   const SettingsGroup = id === "compress-image" ? "div" : Fragment;
   const summary = settingsSummary(id, values);
   return (
     <Container
+      as={embedded ? "section" : "main"}
       className={
         (isMerge ? "merge-workspace " : "") +
-        (id === "crop-image" ? "crop-workspace " : "") +
-        (id === "compress-image" ? "compress-workspace " : "") +
-        (["crop-image", "compress-image"].includes(id)
-          ? "preview-settings-workspace "
-          : "") +
+        (compactSettings ? "ui-compact-workspace " : "") +
+        (sideLayout && files.length > 0 ? "ui-side-workspace " : "") +
+        (id === "convert-image" ? "convert-workspace " : "") +
         (embedded
           ? "tool-workspace combined-operation"
           : "workspace tool-workspace")
@@ -438,10 +479,10 @@ export default function Workspace({
                 ? "PHOTO PRESETS"
                 : "IMAGE TOOLS"}
           </span>
-          <Link className="back" href="/">
+          <Button as={Link} className="back" href="/">
             <Icon name="grid2x2" />
             All tools
-          </Link>
+          </Button>
         </div>
         <div className="page-intro-heading">
           <span className="page-emblem">
@@ -483,7 +524,7 @@ export default function Workspace({
           onFileChange={(file) => changeFiles([file])}
         />
       )}
-      <section
+      <Card
         hidden={tripleSignature}
         className={
           "workpanel tool-panel " +
@@ -524,26 +565,28 @@ export default function Workspace({
                   ? "application/pdf,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
                   : isPdf
                     ? "application/pdf,.pdf"
-                    : "image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+                    : conversionAccept
               }
               title={
                 isMerge
                   ? "Choose PDFs or images, or drop them here"
-                  : `Choose ${isPdf ? "PDFs" : "images"} or drop them here`
+                  : `Choose ${isPdf ? (multi ? "PDFs" : "a PDF") : multi ? "images" : "an image"} or drop ${multi ? "them" : "it"} here`
               }
               hint={
                 isMerge
                   ? "Select 2+ PDFs or images · 25 MB per image · 100 MB total / 300 pages"
                   : isPdf
                     ? "PDF, up to 100 MB total / 300 pages"
-                    : "JPG, PNG, WebP or HEIC/HEIF, up to 25 MB per image"
+                    : "JPG, PNG, WebP, AVIF, BMP, ICO, GIF or HEIC/HEIF · up to 25 MB · animated inputs export as still images"
               }
               buttonLabel={
                 isMerge
                   ? "Choose PDFs or images"
                   : isPdf
                     ? "Choose PDFs"
-                    : "Choose images"
+                    : multi
+                      ? "Choose images"
+                      : "Choose image"
               }
               onFiles={(incoming) => {
                 choose(incoming, replace.current);
@@ -556,7 +599,7 @@ export default function Workspace({
               </span>
               <div className="upload-buttons">
                 {multi && (
-                  <button
+                  <Button
                     className="secondary"
                     disabled={busy}
                     onClick={() => {
@@ -565,10 +608,10 @@ export default function Workspace({
                     }}
                   >
                     Add more files
-                  </button>
+                  </Button>
                 )}
                 {files.length > 0 && (
-                  <button
+                  <Button
                     className="secondary"
                     disabled={busy}
                     onClick={() => {
@@ -577,7 +620,7 @@ export default function Workspace({
                     }}
                   >
                     {multi ? "Replace all" : "Upload another file"}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -596,7 +639,8 @@ export default function Workspace({
               )}
               <ul className="file-list" id="file-list">
                 {files.map((file, i) => (
-                  <li key={i}>
+                  <FileRow key={i}>
+                    {id === "convert-image" && <FileThumbnail file={file} />}
                     {isMerge && (
                       <span className="merge-file-icon">
                         <Icon name="file-text" />
@@ -607,8 +651,8 @@ export default function Workspace({
                       {file.name}
                     </span>
                     <small>{size(file.size)}</small>
-                    {files.length > 1 && (
-                      <button
+                    {files.length > 1 && id !== "convert-image" && (
+                      <Button
                         className="secondary"
                         disabled={busy || i === 0}
                         aria-label={"Move " + file.name + " up"}
@@ -619,10 +663,10 @@ export default function Workspace({
                         }}
                       >
                         ↑
-                      </button>
+                      </Button>
                     )}
                     {isMerge && files.length > 1 && (
-                      <button
+                      <Button
                         className="secondary"
                         disabled={busy || validating || i === files.length - 1}
                         aria-label={"Move " + file.name + " down"}
@@ -633,9 +677,9 @@ export default function Workspace({
                         }}
                       >
                         ↓
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
                       className="secondary"
                       disabled={busy}
                       aria-label={"Remove " + file.name}
@@ -644,8 +688,8 @@ export default function Workspace({
                       }
                     >
                       <Icon name="trash-2" />
-                    </button>
-                  </li>
+                    </Button>
+                  </FileRow>
                 ))}
               </ul>
             </FileContainer>
@@ -661,6 +705,7 @@ export default function Workspace({
                 </summary>
               )}
               {files.length > 0 &&
+                id !== "convert-image" &&
                 (isPdf ? (
                   <PdfEditor
                     files={files}
@@ -701,6 +746,71 @@ export default function Workspace({
                 ? { className: "compress-settings-panel" }
                 : {})}
             >
+              {id === "convert-image" && (
+                <section
+                  className="convert-options"
+                  aria-labelledby="convert-options-heading"
+                >
+                  <div className="convert-options-heading">
+                    <Icon name="replace" />
+                    <div>
+                      <h2 id="convert-options-heading">Convert to</h2>
+                      <p>Choose a format for all selected images.</p>
+                    </div>
+                  </div>
+                  <div
+                    className="convert-format-buttons"
+                    role="group"
+                    aria-label="Output format"
+                  >
+                    {conversionFormats
+                      .filter(([format]) => !sameSourceFormat(format))
+                      .map(([format, label, hint]) => (
+                        <Button
+                          type="button"
+                          key={format}
+                          disabled={busy || validating}
+                          aria-pressed={values.format === format}
+                          title={`Convert to ${label}`}
+                          onClick={() => onValues({ format })}
+                        >
+                          <strong>{label}</strong>
+                          <small>{hint}</small>
+                        </Button>
+                      ))}
+                  </div>
+                  {["image/jpeg", "image/webp"].includes(values.format) && (
+                    <div className="convert-quality">
+                      <label htmlFor="quality">Quality</label>
+                      <input
+                        id="quality"
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={values.quality}
+                        disabled={busy || validating}
+                        onChange={(event) =>
+                          onValues({ quality: event.target.value })
+                        }
+                      />
+                      <input
+                        aria-label="Image quality"
+                        type="range"
+                        min="1"
+                        max="100"
+                        value={values.quality}
+                        disabled={busy || validating}
+                        onChange={(event) =>
+                          onValues({ quality: event.target.value })
+                        }
+                      />
+                    </div>
+                  )}
+                  <p className="convert-format-hint">
+                    {conversionHints[values.format]}
+                  </p>
+                </section>
+              )}
               {id === "compress-image" && (
                 <div className="compress-quick-settings">
                   <Settings
@@ -708,13 +818,14 @@ export default function Workspace({
                     values={values}
                     busy={busy || validating}
                     only={["target"]}
+                    compact={compactSettings}
                     onChange={(key, value) => onValues({ [key]: value })}
                   />
                 </div>
               )}
               <details
                 className="settings-disclosure tool-settings-details"
-                hidden={embedded && !files.length}
+                hidden={(embedded || compactSettings) && !files.length}
                 open={files.length > 0 && settingsOpen}
                 onToggle={(e) =>
                   setSettingsOpen(files.length > 0 && e.currentTarget.open)
@@ -726,14 +837,23 @@ export default function Workspace({
                     if (!files.length) event.preventDefault();
                   }}
                 >
-                  Adjust settings
+                  {id === "convert-image"
+                    ? "Filename & preferences"
+                    : "Adjust settings"}
                   <span className="tool-settings-summary" title={summary}>
                     {summary}
                   </span>
                 </summary>
                 <Settings
                   id={id}
-                  exclude={id === "compress-image" ? ["target"] : []}
+                  compact={compactSettings}
+                  exclude={
+                    id === "compress-image"
+                      ? ["target"]
+                      : id === "convert-image"
+                        ? ["format", "quality"]
+                        : []
+                  }
                   values={values}
                   onChange={(key, value) => {
                     const patch = { [key]: value };
@@ -779,20 +899,20 @@ export default function Workspace({
                     <summary>Preferences & reset</summary>
                   )}
                   <div className="settings-toolbar">
-                    <button
+                    <Button
                       className="secondary"
                       disabled={busy || validating || !canUndo}
                       onClick={undo}
                     >
                       Undo settings
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       className="secondary"
                       disabled={busy || validating}
                       onClick={reset}
                     >
                       Reset settings
-                    </button>
+                    </Button>
                     <label>
                       <input
                         type="checkbox"
@@ -811,7 +931,7 @@ export default function Workspace({
             </SettingsGroup>
             {notices[id] && <p className="notice">{notices[id]}</p>}
             {files.length > 0 && (
-              <div className="process-actions" ref={actionsRef}>
+              <ActionBar ref={actionsRef}>
                 <p
                   className="output-summary"
                   id="output-summary"
@@ -831,7 +951,7 @@ export default function Workspace({
                             `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
                 </p>
                 {isMerge && (
-                  <button
+                  <Button
                     className="secondary merge-add-files"
                     disabled={busy || validating}
                     onClick={() => {
@@ -841,9 +961,9 @@ export default function Workspace({
                   >
                     <Icon name="upload" />
                     Add PDFs or images
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
                   className="primary"
                   id="process"
                   hidden={outputs.length > 0 && !busy && !error}
@@ -853,12 +973,12 @@ export default function Workspace({
                 >
                   <Icon name="wand-sparkles" />
                   {busy ? "Processing…" : actionLabels[id] || "Save result"}
-                </button>
+                </Button>
                 {outputs.length > 0 && !busy && (
                   <DownloadActions outputs={outputs} />
                 )}
                 {busy && (
-                  <button
+                  <Button
                     className="secondary cancel-processing"
                     disabled={cancelling}
                     onClick={() => {
@@ -868,9 +988,9 @@ export default function Workspace({
                     }}
                   >
                     {cancelling ? "Cancelling…" : "Cancel processing"}
-                  </button>
+                  </Button>
                 )}
-              </div>
+              </ActionBar>
             )}
             {busy && (
               <progress
@@ -883,11 +1003,14 @@ export default function Workspace({
               className={"status " + (error ? "error" : "")}
               role={error ? "alert" : "status"}
               aria-live={error ? "assertive" : "polite"}
+              hidden={
+                id === "convert-image" && outputs.length > 0 && !busy && !error
+              }
             >
               {status}
             </div>
-            <div className="outputs" id="outputs" tabIndex={-1}>
-              {outputs.length > 0 && (
+            <div className="outputs ui-results" id="outputs" tabIndex={-1}>
+              {outputs.length > 0 && id !== "convert-image" && (
                 <div className="results-summary">
                   <h2>
                     {busy || error
@@ -921,6 +1044,22 @@ export default function Workspace({
                   </small>
                 </div>
               )}
+              {id === "convert-image" && outputs.length > 0 && (
+                <p className="ui-result-heading" role="status">
+                  <strong>✓ Conversion complete</strong>
+                  <span>
+                    {size(files.reduce((sum, file) => sum + file.size, 0))}{" "}
+                    original →{" "}
+                    {size(
+                      outputs.reduce(
+                        (sum, result) => sum + result.blob.size,
+                        0,
+                      ),
+                    )}{" "}
+                    converted
+                  </span>
+                </p>
+              )}
               {outputs.map((result, i) => (
                 <ResultPreview
                   key={i}
@@ -931,13 +1070,11 @@ export default function Workspace({
             </div>
           </div>
         </div>
-      </section>
-      <HelpContainer className="merge-help">
-        {(isMerge || embedded) && (
-          <summary>
-            Need a hand? <span>Instructions, tips & related tools</span>
-          </summary>
-        )}
+      </Card>
+      <HelpContainer as="details" className="merge-help ui-help">
+        <summary>
+          Need a hand? <span>Instructions, tips & related tools</span>
+        </summary>
         <ToolGuide id={id} />
         <div className="steps">
           {[

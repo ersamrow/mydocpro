@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import { useEffect, useRef, useState } from "react";
 import { cropBox, dragCrop, clamp } from "../src/image-geometry.js";
 export default function ImageManipulator({
@@ -7,6 +8,7 @@ export default function ImageManipulator({
   onValues,
   busy,
   previewZoom = false,
+  previewHeight = 380,
 }) {
   const [viewWidth, setViewWidth] = useState(500);
   const viewZoom = previewZoom ? Number(values["image-zoom"] || 100) : 100;
@@ -39,7 +41,7 @@ export default function ImageManipulator({
     w: Number(values["crop-w"] || 1),
     h: Number(values["crop-h"] || 1),
   };
-  const fitWidth = Math.min(viewWidth, (380 * width) / height);
+  const fitWidth = Math.min(viewWidth, (previewHeight * width) / height);
   const fitHeight = (fitWidth * height) / width;
   useEffect(() => {
     if (!previewZoom || !board.current) return;
@@ -311,29 +313,29 @@ export default function ImageManipulator({
         {error ||
           (crop
             ? "Drag edges to crop freely. Use the arrows to rotate 90°. Rotating resets the crop selection."
-            : "Drag the corner or use the size slider. Exact dimensions remain available below.")}
+            : "Drag the corner or use the size slider. Set exact dimensions in the options.")}
       </p>
       {crop && (
         <div className="crop-rotation-bar">
-          <button
+          <Button
             className="secondary"
             disabled={busy}
             aria-label="Rotate image left 90 degrees"
             onClick={() => onValues({ rotation: String((angle + 270) % 360) })}
           >
             ↶ Rotate left
-          </button>
-          <button
+          </Button>
+          <Button
             className="secondary"
             disabled={busy}
             aria-label="Rotate image right 90 degrees"
             onClick={() => onValues({ rotation: String((angle + 90) % 360) })}
           >
             ↷ Rotate right
-          </button>
-          <button className="secondary" disabled={busy} onClick={reset}>
+          </Button>
+          <Button className="secondary" disabled={busy} onClick={reset}>
             Reset crop
-          </button>
+          </Button>
         </div>
       )}
       {previewZoom && (
@@ -341,14 +343,14 @@ export default function ImageManipulator({
           className="preview-zoom-controls"
           aria-label="Preview zoom controls"
         >
-          <button
+          <Button
             type="button"
             disabled={viewZoom <= 100 || busy}
             aria-label="Zoom out"
             onClick={() => zoomTo(Math.max(100, viewZoom - 25))}
           >
             −
-          </button>
+          </Button>
           <input
             type="range"
             min="100"
@@ -359,16 +361,16 @@ export default function ImageManipulator({
             disabled={busy}
             onChange={(e) => zoomTo(+e.target.value)}
           />
-          <button
+          <Button
             type="button"
             disabled={viewZoom >= 400 || busy}
             aria-label="Zoom in"
             onClick={() => zoomTo(Math.min(400, viewZoom + 25))}
           >
             +
-          </button>
+          </Button>
           <output aria-live="polite">{viewZoom}%</output>
-          <button
+          <Button
             type="button"
             disabled={busy}
             onClick={() => {
@@ -377,7 +379,7 @@ export default function ImageManipulator({
             }}
           >
             Fit image
-          </button>
+          </Button>
         </div>
       )}
       <div
@@ -422,8 +424,8 @@ export default function ImageManipulator({
               width: previewZoom
                 ? fitWidth
                 : crop
-                  ? `min(100%, ${(380 * width) / height}px)`
-                  : `min(${Math.max(15, Math.min(1, w / width) * 90)}%, ${(380 * w) / h}px)`,
+                  ? `min(100%, ${(previewHeight * width) / height}px)`
+                  : `min(${Math.max(15, Math.min(1, w / width) * 90)}%, ${(previewHeight * w) / h}px)`,
             }}
           >
             <canvas
@@ -527,9 +529,9 @@ export default function ImageManipulator({
                 }}
               />
             </label>
-            <button className="secondary" disabled={busy} onClick={reset}>
+            <Button className="secondary" disabled={busy} onClick={reset}>
               Original size
-            </button>
+            </Button>
           </>
         )}
         <span role="status">

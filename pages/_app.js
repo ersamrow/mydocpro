@@ -18,6 +18,8 @@ import "../src/image-studio.css";
 import "../src/merge-workspace.css";
 import "../src/shared-ui.css";
 import "../src/typography.css";
+import "../src/convert-workspace.css";
+import "../src/ui.css";
 import Header from "../components/Header.js";
 import SiteScripts from "../components/SiteScripts.js";
 import DownloadFollowPrompt from "../components/DownloadFollowPrompt.js";

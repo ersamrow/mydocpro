@@ -1,3 +1,4 @@
+import { conversionFormats } from "./image-formats.js";
 const number = (id, label, value, min, max, step) => ({
   id,
   label,
@@ -59,7 +60,7 @@ export function fields(id) {
       number("maxKB", "Max size (KB, optional)", "", 1, 25000),
     ],
     "convert-image": [
-      format(),
+      select("format", "Output format", conversionFormats.map(([mime, label]) => [mime, label])),
       number("quality", "Quality (1–100)", 92, 1, 100),
     ],
     "crop-image": [
@@ -230,7 +231,8 @@ export function validateFiles(
   for (const f of incoming) {
     const isPdf = /\.pdf$/i.test(f.name);
     const isImage =
-      /^image\/(jpeg|png|webp|heic|heif)$/.test(f.type) ||
+      /^image\/(jpeg|png|webp|heic|heif|avif|bmp|x-icon|vnd.microsoft.icon|gif)$/.test(f.type) ||
+      /\.(avif|bmp|ico|gif)$/i.test(f.name) ||
       /\.hei[cf]$/i.test(f.name);
     if (pdf ? !(isPdf || (allowImages && isImage)) : !isImage)
       throw Error(
@@ -238,7 +240,7 @@ export function validateFiles(
           ? allowImages
             ? "Please choose PDFs or JPG, PNG, WebP, HEIC or HEIF images."
             : "Please choose PDF files."
-          : "Please choose JPG, PNG, WebP, HEIC or HEIF images.",
+          : "Please choose JPG, PNG, WebP, AVIF, BMP, ICO, GIF, HEIC or HEIF images.",
       );
     if (!f.size) throw Error(f.name + " is empty. Choose a file with content.");
     if (f.size > (pdf && isPdf ? 100 : 25) * 1048576)

@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import { useEffect, useState, useRef } from "react";
 import { zipOutputs } from "../src/zip.js";
 export default function ZipDownload({ outputs, busy }) {
@@ -26,16 +27,18 @@ export default function ZipDownload({ outputs, busy }) {
   return (
     <div className="zip-download">
       {url ? (
-        <a
+        <Button
+          as="a"
+          variant="primary"
           ref={downloadLink}
           className="primary"
           download="mydocpro-files.zip"
           href={url}
         >
           Download all (ZIP)
-        </a>
+        </Button>
       ) : (
-        <button
+        <Button
           className="primary"
           disabled={busy || packing}
           onClick={async () => {
@@ -54,7 +57,7 @@ export default function ZipDownload({ outputs, busy }) {
           }}
         >
           {packing ? "Preparing ZIP…" : "Download all (ZIP)"}
-        </button>
+        </Button>
       )}
       <span role="status">{error || (url ? "ZIP ready." : "")}</span>
     </div>

@@ -1,3 +1,4 @@
+import { Button, Card } from "./ui.js";
 import { useState, useRef } from "react";
 import Link from "next/link";
 export default function ContactForm() {
@@ -32,7 +33,8 @@ export default function ContactForm() {
     }
   }
   return (
-    <form
+    <Card
+      as="form"
       id="contact-form"
       className="contact-form"
       action="/api/contact"
@@ -80,9 +82,9 @@ export default function ContactForm() {
         email you a confirmation. Please do not include private documents,
         passwords or signatures. <Link href="/privacy">Privacy details</Link>.
       </p>
-      <button className="primary" disabled={busy} type="submit">
+      <Button className="primary" disabled={busy} type="submit">
         {busy ? "Sending…" : "Send message"}
-      </button>
+      </Button>
       <p
         ref={status}
         id="contact-status"
@@ -92,6 +94,6 @@ export default function ContactForm() {
       >
         {message}
       </p>
-    </form>
+    </Card>
   );
 }

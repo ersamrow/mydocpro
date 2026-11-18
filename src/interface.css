@@ -110,7 +110,7 @@ body {
   font-size: 10px;
   line-height: 1.35;
   width: 100%;
-  min-height: 1.35em;
+  min-height: var(--ui-control-height);
   margin: 0;
 }
 .site-header .pwa-dialog {
@@ -118,14 +118,6 @@ body {
 }
 html:root {
   scroll-padding-top: 110px;
-}
-.workspace.tool-workspace,
-.workspace.information-page {
-  max-width: 1120px;
-  width: calc(100% - 64px);
-  margin: 38px auto 64px;
-  padding: 0;
-  min-width: 0;
 }
 .tool-heading,
 .page-intro {
@@ -146,14 +138,7 @@ html:root {
   justify-self: start;
   white-space: nowrap;
   gap: 7px;
-  min-height: 36px;
   margin: 0;
-  padding: 7px 12px;
-  background: #fff;
-  border: 1px solid var(--ui-border);
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 600;
   text-decoration: none;
 }
 .tool-heading .back svg {
@@ -256,14 +241,6 @@ html:root {
   height: 15px;
   color: #37866a;
 }
-.tool-workspace .workpanel {
-  margin: 0;
-  background: #fff;
-  border: 1px solid var(--ui-border);
-  border-radius: 22px;
-  padding: 28px;
-  box-shadow: 0 8px 32px #173d3107;
-}
 .tool-workspace .dropzone {
   display: flex;
   flex-direction: column;
@@ -321,10 +298,6 @@ html:root {
 }
 .tool-workspace .workpanel .settings > label,
 .tool-workspace .workpanel .settings > label:not(.range-field) {
-  padding: 16px;
-  border: 1px solid #e4ebe5;
-  border-radius: 13px;
-  background: #f8faf7;
   font-size: 12px;
   font-weight: 650;
   color: #3d5c4f;
@@ -339,22 +312,6 @@ html:root {
   font-weight: 400;
   background: #fff;
 }
-.tool-workspace .workpanel .process-actions {
-  align-items: center;
-  gap: 16px;
-  border-top: 1px solid var(--ui-border);
-  padding-top: 22px;
-}
-.tool-workspace .primary {
-  background: var(--ui-green);
-  color: #fff;
-  border-radius: 10px;
-  min-height: 48px;
-  box-shadow: 0 3px 8px #185c4618;
-}
-.tool-workspace .primary:hover:enabled {
-  background: #104b3b;
-}
 .tool-workspace .notice {
   border: 1px solid #eee3c9;
   border-left: 3px solid #d7b86e;
@@ -365,22 +322,10 @@ html:root {
   line-height: 1.7;
   color: #826b38;
 }
-.tool-workspace .file-list li {
-  padding: 12px 0;
-}
 .tool-workspace .outputs:not(:empty) {
   margin-top: 22px;
   padding-top: 18px;
   border-top: 1px solid var(--ui-border);
-}
-.tool-workspace .tool-guide {
-  margin: 32px 0 0;
-  padding: 30px;
-  border: 1px solid var(--ui-border);
-  border-radius: 18px;
-  background: #fff;
-  color: #53695e;
-  line-height: 1.85;
 }
 .tool-workspace .tool-guide h2 {
   font-size: 23px;
@@ -524,11 +469,6 @@ html:root {
 }
 .information-content {
   min-width: 0;
-  padding: 34px 38px;
-  background: white;
-  border: 1px solid var(--ui-border);
-  border-radius: 20px;
-  box-shadow: 0 8px 30px #173d3105;
   color: #53685c;
   line-height: 1.9;
 }
@@ -564,10 +504,6 @@ html:root {
 }
 .information-content .contact-form {
   margin: 0 0 30px;
-  padding: 0 0 28px;
-  border: 0;
-  border-bottom: 1px solid var(--ui-border);
-  border-radius: 0;
   max-width: none;
   gap: 18px;
 }
@@ -599,12 +535,6 @@ html:root {
 .information-content .contact-form p {
   font-size: 12px;
   line-height: 1.8;
-}
-.information-content .contact-form .primary {
-  min-height: 48px;
-  padding: 12px 24px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px #185c4618;
 }
 .site-footer {
   display: grid;
@@ -780,10 +710,6 @@ nav.exam-links a {
   display: grid;
   align-content: start;
   gap: 8px;
-  padding: 12px 16px;
-  background: var(--ui-surface);
-  border: 1px solid var(--ui-border);
-  border-radius: 10px;
 }
 .footer-projects strong {
   display: flex;
@@ -862,9 +788,6 @@ nav.exam-links a {
     grid-template-columns: 200px minmax(0, 1fr);
     gap: 24px;
   }
-  .information-content {
-    padding: 28px;
-  }
 }
 @media (max-width: 800px) {
   html:root {
@@ -913,11 +836,6 @@ nav.exam-links a {
     width: 14px;
     height: 14px;
   }
-  .workspace.tool-workspace,
-  .workspace.information-page {
-    width: calc(100% - 40px);
-    margin-top: 26px;
-  }
   .tool-workspace .workpanel .settings {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -952,18 +870,11 @@ nav.exam-links a {
     width: 15px;
     height: 15px;
   }
-  .information-content {
-    padding: 28px;
-  }
   .page-description {
     max-width: 650px;
   }
 }
 @media (max-width: 600px) {
-  .tool-workspace .workpanel {
-    padding: 18px;
-    border-radius: 17px;
-  }
   .tool-workspace .workpanel .settings {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -1002,10 +913,6 @@ nav.exam-links a {
     padding-bottom: 22px;
     margin-bottom: 22px;
   }
-  .tool-workspace .tool-guide {
-    padding: 22px;
-    border-radius: 16px;
-  }
   .tool-workspace .tool-guide h2 {
     font-size: 21px;
   }
@@ -1017,32 +924,12 @@ nav.exam-links a {
     padding: 18px 0;
     border-top: 1px solid var(--ui-border);
   }
-  .information-content {
-    padding: 22px;
-    border-radius: 16px;
-  }
   .information-content p,
   .information-content li {
     font-size: 14px;
   }
   .information-content h2 {
     font-size: 19px;
-  }
-  .tool-workspace .workpanel.pdf-editor-panel.has-files .process-actions {
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    border-top: 1px solid #d1dfd3;
-    background: #fcfefb;
-    gap: 12px;
-  }
-  .tool-workspace
-    .workpanel.pdf-editor-panel.has-files
-    .process-actions
-    .primary {
-    width: auto;
-    min-height: 48px;
-  }
-  .tool-workspace .workpanel:not(.pdf-editor-panel) .process-actions .primary {
-    width: 100%;
   }
 }
 @media (max-width: 400px) {
@@ -1075,11 +962,6 @@ nav.exam-links a {
   .site-header nav a:last-child {
     font-size: 10px;
   }
-  .workspace.tool-workspace,
-  .workspace.information-page {
-    width: calc(100% - 24px);
-    margin-top: 22px;
-  }
   .workspace .page-intro-heading h1 {
     font-size: 26px;
   }
@@ -1095,12 +977,6 @@ nav.exam-links a {
   }
   .tool-workspace .dropzone strong {
     font-size: 18px;
-  }
-  .tool-workspace .workpanel {
-    padding: 14px;
-  }
-  .information-content {
-    padding: 18px;
   }
   .information-sidebar nav a {
     font-size: 11px;
@@ -1133,17 +1009,6 @@ nav.exam-links a {
   max-width: 420px;
   margin: 0 auto 24px;
 }
-.not-found-page .primary {
-  display: inline-flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 12px 22px;
-  border-radius: 10px;
-  background: var(--ui-green);
-  color: white;
-}
 @media (max-width: 600px) {
   .not-found-page {
     padding: 32px 24px;
@@ -1151,10 +1016,6 @@ nav.exam-links a {
   }
 }
 /* Compact introductions and upload entry points, shared by every tool. */
-.workspace.tool-workspace,
-.workspace.information-page {
-  margin-top: 20px;
-}
 .workspace .tool-heading,
 .information-page .page-intro {
   margin-bottom: 16px;
@@ -1162,10 +1023,6 @@ nav.exam-links a {
 }
 .tool-heading-meta {
   margin-bottom: 10px;
-}
-.workspace .tool-heading .back {
-  min-height: 44px;
-  padding: 8px 10px;
 }
 .tool-heading .page-intro-heading,
 .information-page .page-intro-heading {
@@ -1206,10 +1063,6 @@ nav.exam-links a {
 }
 .information-page .page-kicker {
   margin-bottom: 5px;
-}
-.tool-workspace .workpanel {
-  padding: 20px;
-  border-radius: 18px;
 }
 .tool-workspace .dropzone {
   display: grid;
@@ -1270,10 +1123,6 @@ nav.exam-links a {
   }
 }
 @media (max-width: 600px) {
-  .workspace.tool-workspace,
-  .workspace.information-page {
-    margin-top: 12px;
-  }
   .workspace .tool-heading,
   .information-page .page-intro {
     margin-bottom: 12px;
@@ -1314,9 +1163,6 @@ nav.exam-links a {
     width: 13px;
     height: 13px;
   }
-  .tool-workspace .workpanel {
-    padding: 14px;
-  }
   .tool-workspace .dropzone {
     padding: 16px 12px;
     gap: 10px;
@@ -1334,10 +1180,6 @@ nav.exam-links a {
 /* Numeric settings share a touch-friendly slider and an exact-value entry. */
 .tool-workspace .workpanel .settings > .range-field {
   min-width: 0;
-  padding: 16px;
-  border: 1px solid #e4ebe5;
-  border-radius: 13px;
-  background: #f8faf7;
   color: #3d5c4f;
   font-size: 12px;
   font-weight: 650;
@@ -1396,20 +1238,6 @@ nav.exam-links a {
   gap: 6px;
   margin-top: 10px;
 }
-.setting-presets button {
-  min-height: 44px;
-  padding: 8px 10px;
-  background: white;
-  border: 1px solid #bfcec2;
-  border-radius: 8px;
-  font-size: 11px;
-  color: #28523e;
-}
-.setting-presets button[aria-pressed="true"] {
-  background: #dcefdc;
-  border-color: #478166;
-  font-weight: 700;
-}
 .settings-disclosure > summary,
 .quality-preview > summary {
   display: flex;
@@ -1432,9 +1260,6 @@ nav.exam-links a {
   border-top: 1px solid var(--ui-border);
 }
 .quality-preview {
-  padding: 0 14px;
-  border: 1px solid var(--ui-border);
-  border-radius: 12px;
   margin: 16px 0;
 }
 .quality-preview img {
@@ -1465,10 +1290,6 @@ nav.exam-links a {
 .tool-workspace .results-summary {
   grid-column: 1/-1;
   width: 100%;
-  padding: 18px;
-  background: #edf6ec;
-  border: 1px solid #d0e4cd;
-  border-radius: 12px;
 }
 .results-summary h2 {
   font-size: 20px;
@@ -1481,34 +1302,6 @@ nav.exam-links a {
 .results-summary small {
   font-size: 12px;
   color: #4b6657;
-}
-.tool-workspace .result-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items: stretch;
-  padding: 18px;
-  border: 1px solid #cbded0;
-  border-radius: 12px;
-  background: white;
-  min-width: 0;
-  max-width: 100%;
-}
-.result-preview > span {
-  display: grid;
-  gap: 8px;
-  overflow-wrap: anywhere;
-}
-.result-preview strong {
-  font-size: 14px;
-}
-.result-preview small {
-  color: #4b6657;
-}
-.tool-workspace .result-preview img {
-  max-width: 100%;
-  max-height: 220px;
-  object-fit: contain;
 }
 .tool-workspace .intro,
 .tool-workspace .upload-copy span,
@@ -1573,12 +1366,6 @@ nav.exam-links a {
   align-items: center;
   width: 100%;
   margin: 8px 0;
-}
-.zip-download .primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 18px;
 }
 .zip-download span {
   font-size: 12px;
@@ -1658,12 +1445,6 @@ nav.exam-links a {
     flex: 1;
   }
 }
-.tool-workspace .process-actions .cancel-processing {
-  margin: 0;
-  min-height: 44px;
-  padding: 10px 14px;
-  flex-shrink: 0;
-}
 /* Put the current task first; keep supporting controls quiet but reachable. */
 .workflow-steps {
   display: flex;
@@ -1730,24 +1511,6 @@ nav.exam-links a {
 .tool-workspace .settings-disclosure {
   margin-top: 18px;
 }
-.tool-workspace .workpanel .process-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 18px;
-}
-.tool-workspace .output-summary {
-  margin: 0;
-  flex: 1 1 200px;
-  font-size: 12px;
-  line-height: 1.6;
-  color: #4b6657;
-}
-.tool-workspace .workpanel .process-actions .primary {
-  padding: 12px 20px;
-  font-size: 14px;
-}
 .search .clear-search {
   display: grid;
   place-items: center;
@@ -1800,27 +1563,7 @@ nav.exam-links a {
   .tool-workspace .settings-toolbar label {
     margin-left: 0;
   }
-  .tool-workspace
-    .workpanel.pdf-editor-panel.has-files
-    .process-actions
-    .output-summary {
-    flex: 1 1 100px;
-    font-size: 11px;
-  }
-  .tool-workspace
-    .workpanel:not(.pdf-editor-panel)
-    .process-actions
-    .output-summary {
-    flex-basis: 100%;
-  }
   .field-hint {
     font-size: 12px;
-  }
-  .tool-workspace
-    .workpanel.pdf-editor-panel.has-files
-    .process-actions
-    .primary {
-    font-size: 12px;
-    padding: 10px 14px;
   }
 }

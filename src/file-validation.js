@@ -28,12 +28,16 @@ export async function inspectFiles(files, pdf) {
         new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
         new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
       const header = new TextDecoder().decode(bytes.slice(4, 64));
+      const gif = /^GIF8[79]a/.test(new TextDecoder().decode(bytes.slice(0, 6)));
+      const bmp = bytes[0] === 66 && bytes[1] === 77;
+      const ico = bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 1 && bytes[3] === 0;
+      const avif = header.startsWith("ftyp") && /avif|avis/.test(header);
       const heif =
         header.startsWith("ftyp") &&
         /heic|heix|hevc|hevx|mif1|msf1/.test(header);
-      if (!png && !jpg && !webp && !heif)
+      if (!png && !jpg && !webp && !heif && !gif && !bmp && !ico && !avif)
         throw Error(
-          `${file.name} is not a supported image. Choose JPG, PNG, WebP, HEIC or HEIF.`,
+          `${file.name} is not a supported image. Choose JPG, PNG, WebP, AVIF, BMP, ICO, GIF, HEIC or HEIF.`,
         );
       if (heif) {
         const { normalizeImageFile } = await import("./image-processing.js");

@@ -69,7 +69,7 @@ const assert = require("node:assert/strict");
       .click();
     await make.click();
     const output = page.getByRole("link", {
-      name: "Download PDF",
+      name: "Download PDF – free",
       exact: true,
     });
     await output.waitFor();

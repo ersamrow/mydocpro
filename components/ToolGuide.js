@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Card } from "./ui.js";
 import { guides, combinedGuideDetails } from "../src/tool-guides.js";
 import { guideDetails } from "../src/tool-guide-details.js";
 import { tools } from "../src/tools.js";
@@ -16,7 +17,7 @@ export default function ToolGuide({ id }) {
           .slice(0, 2),
       ];
   return (
-    <section className="tool-guide" aria-label="Tool guidance">
+    <Card className="tool-guide" aria-label="Tool guidance">
       {id === "resize-image" ? (
         <ResizeImageGuide />
       ) : (
@@ -60,6 +61,6 @@ export default function ToolGuide({ id }) {
       <p>
         <Link href="/help">Troubleshooting and file privacy</Link>
       </p>
-    </section>
+    </Card>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { pageSeo } from "../src/seo.js";
 import { tools } from "../src/tools.js";
 import Home from "./Home.js";
+import { Button, ToolLayout } from "./ui.js";
 const InformationPage = dynamic(() => import("./InformationPage.js"));
 const Workspace = dynamic(() => import("./Workspace.jsx"));
 const CombinedWorkspace = dynamic(() => import("./CombinedWorkspace.js"));
@@ -28,17 +29,17 @@ export default function ToolApplication({ id, cards, examLinks }) {
       ) : m.known ? (
         <InformationPage id={id} />
       ) : (
-        <main className="workspace not-found-page">
+        <ToolLayout className="workspace not-found-page">
           <span className="page-kicker">ERROR 404</span>
           <h1>Page not found</h1>
           <p>
             We couldn’t find that page. Check the address or choose a tool to
             get started.
           </p>
-          <Link className="primary" href="/">
+          <Button as={Link} variant="primary" href="/">
             Browse all tools <span aria-hidden="true">→</span>
-          </Link>
-        </main>
+          </Button>
+        </ToolLayout>
       )}
     </>
   );

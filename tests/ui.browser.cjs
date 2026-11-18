@@ -27,9 +27,78 @@ const path = require("node:path");
           ),
           `${id} overflows at ${width}px`,
         );
+        const smallControls = await page
+          .locator(".ui-button:visible")
+          .evaluateAll((buttons) =>
+            buttons
+              .filter((button) => {
+                const bounds = button.getBoundingClientRect();
+                return bounds.width < 44 || bounds.height < 44;
+              })
+              .map(
+                (button) =>
+                  button.getAttribute("aria-label") ||
+                  button.textContent.trim(),
+              ),
+          );
+        assert.deepEqual(
+          smallControls,
+          [],
+          `${id} has undersized shared controls at ${width}px`,
+        );
       }
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    for (const id of [
+      "compress-image",
+      "resize-image",
+      "convert-image",
+      "image-editor",
+      "pdf-toolkit",
+    ]) {
+      await page.goto(base + "/" + id);
+      const input =
+        id === "image-editor"
+          ? "#studio-upload"
+          : id === "pdf-toolkit"
+            ? "#workbench-upload"
+            : "#upload";
+      await page
+        .locator(input)
+        .setInputFiles(
+          path.join(
+            __dirname,
+            id === "pdf-toolkit" ? "two-pages.pdf" : "photo.png",
+          ),
+        );
+      await page.locator(".ui-action-bar").waitFor();
+      if (id === "image-editor")
+        await page.locator(".studio-download").waitFor();
+      else if (id === "pdf-toolkit")
+        await page
+          .getByRole("button", {
+            name: "Create PDF from selected pages",
+            exact: true,
+          })
+          .waitFor();
+      else await page.locator("#process:enabled").waitFor();
+      const bar = page.locator(".ui-action-bar");
+      assert.equal(
+        await bar.evaluate((element) => getComputedStyle(element).position),
+        "sticky",
+        id,
+      );
+      assert.ok(
+        (await bar.boundingBox()).height <= 120,
+        `${id} action bar must stay compact on mobile`,
+      );
+      assert.ok(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth + 1,
+        ),
+        `${id} selected-file state overflows`,
+      );
+    }
     await page.goto(base);
     assert.match(
       await page
@@ -38,7 +107,9 @@ const path = require("node:path");
         .evaluate((el) => getComputedStyle(el).fontFamily),
       /sans-serif/,
     );
-    await page.locator("[data-install-app]").click();
+    await page
+      .getByRole("button", { name: /^App and offline status:/ })
+      .click();
     let bounds = await page.locator(".pwa-dialog").boundingBox();
     await page.mouse.click(bounds.x + 5, bounds.y + 5);
     assert.ok(
@@ -87,17 +158,18 @@ const path = require("node:path");
     );
     await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
     assert.ok(
-      await page.evaluate(
-        () =>
-          document.querySelector("footer").getBoundingClientRect().bottom <=
-          document.querySelector(".process-actions").getBoundingClientRect()
-            .top,
-      ),
-      "Fixed action bar must not cover footer",
+      await page.evaluate(() => {
+        const footer = document.querySelector("footer").getBoundingClientRect();
+        const bar = document
+          .querySelector(".ui-action-bar")
+          .getBoundingClientRect();
+        return bar.bottom <= footer.top || bar.top >= footer.bottom;
+      }),
+      "The shared sticky action bar must stay within the workspace and not cover the footer",
     );
     assert.deepEqual(errors, []);
     console.log(
-      "UI checks passed: all routes at 320/1440px, representative routes at 390/768/1024px, dialogs, keyboard focus, touch targets and fixed action bar.",
+      "UI checks passed: all routes at 320/1440px, representative routes at 390/768/1024px, dialogs, keyboard focus, touch targets and shared sticky action bar.",
     );
   } finally {
     await browser.close();

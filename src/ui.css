@@ -1,0 +1,513 @@
+/* Shared UI primitives. Page styles own content geometry, never these surfaces. */
+:root {
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 24px;
+  --ui-control-height: 44px;
+  --ui-layout-width: 1280px;
+}
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  min-height: var(--ui-control-height);
+  padding: 9px 14px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  color: var(--ui-green);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
+}
+.ui-button:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--ui-hover);
+  border-color: var(--ui-green);
+}
+.ui-button--primary {
+  background: var(--ui-green);
+  border-color: var(--ui-green);
+  color: var(--ui-surface);
+}
+.ui-button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--ui-green-hover);
+  border-color: var(--ui-green-hover);
+}
+.ui-button[aria-pressed="true"] {
+  background: var(--ui-soft);
+  border-color: var(--ui-green);
+  color: var(--ui-green);
+  box-shadow: inset 0 0 0 1px var(--ui-green);
+}
+.ui-button--icon {
+  width: var(--ui-control-height);
+  padding: 8px;
+  flex-shrink: 0;
+}
+.ui-button > svg {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+.ui-button:disabled,
+.ui-button[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ui-button[hidden] {
+  display: none;
+}
+.ui-card {
+  min-width: 0;
+  padding: var(--ui-space-4);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  color: var(--ui-ink);
+}
+.ui-card--flat {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.ui-tool-layout .ui-card .ui-settings--compact {
+  max-width: none;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 20px;
+  margin: 12px 0;
+  align-items: start;
+}
+.ui-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.ui-setting-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.ui-setting-heading label {
+  min-width: 0;
+}
+.ui-tool-layout
+  .ui-card
+  .ui-settings--compact
+  .ui-setting
+  input:not([type="range"]),
+.ui-tool-layout .ui-card .ui-settings--compact .ui-setting select {
+  margin: 0;
+  padding: 8px;
+  height: 44px;
+  min-height: 44px;
+  font-size: 14px;
+}
+.ui-setting-heading input {
+  width: 76px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.ui-setting input[type="range"] {
+  min-height: 32px;
+  margin: 0;
+  width: 100%;
+}
+.ui-setting--wide {
+  grid-column: 1/-1;
+}
+.ui-compact-workspace .settings-disclosure .tool-settings-summary {
+  display: none;
+}
+.ui-compact-workspace .image-previews .image-edit-stage {
+  min-height: 120px;
+  padding: 12px;
+}
+.ui-compact-workspace .image-previews .image-edit-stage img {
+  max-height: 180px;
+}
+.ui-compact-workspace .manipulator-board {
+  min-height: 120px;
+  padding: 12px;
+}
+.ui-compact-workspace .manipulator-surface {
+  max-height: 220px;
+}
+.ui-compact-workspace .thumbnail-image {
+  height: 110px;
+}
+.ui-compact-workspace .page-thumbnails {
+  margin-top: 8px;
+}
+.ui-compact-workspace .settings-toolbar {
+  padding-top: 10px;
+  gap: 8px;
+}
+.ui-preview-details {
+  margin-top: 10px;
+  font-size: 12px;
+}
+.ui-preview-details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.ui-preview-options {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.ui-preview-pane,
+.ui-options-pane {
+  min-width: 0;
+}
+.ui-preview-options[data-has-preview="false"],
+.ui-preview-options:not(:has(.ui-options-pane)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ui-side-workspace .workpanel .merge-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
+  gap: 16px 24px;
+  align-items: start;
+}
+.ui-side-workspace .merge-layout .merge-canvas {
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.ui-side-workspace .merge-layout .merge-controls {
+  display: contents;
+}
+.ui-side-workspace .merge-controls > .tool-settings-details,
+.ui-side-workspace .merge-controls > .compress-settings-panel {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 0;
+  min-width: 0;
+}
+.ui-side-workspace .merge-controls > .notice {
+  grid-column: 2;
+  margin: 0;
+}
+.ui-side-workspace
+  .merge-controls
+  > :is(.ui-action-bar, .processing-progress, .status, .outputs) {
+  grid-column: 1 / -1;
+}
+.ui-side-workspace .merge-layout .image-previews {
+  margin: 0;
+}
+.ui-side-workspace .image-result-panel {
+  min-width: 0;
+}
+.ui-side-workspace .merge-page-editor {
+  max-height: 560px;
+  overflow: auto;
+}
+.ui-side-workspace .workpanel .image-edit-stage {
+  min-height: 160px;
+  padding: 12px;
+}
+.ui-side-workspace .workpanel .image-edit-stage img {
+  max-height: 240px;
+}
+.ui-side-workspace .workpanel .ui-settings--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 899px) {
+  .ui-preview-options,
+  .ui-side-workspace .workpanel .merge-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ui-side-workspace .merge-layout .merge-canvas,
+  .ui-side-workspace .merge-controls > .tool-settings-details,
+  .ui-side-workspace .merge-controls > .compress-settings-panel,
+  .ui-side-workspace .merge-controls > .notice {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .ui-side-workspace .merge-page-editor {
+    max-height: 360px;
+  }
+}
+@media (max-width: 650px) {
+  .ui-tool-layout .ui-card .ui-settings--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .ui-setting-heading {
+    flex-wrap: wrap;
+  }
+  .ui-setting-heading label {
+    flex-basis: 100%;
+  }
+  .ui-setting-heading input {
+    width: 100%;
+  }
+}
+
+.ui-tool-layout {
+  width: calc(100% - 40px);
+  max-width: var(--ui-layout-width);
+  margin: 28px auto 40px;
+  min-width: 0;
+}
+.ui-tool-layout.ui-tool-layout {
+  padding-inline: 0;
+}
+.ui-tool-layout .ui-tool-layout {
+  width: 100%;
+  margin: 0;
+}
+.ui-tool-layout > .workpanel {
+  margin-top: 20px;
+}
+.ui-card.tool-guide {
+  margin-top: 24px;
+  line-height: 1.8;
+}
+.ui-card.tool-guide h2 {
+  font-size: 23px;
+  margin-top: 0;
+}
+.ui-card.tool-guide h3 {
+  font-size: 16px;
+  margin-top: 24px;
+}
+.ui-card.tool-guide p {
+  font-size: 14px;
+}
+.ui-file-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  min-width: 0;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+}
+.ui-file-row > span {
+  flex: 1;
+  min-width: 0;
+}
+.file-list .ui-file-row > span:not(.merge-file-icon) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ui-file-row > small {
+  font-size: 11px;
+  color: var(--ui-muted);
+}
+.ui-file-row img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 5px;
+}
+.ui-file-row .ui-button {
+  flex-shrink: 0;
+}
+.ui-action-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  box-shadow: 0 6px 24px #173d3318;
+}
+.ui-action-bar[hidden] {
+  display: none;
+}
+.ui-action-bar .output-summary {
+  flex: 1 1 180px;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  height: auto;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+}
+.ui-action-bar .ui-button {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}
+.ui-action-bar .download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ui-action-bar .zip-download {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ui-action-bar .zip-download > span:empty {
+  display: none;
+}
+.ui-control-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-2);
+}
+.ui-control-group > label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 12px;
+}
+.ui-control-group > label input,
+.ui-control-group > label select {
+  min-height: var(--ui-control-height);
+  max-width: 100%;
+}
+.ui-control-group > label input {
+  width: 180px;
+}
+.ui-control-group > label select {
+  width: 150px;
+}
+.studio-edit-toolbar {
+  margin: 16px 0;
+}
+.studio-card > .ui-button--primary {
+  width: 100%;
+  margin-top: 12px;
+}
+.ui-help {
+  margin-top: 24px;
+  padding: 0;
+  overflow: hidden;
+}
+.ui-help > summary {
+  padding: 10px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.ui-help[open] > summary {
+  border-bottom: 1px solid var(--ui-border);
+}
+.ui-help .tool-guide {
+  margin: 0;
+  padding: 14px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.ui-help .tool-guide > :is(h2, h3, p, ol, ul) {
+  max-width: none;
+}
+.ui-help .tool-guide > h2 {
+  margin-top: 0;
+}
+.ui-help .steps {
+  margin: 0;
+  padding: 0 14px 14px;
+}
+.ui-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ui-result-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  align-items: center;
+  margin: 0;
+  font-size: 12px;
+}
+.ui-result-heading strong {
+  color: var(--ui-success);
+}
+.ui-result-heading span {
+  color: var(--ui-muted);
+}
+.ui-result-row {
+  width: 100%;
+}
+.ui-result-row strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.ui-result-row small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--ui-muted);
+}
+.ui-result-row a {
+  flex-shrink: 0;
+}
+@media (max-width: 650px) {
+  .ui-tool-layout {
+    width: calc(100% - 24px);
+    margin-block: 18px 28px;
+  }
+  .ui-card {
+    padding: 12px;
+  }
+  .ui-action-bar {
+    bottom: 8px;
+    padding: 10px;
+    gap: 8px;
+  }
+  .ui-action-bar .output-summary {
+    flex-basis: 100%;
+  }
+  .ui-action-bar .ui-button {
+    flex: 1 1 auto;
+  }
+  html:has(.ui-action-bar) {
+    scroll-padding-bottom: 110px;
+  }
+  .ui-help {
+    padding: 0;
+  }
+  .ui-help > summary,
+  .ui-help .tool-guide {
+    padding: 12px;
+  }
+  .ui-help .steps {
+    padding: 0 12px 12px;
+  }
+}

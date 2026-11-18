@@ -71,13 +71,6 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  min-height: 44px;
-  padding: 10px 18px;
-  border-radius: var(--ui-radius-control);
-  background: var(--ui-green);
-  color: var(--ui-surface);
-  font-size: 13px;
-  font-weight: 600;
   white-space: nowrap;
 }
 @media (max-width: 650px) {

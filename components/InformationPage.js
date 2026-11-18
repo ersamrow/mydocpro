@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Card, ToolLayout } from "./ui.js";
 import { Breadcrumb, Icon } from "./Shared.js";
 import { sitePages } from "../src/site-content.js";
 import { pageBodies } from "./ContentPages.js";
@@ -14,7 +15,7 @@ export default function InformationPage({ id }) {
     Content = pageBodies[id],
     current = pages.find((p) => p[0] === id);
   return (
-    <main className={"workspace information-page information-" + id}>
+    <ToolLayout className={"workspace information-page information-" + id}>
       <section className="page-intro">
         <Breadcrumb title={page.title} />
         <div className="page-intro-heading">
@@ -57,10 +58,10 @@ export default function InformationPage({ id }) {
             </Link>
           </div>
         </aside>
-        <article className="information-content privacy-page">
+        <Card as="article" className="information-content privacy-page">
           <Content />
-        </article>
+        </Card>
       </div>
-    </main>
+    </ToolLayout>
   );
 }

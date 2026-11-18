@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Card } from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
 import {
@@ -129,7 +130,7 @@ export function Footer({ examLinks }) {
       <nav aria-labelledby="footer-projects">
         <h2 id="footer-projects">Our Products</h2>
         <div className="footer-projects">
-          <a href="https://greetlo.in/">
+          <Card as="a" href="https://greetlo.in/">
             <strong>
               <span className="footer-product-brand">
                 <img
@@ -144,8 +145,8 @@ export function Footer({ examLinks }) {
               <ArrowUpRight aria-hidden="true" />
             </strong>
             <span>Create and share personalized greeting cards.</span>
-          </a>
-          <a href="https://myledgerpro.in/">
+          </Card>
+          <Card as="a" href="https://myledgerpro.in/">
             <strong>
               <span className="footer-product-brand">
                 <img
@@ -161,7 +162,7 @@ export function Footer({ examLinks }) {
               <ArrowUpRight aria-hidden="true" />
             </strong>
             <span>Track customer balances, loans, and repayments.</span>
-          </a>
+          </Card>
         </div>
       </nav>
       <ExamLinks exams={examLinks} footer />

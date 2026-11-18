@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { Card, ToolLayout } from "./ui.js";
 import { examSeo } from "../src/exam-seo.js";
 import {
   formatExamDimensions,
@@ -101,7 +102,7 @@ export default function ExamLanding({ exam, relatedExams }) {
   return (
     <>
       <SeoHead meta={meta} />
-      <main className={`workspace tool-workspace ${styles.page}`}>
+      <ToolLayout className={`workspace tool-workspace ${styles.page}`}>
         <div className="tool-heading">
           <nav className="breadcrumbs" aria-label="Breadcrumb">
             {meta.breadcrumbs.map(({ name, path }, i) => (
@@ -122,7 +123,7 @@ export default function ExamLanding({ exam, relatedExams }) {
 
         <ExamDocumentTool key={exam.slug} exam={exam} />
 
-        <article className={styles.guide}>
+        <Card as="article" className={styles.guide}>
           <section className={styles.live} aria-labelledby="live-photo-title">
             <h2 id="live-photo-title">
               {livePhoto.required
@@ -213,8 +214,8 @@ export default function ExamLanding({ exam, relatedExams }) {
               ))}
             </ul>
           </section>
-        </article>
-      </main>
+        </Card>
+      </ToolLayout>
     </>
   );
 }

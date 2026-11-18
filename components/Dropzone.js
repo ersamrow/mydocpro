@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { Upload } from "lucide-react";
+import { Button } from "./ui.js";
 import styles from "./Dropzone.module.css";
 
 export default function Dropzone({
@@ -45,9 +46,7 @@ export default function Dropzone({
       <Upload className={styles.icon} aria-hidden="true" />
       <span className={styles.copy}>
         <strong className="dropzone-desktop-title">{title}</strong>
-        <strong className="dropzone-touch-title">
-          {buttonLabel}
-        </strong>
+        <strong className="dropzone-touch-title">{buttonLabel}</strong>
         {hint && <span id={hintId}>{hint}</span>}
       </span>
       <input
@@ -66,9 +65,14 @@ export default function Dropzone({
           if (!disabled && files.length) onFiles(files);
         }}
       />
-      <span className={styles.button} aria-hidden="true">
+      <Button
+        as="span"
+        variant="primary"
+        className={styles.button}
+        aria-hidden="true"
+      >
         {buttonLabel} <span>＋</span>
-      </span>
+      </Button>
     </label>
   );
 }

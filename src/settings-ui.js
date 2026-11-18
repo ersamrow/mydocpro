@@ -28,7 +28,7 @@ export function sliderBounds(key, field, values) {
 }
 export function visibleField(key, values) {
   return (
-    !(key === "quality" && values.format === "image/png") &&
+    !(key === "quality" && !["image/jpeg", "image/webp", "image/avif"].includes(values.format) && values.format) &&
     !(key === "every" && values.mode !== "every") &&
     !(key === "orientation" && values.pageSize === "fit")
   );

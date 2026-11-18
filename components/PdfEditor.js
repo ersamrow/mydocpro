@@ -1,3 +1,4 @@
+import { Button } from "./ui.js";
 import { useEffect, useRef, useState } from "react";
 import { pdfRenderer, pageIndices } from "../src/processing.js";
 import { isBackdropClick, useDialogFocus } from "./dialog.js";
@@ -69,9 +70,9 @@ function Zoom({ entry, rotation, onClose }) {
         <h2 id="page-zoom-title">
           {entry.file.name} · Page {entry.index + 1}
         </h2>
-        <button className="secondary" onClick={onClose}>
+        <Button className="secondary" onClick={onClose}>
           Close
-        </button>
+        </Button>
       </div>
       <div className="zoom-content" role="status">
         {message}
@@ -133,12 +134,12 @@ function MoveDialog({ position, count, entry, onMove, onClose }) {
           </select>
         </label>
         <div>
-          <button type="button" className="secondary" onClick={onClose}>
+          <Button type="button" className="secondary" onClick={onClose}>
             Cancel
-          </button>
-          <button className="primary" type="submit">
+          </Button>
+          <Button className="primary" type="submit">
             Move here
-          </button>
+          </Button>
         </div>
       </form>
     </dialog>
@@ -429,16 +430,16 @@ export default function PdfEditor({
               ),
             ],
           ].map(([label, set]) => (
-            <button
+            <Button
               key={label}
               className="secondary"
               disabled={disabled}
               onClick={() => choose(set)}
             >
               {label}
-            </button>
+            </Button>
           ))}
-        <button
+        <Button
           className="secondary"
           disabled={disabled || !history.length}
           onClick={() => {
@@ -450,8 +451,8 @@ export default function PdfEditor({
           }}
         >
           ↶ Undo
-        </button>
-        <button
+        </Button>
+        <Button
           className="secondary"
           disabled={disabled || entries.every((e, i) => e.original === i)}
           onClick={() => {
@@ -467,7 +468,7 @@ export default function PdfEditor({
           }}
         >
           Reset order
-        </button>
+        </Button>
       </div>
       {compact && entries.length > mergePreviewSize && (
         <nav
@@ -480,14 +481,14 @@ export default function PdfEditor({
             {entries.length}
           </span>
           <div>
-            <button
+            <Button
               className="secondary"
               disabled={currentPreviewPage === 0}
               onClick={() => setPreviewPage(currentPreviewPage - 1)}
               aria-label="Previous page previews"
             >
               ←
-            </button>
+            </Button>
             <label>
               <span className="merge-pagination-label">Preview group</span>
               <select
@@ -501,14 +502,14 @@ export default function PdfEditor({
                 ))}
               </select>
             </label>
-            <button
+            <Button
               className="secondary"
               disabled={currentPreviewPage >= previewPageCount - 1}
               onClick={() => setPreviewPage(currentPreviewPage + 1)}
               aria-label="Next page previews"
             >
               →
-            </button>
+            </Button>
           </div>
         </nav>
       )}
@@ -601,7 +602,7 @@ export default function PdfEditor({
                     : "Excluded — check to include"}
                 </span>
               )}
-              <button
+              <Button
                 className="thumbnail-image"
                 disabled={disabled}
                 aria-label={`Zoom ${entry.file.name} page ${entry.index + 1}`}
@@ -618,9 +619,9 @@ export default function PdfEditor({
                 ) : (
                   "Preview unavailable"
                 )}
-              </button>
+              </Button>
               {(workbench || organize) && (
-                <button
+                <Button
                   className="secondary"
                   disabled={disabled}
                   aria-label={`Rotate ${entry.file.name} page ${entry.index + 1} clockwise`}
@@ -648,11 +649,12 @@ export default function PdfEditor({
                   }}
                 >
                   ↻ Rotate 90°
-                </button>
+                </Button>
               )}
               <div className="page-move-controls" hidden={readOnly}>
                 {!compact && (
-                  <button
+                  <Button
+                    variant="icon"
                     className="page-grip"
                     draggable={!disabled}
                     disabled={disabled}
@@ -664,17 +666,19 @@ export default function PdfEditor({
                     }}
                   >
                     ⠿
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="icon"
                   className="secondary"
                   disabled={disabled || i === 0}
                   aria-label={`Move ${entry.file.name} page ${entry.index + 1} earlier`}
                   onClick={() => move(entry, i - 1)}
                 >
                   ←
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="icon"
                   className="page-position"
                   disabled={disabled}
                   aria-label={`Move ${entry.file.name} page ${entry.index + 1} to position`}
@@ -687,15 +691,16 @@ export default function PdfEditor({
                   ) : (
                     `${i + 1} / ${entries.length}`
                   )}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="icon"
                   className="secondary"
                   disabled={disabled || i === entries.length - 1}
                   aria-label={`Move ${entry.file.name} page ${entry.index + 1} later`}
                   onClick={() => move(entry, i + 1)}
                 >
                   →
-                </button>
+                </Button>
               </div>
             </figure>
           );

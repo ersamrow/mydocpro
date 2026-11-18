@@ -1,0 +1,108 @@
+/* Conversion controls; shared surfaces and actions live in ui.css. */
+.convert-workspace .merge-controls {
+  display: contents;
+}
+.convert-workspace .merge-layout {
+  display: block;
+}
+.convert-workspace .merge-page-editor {
+  display: none;
+}
+.convert-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--ui-border);
+}
+.convert-options-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.convert-options-heading h2 {
+  margin: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.convert-options-heading p {
+  display: none;
+}
+.convert-options-heading > svg {
+  width: 18px;
+  color: var(--ui-green);
+}
+.convert-format-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.convert-format-buttons small {
+  display: none;
+}
+.convert-quality {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.convert-quality label {
+  font-weight: 600;
+}
+.convert-quality input[type="number"] {
+  width: 58px;
+  height: 44px;
+  padding: 6px;
+  text-align: center;
+}
+.convert-quality input[type="range"] {
+  width: 130px;
+  margin: 0;
+}
+.convert-format-hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ui-muted);
+}
+.convert-workspace .tool-settings-summary {
+  display: none;
+}
+.convert-workspace .tool-settings-details > .settings {
+  display: block;
+  margin: 8px 0;
+  max-width: 440px;
+}
+.convert-workspace .tool-settings-details > .settings > label {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  gap: 5px;
+}
+.convert-workspace .tool-settings-details .field-hint {
+  display: none;
+}
+.convert-workspace .merge-preferences {
+  padding: 8px 0 0;
+  margin: 0;
+}
+.convert-workspace .settings-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.convert-workspace .preference-note:empty {
+  display: none;
+}
+@media (max-width: 650px) {
+  .convert-format-buttons {
+    flex-basis: 100%;
+  }
+}

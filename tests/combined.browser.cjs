@@ -21,6 +21,22 @@ const { PDFDocument } = require("pdf-lib");
     await page
       .locator("#studio-upload")
       .setInputFiles(path.join(__dirname, "photo.png"));
+    async function changeImage(action) {
+      const previous = await page
+        .locator(".studio-download")
+        .getAttribute("href");
+      await action();
+      await page.waitForFunction((previous) => {
+        const link = document.querySelector(".studio-download");
+        return link && link.href !== previous;
+      }, previous);
+      await page.locator(".studio-download").evaluate(async (a) => {
+        const image = await createImageBitmap(
+          await (await fetch(a.href)).blob(),
+        );
+        image.close();
+      });
+    }
     const readImage = () =>
       page.locator(".studio-download").evaluate(async (a) => {
         const b = await (await fetch(a.href)).blob();
@@ -116,13 +132,16 @@ const { PDFDocument } = require("pdf-lib");
     for (let i = 0; i < 4; i++)
       await page.getByRole("button", { name: "Zoom in", exact: true }).click();
     assert.deepEqual(await readImage(), original);
-    await page
-      .getByRole("button", { name: "Apply crop & rotate", exact: true })
-      .click();
-    await page.locator(".studio-download").waitFor();
+    await changeImage(() =>
+      page
+        .getByRole("button", { name: "Apply crop & rotate", exact: true })
+        .click(),
+    );
     assert.equal((await readImage()).width, Math.round(original.width / 2));
     assert.equal((await readImage()).height, Math.round(original.height / 2));
-    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await changeImage(() =>
+      page.getByRole("button", { name: "Undo", exact: true }).click(),
+    );
     assert.equal((await readImage()).width, original.width);
     const resize = page
       .locator(".studio-card")
@@ -130,17 +149,20 @@ const { PDFDocument } = require("pdf-lib");
     await resize.getByRole("button", { name: "Pixels", exact: true }).click();
     await page.locator("#studio-resize-image-width").fill("240");
     await page.locator("#studio-resize-image-height").fill("180");
-    await page
-      .getByRole("button", { name: "Apply resize image", exact: true })
-      .click();
-    await page.locator(".studio-download").waitFor();
+    await changeImage(() =>
+      page
+        .getByRole("button", { name: "Apply resize image", exact: true })
+        .click(),
+    );
     assert.equal((await readImage()).width, 240);
     assert.equal((await readImage()).height, 180);
     await page.getByRole("slider", { name: "brightness", exact: true }).focus();
-    await page.keyboard.press("Home");
-    await page
-      .getByRole("button", { name: "Flip horizontal", exact: true })
-      .click();
+    await changeImage(() => page.keyboard.press("Home"));
+    await changeImage(() =>
+      page
+        .getByRole("button", { name: "Flip horizontal", exact: true })
+        .click(),
+    );
     assert.equal(
       await page
         .getByRole("button", { name: "Apply effects", exact: true })
@@ -150,30 +172,36 @@ const { PDFDocument } = require("pdf-lib");
     await page.locator(".studio-download").waitFor();
     assert.equal((await readImage()).width, 240);
     assert.deepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
-    await page
-      .getByRole("button", { name: "Reset effects", exact: true })
-      .click();
-    await page.locator(".studio-download").waitFor();
+    await changeImage(() =>
+      page.getByRole("button", { name: "Reset effects", exact: true }).click(),
+    );
     assert.notDeepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
     await page.getByRole("slider", { name: "brightness", exact: true }).focus();
-    await page.keyboard.press("Home");
+    await changeImage(() => page.keyboard.press("Home"));
     await page.locator(".studio-download").waitFor();
     assert.deepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
-    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await changeImage(() =>
+      page.getByRole("button", { name: "Undo", exact: true }).click(),
+    );
     assert.notDeepEqual((await readImage()).center.slice(0, 3), [0, 0, 0]);
-    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await changeImage(() =>
+      page.getByRole("button", { name: "Undo", exact: true }).click(),
+    );
     assert.equal((await readImage()).width, original.width);
-    await page.getByRole("button", { name: "Redo", exact: true }).click();
+    await changeImage(() =>
+      page.getByRole("button", { name: "Redo", exact: true }).click(),
+    );
     assert.equal((await readImage()).width, 240);
     await page.locator(".studio-more > summary").click();
     const convert = page
       .locator(".studio-card")
       .filter({ has: page.locator("legend", { hasText: /^Convert image$/ }) });
     await convert.getByRole("button", { name: "WebP", exact: true }).click();
-    await page
-      .getByRole("button", { name: "Apply convert image", exact: true })
-      .click();
-    await page.locator(".studio-download").waitFor();
+    await changeImage(() =>
+      page
+        .getByRole("button", { name: "Apply convert image", exact: true })
+        .click(),
+    );
     assert.equal((await readImage()).type, "image/webp");
     assert.equal((await readImage()).width, 240);
     await page.locator(".studio-more > summary").click();
@@ -186,6 +214,16 @@ const { PDFDocument } = require("pdf-lib");
       fullPage: true,
     });
     await page.setViewportSize({ width: 375, height: 812 });
+    const editorBar = await page.locator(".ui-action-bar").evaluate((bar) => ({
+      position: getComputedStyle(bar).position,
+      height: bar.getBoundingClientRect().height,
+      controls: [...bar.querySelectorAll("button, a")].map((control) => ({
+        height: control.getBoundingClientRect().height,
+      })),
+    }));
+    assert.equal(editorBar.position, "sticky");
+    assert.ok(editorBar.height <= 120, "Mobile floating bar stays compact");
+    assert.ok(editorBar.controls.every(({ height }) => height >= 44));
     assert.ok(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -213,9 +251,9 @@ const { PDFDocument } = require("pdf-lib");
         path.join(__dirname, "one-page.pdf"),
       ]);
     await page.locator("#process").click();
-    await page.locator("#outputs a.result-download").first().waitFor();
+    await page.locator(".ui-action-bar a[download]").first().waitFor();
     const bytes = await page
-      .locator("#outputs a.result-download")
+      .locator(".ui-action-bar a[download]")
       .first()
       .evaluate(async (a) =>
         Array.from(new Uint8Array(await (await fetch(a.href)).arrayBuffer())),
@@ -236,11 +274,10 @@ const { PDFDocument } = require("pdf-lib");
       .locator(".pdf-task-grid")
       .getByRole("button", { name: /Image to PDF/ })
       .click();
-    assert.equal(
-      await page.locator("#upload").getAttribute("accept"),
-      "image/jpeg,image/png,image/webp",
-    );
-    assert.ok(await page.locator("#dropzone").isVisible());
+    const accept = await page.locator("#upload").getAttribute("accept");
+    for (const type of ["image/jpeg", "image/png", "image/webp", "image/heic"])
+      assert.ok(accept.includes(type), `Image to PDF accepts ${type}`);
+    assert.ok(await page.locator(".shared-dropzone").isVisible());
     await page.setViewportSize({ width: 375, height: 812 });
     assert.ok(
       await page.evaluate(

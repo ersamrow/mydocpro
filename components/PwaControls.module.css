@@ -1,18 +1,22 @@
-.installSlot {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  min-height: 44px;
-}
-
 .statusButton {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  min-height: var(--ui-control-height);
   border: 0;
   padding: 0;
   background: transparent;
   font-family: inherit;
   text-align: right;
   cursor: pointer;
+}
+
+.installLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ui-focus-inverse);
 }
 
 .statusButton:hover,

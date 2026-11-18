@@ -1,3 +1,4 @@
+import { Button, Card, ActionBar } from "./ui.js";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import {
@@ -139,99 +140,107 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
         onFiles={(files) => choose(files[0])}
       />
       {file && <p className={styles.filename}>{file.name}</p>}
-      {(sourceUrl || triple) && (
-        <figure className={styles.figure}>
-          <div
-            className={styles.preview}
-            style={{ "--exam-aspect": frameRatio || fixedRatio || 1 }}
+      <div
+        className="ui-preview-options"
+        data-has-preview={Boolean(sourceUrl || triple)}
+      >
+        {(sourceUrl || triple) && (
+          <figure className={`ui-preview-pane ${styles.figure}`}>
+            <div
+              className={styles.preview}
+              style={{ "--exam-aspect": frameRatio || fixedRatio || 1 }}
+            >
+              {sourceUrl && (
+                <img
+                  src={sourceUrl}
+                  alt="Source image framing"
+                  style={{ objectFit: fit }}
+                  onLoad={async (event) => {
+                    const { naturalWidth, naturalHeight } = event.currentTarget;
+                    const { examFrame } = await import("../src/exam-output.js");
+                    const frame = examFrame(doc, naturalWidth, naturalHeight);
+                    setFrameRatio(frame.width / frame.height);
+                  }}
+                />
+              )}
+              {triple && (
+                <div className={styles.rows} aria-hidden="true">
+                  {[1, 2, 3].map((n) => (
+                    <span key={n}>{!sourceUrl && `Signature ${n}`}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <figcaption>
+              {triple
+                ? "Three-signature guide. Guide lines stay out of the JPG."
+                : "Image framing"}
+            </figcaption>
+          </figure>
+        )}
+        {(hasFrame || doc.type !== "photo") && (
+          <details
+            className={`ui-options-pane tool-settings-details ${styles.settings}`}
+            open={Boolean(file) && settingsOpen}
+            onToggle={(event) =>
+              setSettingsOpen(Boolean(file) && event.currentTarget.open)
+            }
           >
-            {sourceUrl && (
-              <img
-                src={sourceUrl}
-                alt="Source image framing"
-                style={{ objectFit: fit }}
-                onLoad={async (event) => {
-                  const { naturalWidth, naturalHeight } = event.currentTarget;
-                  const { examFrame } = await import("../src/exam-output.js");
-                  const frame = examFrame(doc, naturalWidth, naturalHeight);
-                  setFrameRatio(frame.width / frame.height);
-                }}
-              />
+            <summary
+              aria-disabled={!file}
+              onClick={(event) => {
+                if (!file) event.preventDefault();
+              }}
+            >
+              Settings
+              <span className="tool-settings-summary">
+                {[
+                  hasFrame &&
+                    (fit === "contain" ? "Keep entire image" : "Centre crop"),
+                  doc.type !== "photo" &&
+                    `Whiten paper: ${whitePaper ? "on" : "off"}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </summary>
+            {!!hasFrame && (
+              <label>
+                Framing
+                <select
+                  value={fit}
+                  disabled={busy}
+                  onChange={(e) => changeSetting(setFit, e.target.value)}
+                >
+                  <option value="contain">
+                    Keep the entire image (white padding)
+                  </option>
+                  <option value="cover">Centre crop to the preset shape</option>
+                </select>
+              </label>
             )}
-            {triple && (
-              <div className={styles.rows} aria-hidden="true">
-                {[1, 2, 3].map((n) => (
-                  <span key={n}>{!sourceUrl && `Signature ${n}`}</span>
-                ))}
-              </div>
+            {doc.type !== "photo" && (
+              <label className={styles.check}>
+                <input
+                  type="checkbox"
+                  checked={whitePaper}
+                  disabled={busy}
+                  onChange={(e) =>
+                    changeSetting(setWhitePaper, e.target.checked)
+                  }
+                />
+                Whiten paper
+              </label>
             )}
-          </div>
-          <figcaption>
-            {triple
-              ? "Three-signature guide. Guide lines stay out of the JPG."
-              : "Image framing"}
-          </figcaption>
-        </figure>
-      )}
-      {(hasFrame || doc.type !== "photo") && (
-        <details
-          className={`tool-settings-details ${styles.settings}`}
-          open={Boolean(file) && settingsOpen}
-          onToggle={(event) =>
-            setSettingsOpen(Boolean(file) && event.currentTarget.open)
-          }
-        >
-          <summary
-            aria-disabled={!file}
-            onClick={(event) => {
-              if (!file) event.preventDefault();
-            }}
-          >
-            Settings
-            <span className="tool-settings-summary">
-              {[
-                hasFrame &&
-                  (fit === "contain" ? "Keep entire image" : "Centre crop"),
-                doc.type !== "photo" &&
-                  `Whiten paper: ${whitePaper ? "on" : "off"}`,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </span>
-          </summary>
-          {!!hasFrame && (
-            <label>
-              Framing
-              <select
-                value={fit}
-                disabled={busy}
-                onChange={(e) => changeSetting(setFit, e.target.value)}
-              >
-                <option value="contain">
-                  Keep the entire image (white padding)
-                </option>
-                <option value="cover">Centre crop to the preset shape</option>
-              </select>
-            </label>
-          )}
-          {doc.type !== "photo" && (
-            <label className={styles.check}>
-              <input
-                type="checkbox"
-                checked={whitePaper}
-                disabled={busy}
-                onChange={(e) => changeSetting(setWhitePaper, e.target.checked)}
-              />
-              Whiten paper
-            </label>
-          )}
-        </details>
-      )}
+          </details>
+        )}
+      </div>
       {file && (
-        <div className="process-actions">
+        <ActionBar className="process-actions">
           {output && outputUrl && !busy ? (
-            <a
-              className="primary"
+            <Button
+              as="a"
+              variant="primary"
               href={outputUrl}
               download={
                 doc.filename ||
@@ -242,18 +251,18 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
               }
             >
               Download JPG
-            </a>
+            </Button>
           ) : (
-            <button
-              className="primary"
+            <Button
+              variant="primary"
               type="button"
               disabled={!file || busy}
               onClick={prepareJpeg}
             >
               {busy ? "Working…" : "Prepare JPG"}
-            </button>
+            </Button>
           )}
-        </div>
+        </ActionBar>
       )}
       {status && (
         <p role="alert" className={styles.warning}>
@@ -262,7 +271,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
       )}
       <div role="status" aria-live="polite">
         {output && (
-          <div className={styles.result}>
+          <Card as="div" className={styles.result}>
             <strong
               className={output.issues.length ? styles.warning : styles.success}
             >
@@ -294,7 +303,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
                 className={styles.resultImage}
               />
             )}
-          </div>
+          </Card>
         )}
       </div>
     </div>
@@ -362,9 +371,9 @@ function CertificatePreset({ doc }) {
           {error}
         </p>
       )}
-      <Link prefetch={false} className="secondary" href="/compress-pdf">
+      <Button as={Link} prefetch={false} href="/compress-pdf">
         Open PDF compressor
-      </Link>
+      </Button>
     </div>
   );
 }
@@ -374,7 +383,7 @@ export default function ExamDocumentTool({ exam, initialFile, onFileChange }) {
   const doc =
     exam.documents.find((item) => item.type === selected) || exam.documents[0];
   return (
-    <section
+    <Card
       className={styles.panel}
       aria-label={`${exam.shortName} document tool`}
     >
@@ -386,14 +395,14 @@ export default function ExamDocumentTool({ exam, initialFile, onFileChange }) {
           aria-label="Choose a document"
         >
           {exam.documents.map((item) => (
-            <button
+            <Button
               key={item.type}
               type="button"
               aria-pressed={item.type === doc.type}
               onClick={() => setSelected(item.type)}
             >
               {item.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -408,6 +417,6 @@ export default function ExamDocumentTool({ exam, initialFile, onFileChange }) {
           onFileChange={onFileChange}
         />
       )}
-    </section>
+    </Card>
   );
 }

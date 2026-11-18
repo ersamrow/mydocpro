@@ -1,3 +1,4 @@
+import { Button, Card, ToolLayout } from "./ui.js";
 import TrustBadges from "./TrustBadges.js";
 import { useState } from "react";
 import Link from "next/link";
@@ -53,12 +54,12 @@ export default function CombinedWorkspace({ heading }) {
     setSelected(next);
   }
   return (
-    <main className="workspace tool-workspace combined-workspace pdf-toolkit">
+    <ToolLayout className="workspace tool-workspace combined-workspace pdf-toolkit">
       <div className="tool-heading">
-        <Link className="back" href="/">
+        <Button as={Link} className="back" href="/">
           <Icon name="grid2x2" />
           All tools
-        </Link>
+        </Button>
 
         <h1>{heading}</h1>
         <p className="intro">
@@ -67,7 +68,7 @@ export default function CombinedWorkspace({ heading }) {
         </p>
         <TrustBadges toolId="pdf-toolkit" />
       </div>
-      <section className="combined-start" aria-label="PDF tasks">
+      <Card className="combined-start" aria-label="PDF tasks">
         <h2>What would you like to do?</h2>
         <div
           className="pdf-task-grid"
@@ -75,7 +76,7 @@ export default function CombinedWorkspace({ heading }) {
           aria-label="Choose a PDF task"
         >
           {operations.map((item) => (
-            <button
+            <Button
               key={item[0]}
               type="button"
               aria-pressed={selected === item[0]}
@@ -92,7 +93,7 @@ export default function CombinedWorkspace({ heading }) {
                   ✓
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
         <div className="pdf-task-help">
@@ -115,7 +116,7 @@ export default function CombinedWorkspace({ heading }) {
             ? "Processing your files. Task switching will be available when finished."
             : notice}
         </p>
-      </section>
+      </Card>
       {selected === "pdf-workbench" ? (
         <PdfWorkbench
           files={files}
@@ -133,6 +134,6 @@ export default function CombinedWorkspace({ heading }) {
         />
       )}
       <ToolGuide id="pdf-toolkit" />
-    </main>
+    </ToolLayout>
   );
 }

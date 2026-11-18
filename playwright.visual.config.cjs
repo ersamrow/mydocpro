@@ -6,7 +6,8 @@ module.exports = defineConfig({
   workers: 1,
   reporter: "list",
   use: {
-    baseURL: process.env.TEST_URL || "http://127.0.0.1:3000",
+    baseURL: process.env.TEST_URL || "http://127.0.0.1:4173",
+    serviceWorkers: "block",
     launchOptions: {
       executablePath:
         process.env.CHROME_PATH ||
@@ -18,7 +19,14 @@ module.exports = defineConfig({
     toHaveScreenshot: { animations: "disabled", maxDiffPixelRatio: 0.005 },
   },
   projects: [
-    { name: "mobile", use: { viewport: { width: 390, height: 900 } } },
+    {
+      name: "mobile",
+      use: {
+        viewport: { width: 390, height: 900 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
     { name: "desktop", use: { viewport: { width: 1440, height: 1000 } } },
   ],
 });

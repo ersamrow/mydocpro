@@ -1,5 +1,17 @@
 # MyDocPro — Next.js
 
+## Shared interface
+
+Use `components/ui.js` for `Button`, `Card`, `ToolLayout`, `ActionBar` and
+`FileRow`. Their styles live in `src/ui.css`, using `src/theme-tokens.css`.
+Page CSS should describe unique controls and geometry, such as crop handles or
+PDF thumbnails, rather than redefine shared buttons, cards or floating bars.
+
+`Button` defaults to `type="button"`; use `type="submit"` explicitly for form
+submission, `as="a"` for downloads, and `as={Link}` for navigation. Render an
+`ActionBar` only after selecting a file. Keep editing preferences outside it so
+the floating status and download controls remain compact on mobile.
+
 All 24 public pages and the 404 page render as React components. The home page, navigation, information pages, tool settings, upload controls, image previews, crop/resize editor, PDF editor, download controls and install dialog use React state and effects. There is no legacy HTML-string application or PHP backend.
 
 ## Combined workspaces
@@ -11,6 +23,13 @@ Open `/pdf-toolkit` for all existing PDF operations. Choose an operation, upload
 The image tools accept JPG, PNG, WebP and HEIC/HEIF. HEIC decoding loads a self-hosted WASM decoder only when needed and uses the first image/frame. Background cleanup uses a feathered, edge-connected colour tolerance; signature paper cleanup has its own threshold. The PDF Toolkit includes merge, split, compression, image conversion, and page organization; it does not provide OCR, PDF text editing, or password management.
 
 ## Run
+
+Run `npm run test:all` for a fresh production build, syntax checks, unit tests,
+all browser suites and desktop/mobile screenshot comparisons. The runner starts
+and stops its own local server and writes results to `ui-audit/checks/results.json`.
+Set `CHROME_PATH` if Chrome is installed outside the default Windows location.
+Visual baselines are updated deliberately with `npm run test:visual -- --update-snapshots`
+against a running production server (`TEST_URL`), after reviewing the screenshots.
 
 Requires Node.js 20.9+; Node.js 22 LTS is recommended.
 

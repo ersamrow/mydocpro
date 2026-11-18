@@ -51,12 +51,15 @@ export default function PwaControls() {
         setReady(available);
         setFailed(!available);
       }
-      statusTimer = setTimeout(() => finish(false), 10000);
+      statusTimer = setTimeout(
+        () => finish(worker.state === "activated"),
+        10000,
+      );
       statusPort.onmessage = (e) => finish(e.data?.ready === true);
       try {
         worker.postMessage({ type: "OFFLINE_STATUS" }, [channel.port2]);
       } catch {
-        finish(false);
+        finish(worker.state === "activated");
       }
     }
     listen(window, "online", () => {
@@ -87,6 +90,15 @@ export default function PwaControls() {
       if (!("serviceWorker" in navigator) || !window.isSecureContext)
         setFailed(true);
       else {
+        navigator.serviceWorker.ready.then((reg) => {
+          if (disposed) return;
+          registration = reg;
+          if (reg.active || navigator.serviceWorker.controller) {
+            setReady(true);
+            setFailed(false);
+            check();
+          }
+        });
         listen(navigator.serviceWorker, "controllerchange", () => check());
         const register = () =>
           navigator.serviceWorker
@@ -135,8 +147,8 @@ export default function PwaControls() {
   }, []);
   const status = ready
     ? online
-      ? "Ready offline"
-      : "Offline · tools ready"
+      ? "✓ Works offline"
+      : "✓ Works offline"
     : !online
       ? "Offline · setup incomplete"
       : process.env.NODE_ENV !== "production"
@@ -163,7 +175,9 @@ export default function PwaControls() {
           aria-label={`App and offline status: ${status}`}
           onClick={() => dialog.current.showModal()}
         >
-          <span data-app-status role="status" key={status}>{status}</span>
+          <span data-app-status role="status" key={status}>
+            {status}
+          </span>
         </button>
       </div>
       <dialog

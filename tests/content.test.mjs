@@ -32,7 +32,11 @@ test("React renders interactive controls before hydration and 404 is non-indexab
   const html = await readFile(new URL("resize-image.html", root), "utf8");
   assert.match(html, /id="upload"/);
   assert.match(html, /id="width"/);
-  assert.match(html, /id="process"/);
+  assert.doesNotMatch(
+    html,
+    /id="process"/,
+    "processing controls require a selected file",
+  );
   const contact = await readFile(new URL("contact.html", root), "utf8");
   assert.match(contact, /action="\/api\/contact"/);
   assert.match(contact, /name="message"/);

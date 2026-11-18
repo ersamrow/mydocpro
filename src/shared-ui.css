@@ -326,18 +326,18 @@ body {
   #app .site-header {
     height: 76px;
     min-height: 76px;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     gap: 8px;
     padding: 8px 12px;
   }
   #app .site-header .header-identity {
-    grid-column: 1;
+    grid-column: 2;
   }
   #app .site-header .mobile-menu-toggle {
     display: flex;
     align-items: center;
     gap: 5px;
-    grid-column: 2;
+    grid-column: 1;
     grid-row: 1;
     padding: 8px;
     min-height: 44px;

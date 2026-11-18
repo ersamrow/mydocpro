@@ -535,6 +535,37 @@
     display: block;
     margin-right: auto;
   }
+  .tool-workspace:not(.merge-workspace) .tool-panel.has-files .file-list li {
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 4px 8px;
+  }
+  .tool-workspace:not(.merge-workspace)
+    .file-list
+    li
+    > span:not(.merge-file-icon) {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tool-workspace:not(.merge-workspace) .file-list li small {
+    flex: 0 0 auto;
+    margin-right: 0;
+    white-space: nowrap;
+  }
+  .tool-workspace:not(.merge-workspace)
+    .file-list
+    li
+    > button.secondary {
+    display: grid;
+    flex: 0 0 44px;
+    place-items: center;
+    width: 44px;
+    padding: 0;
+  }
   .tool-workspace .workpanel .process-actions {
     gap: 8px;
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom));

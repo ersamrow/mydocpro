@@ -775,21 +775,16 @@ export default function Workspace({
               </details>
             </SettingsGroup>
             {notices[id] && <p className="notice">{notices[id]}</p>}
-            <div
-              className="process-actions"
-              ref={actionsRef}
-              hidden={!files.length}
-            >
-              <p
-                className="output-summary"
-                id="output-summary"
-                aria-live="polite"
-                hidden={false}
-              >
-                {outputs.length > 0 && !busy
-                  ? `${outputs.length} ${outputs.length === 1 ? "file" : "files"} ready to download${error ? " · Some files could not be completed" : ""}`
-                  : !files.length
-                    ? "Choose a file above to get started."
+            {files.length > 0 && (
+              <div className="process-actions" ref={actionsRef}>
+                <p
+                  className="output-summary"
+                  id="output-summary"
+                  aria-live="polite"
+                  hidden={false}
+                >
+                  {outputs.length > 0 && !busy
+                    ? `${outputs.length} ${outputs.length === 1 ? "file" : "files"} ready to download${error ? " · Some files could not be completed" : ""}`
                     : !isPdf
                       ? `${files.length} ${files.length === 1 ? "image" : "images"} ready · Review settings, then save.`
                       : (pdf.error ? "Choose another PDF to continue." : "") ||
@@ -799,48 +794,49 @@ export default function Workspace({
                               ? "Add one more PDF to merge."
                               : rangeError) ||
                             `${count} ${count === 1 ? "page" : "pages"} ${id === "compress-pdf" ? "to compress" : id === "merge-pdf" ? "to merge" : "selected"}`)}
-              </p>
-              {isMerge && (
+                </p>
+                {isMerge && (
+                  <button
+                    className="secondary merge-add-files"
+                    disabled={busy || validating}
+                    onClick={() => {
+                      replace.current = false;
+                      upload.current.click();
+                    }}
+                  >
+                    <Icon name="upload" />
+                    Add PDFs
+                  </button>
+                )}
                 <button
-                  className="secondary merge-add-files"
-                  disabled={busy || validating}
-                  onClick={() => {
-                    replace.current = false;
-                    upload.current.click();
-                  }}
+                  className="primary"
+                  id="process"
+                  hidden={outputs.length > 0 && !busy && !error}
+                  disabled={disabled}
+                  onClick={run}
+                  aria-describedby="output-summary"
                 >
-                  <Icon name="upload" />
-                  Add PDFs
+                  <Icon name="wand-sparkles" />
+                  {busy ? "Processing…" : actionLabels[id] || "Save result"}
                 </button>
-              )}
-              <button
-                className="primary"
-                id="process"
-                hidden={outputs.length > 0 && !busy && !error}
-                disabled={disabled}
-                onClick={run}
-                aria-describedby="output-summary"
-              >
-                <Icon name="wand-sparkles" />
-                {busy ? "Processing…" : actionLabels[id] || "Save result"}
-              </button>
-              {outputs.length > 0 && !busy && (
-                <DownloadActions outputs={outputs} />
-              )}
-              {busy && (
-                <button
-                  className="secondary cancel-processing"
-                  disabled={cancelling}
-                  onClick={() => {
-                    controller.current?.abort();
-                    setCancelling(true);
-                    setStatus("Cancelling… finishing the current operation.");
-                  }}
-                >
-                  {cancelling ? "Cancelling…" : "Cancel processing"}
-                </button>
-              )}
-            </div>
+                {outputs.length > 0 && !busy && (
+                  <DownloadActions outputs={outputs} />
+                )}
+                {busy && (
+                  <button
+                    className="secondary cancel-processing"
+                    disabled={cancelling}
+                    onClick={() => {
+                      controller.current?.abort();
+                      setCancelling(true);
+                      setStatus("Cancelling… finishing the current operation.");
+                    }}
+                  >
+                    {cancelling ? "Cancelling…" : "Cancel processing"}
+                  </button>
+                )}
+              </div>
+            )}
             {busy && (
               <progress
                 className="processing-progress"

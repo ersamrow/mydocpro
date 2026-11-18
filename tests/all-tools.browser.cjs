@@ -43,6 +43,14 @@ const path = require("node:path");
       }
       await page.locator(`.card[href="/${id}"]`).click();
       await page.locator("#upload").waitFor();
+      if (id === "compress-image") {
+        await page.setViewportSize({ width: 390, height: 844 });
+        assert.equal(
+          await page.locator(".process-actions").count(),
+          0,
+          "compress action bar is absent before a file is selected",
+        );
+      }
       assert.equal(
         await page.evaluate(() => window.navigationSentinel),
         42,
@@ -94,6 +102,23 @@ const path = require("node:path");
       await page.waitForFunction(
         () => !document.querySelector("#process").disabled,
       );
+      if (id === "compress-image") {
+        assert.equal(await page.locator(".process-actions").count(), 1);
+        const fileRow = await page
+          .locator(".file-list li")
+          .first()
+          .boundingBox();
+        const removeButton = await page
+          .locator('.file-list li button[aria-label^="Remove "]')
+          .first()
+          .boundingBox();
+        assert.ok(fileRow.height <= 56, "mobile file row stays compact");
+        assert.ok(
+          removeButton.width >= 44 && removeButton.height >= 44,
+          "mobile remove button remains an accessible touch target",
+        );
+        await page.setViewportSize({ width: 1280, height: 900 });
+      }
       await page.locator("#process").click();
       await page
         .locator("#outputs a[download]")

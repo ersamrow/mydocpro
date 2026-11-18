@@ -8,7 +8,9 @@ export default function Header({ id }) {
   const router = useRouter();
   const category = tools.find((tool) => tool[0] === id)?.[3];
   const [hash, setHash] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setHash(router.asPath.split("#")[1] || ""), [router.asPath]);
+  useEffect(() => setMenuOpen(false), [router.asPath]);
   const active =
     category || (["image", "pdf"].includes(hash) ? hash : !id ? "all" : null);
   return (
@@ -17,7 +19,22 @@ export default function Header({ id }) {
         <Logo />
         <span className="header-tagline">A little less paperwork.</span>
       </div>
-      <nav aria-label="Main navigation">
+      <button
+        type="button"
+        className="mobile-menu-toggle"
+        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+        aria-expanded={menuOpen}
+        aria-controls="main-navigation"
+        onClick={() => setMenuOpen((v) => !v)}
+      >
+        <Icon name="menu" />
+        <span>Menu</span>
+      </button>
+      <nav
+        id="main-navigation"
+        className={menuOpen ? "mobile-nav-open" : ""}
+        aria-label="Main navigation"
+      >
         {[
           ["all", "/#tools", "All tools", "grid2x2"],
           ["image", "/#image", "Images", "image"],

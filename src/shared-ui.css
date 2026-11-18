@@ -268,3 +268,129 @@ body {
   background: var(--ui-green);
   border-color: var(--ui-surface);
 }
+
+/* Compact controls use the same sidebar as the live preview. */
+.preview-settings-workspace
+  .has-files
+  .merge-controls
+  > .compress-settings-panel {
+  grid-column: 2;
+  grid-row: 3;
+  min-width: 0;
+}
+.compress-quick-settings {
+  margin-bottom: 12px;
+}
+.compress-quick-settings .settings {
+  max-width: none;
+}
+.compress-workspace .setting-presets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.compress-workspace .compress-settings-panel .tool-settings-details {
+  margin: 0;
+}
+.result-warning {
+  color: var(--ui-warning);
+}
+.tool-workspace .process-actions[hidden] {
+  display: none;
+}
+.dropzone-touch-title {
+  display: none;
+}
+.site-header .mobile-menu-toggle {
+  display: none;
+}
+@media (pointer: coarse) {
+  .dropzone-desktop-title {
+    display: none;
+  }
+  .dropzone-touch-title {
+    display: block;
+  }
+}
+@media (max-width: 950px) {
+  .preview-settings-workspace
+    .has-files
+    .merge-controls
+    > .compress-settings-panel {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+@media (max-width: 479px) {
+  html:root {
+    scroll-padding-top: 84px;
+  }
+  #app .site-header {
+    height: 76px;
+    min-height: 76px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  #app .site-header .header-identity {
+    grid-column: 1;
+  }
+  #app .site-header .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    grid-column: 2;
+    grid-row: 1;
+    padding: 8px;
+    min-height: 44px;
+    color: var(--ui-focus-inverse);
+    background: transparent;
+    border-color: currentColor;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: var(--ui-radius-control);
+    width: 44px;
+    justify-content: center;
+  }
+  #app .site-header .mobile-menu-toggle span {
+    display: none;
+  }
+  #app .site-header .brand {
+    font-size: 18px;
+    gap: 6px;
+  }
+  #app .site-header .brand .brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+  #app .site-header .mobile-menu-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+  #app .site-header .app-controls {
+    grid-column: 3;
+    grid-row: 1;
+    max-width: 112px;
+  }
+  #app .site-header nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 12px;
+    right: 12px;
+    padding: 8px;
+    grid-template-columns: 1fr 1fr;
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-control);
+    box-shadow: 0 8px 24px #183b3320;
+  }
+  #app .site-header nav.mobile-nav-open {
+    display: grid;
+  }
+  #app .site-header nav a {
+    color: var(--ui-ink);
+  }
+  #app .site-header nav a.nav-active {
+    color: var(--ui-green);
+    background: var(--ui-soft);
+  }
+}

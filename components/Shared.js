@@ -31,8 +31,10 @@ import {
   ArrowLeft,
   Upload,
   WandSparkles,
+  Menu,
 } from "lucide-react";
 const icons = {
+  Menu,
   Files,
   ShieldCheck,
   Check,
@@ -116,7 +118,10 @@ export function Footer({ examLinks }) {
       <div className="footer-identity">
         <Logo />
         <p>Made for your everyday paperwork. Built for your privacy.</p>
-        <p>MyDocPro is free to use. No account, no watermark, and your files stay on your device.</p>
+        <p>
+          MyDocPro is free to use. No account, no watermark, and your files stay
+          on your device.
+        </p>
         <WhatsAppChannel />
       </div>
       <nav aria-labelledby="footer-projects">
@@ -125,7 +130,14 @@ export function Footer({ examLinks }) {
           <a href="https://greetlo.in/">
             <strong>
               <span className="footer-product-brand">
-                <img src="/brand/greetlo-logo.webp" alt="Greetlo" width="640" height="234" loading="lazy" decoding="async" />
+                <img
+                  src="/brand/greetlo-logo.webp"
+                  alt="Greetlo"
+                  width="640"
+                  height="234"
+                  loading="lazy"
+                  decoding="async"
+                />
               </span>
               <ArrowUpRight aria-hidden="true" />
             </strong>
@@ -134,7 +146,14 @@ export function Footer({ examLinks }) {
           <a href="https://myledgerpro.in/">
             <strong>
               <span className="footer-product-brand">
-                <img src="/brand/myledgerpro-logo.png" alt="" width="512" height="512" loading="lazy" decoding="async" />
+                <img
+                  src="/brand/myledgerpro-logo.png"
+                  alt=""
+                  width="512"
+                  height="512"
+                  loading="lazy"
+                  decoding="async"
+                />
                 MyLedgerPro
               </span>
               <ArrowUpRight aria-hidden="true" />

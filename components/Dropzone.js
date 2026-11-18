@@ -44,7 +44,10 @@ export default function Dropzone({
     >
       <Upload className={styles.icon} aria-hidden="true" />
       <span className={styles.copy}>
-        <strong>{title}</strong>
+        <strong className="dropzone-desktop-title">{title}</strong>
+        <strong className="dropzone-touch-title">
+          {accept?.includes("image") ? "Choose images" : "Choose PDFs"}
+        </strong>
         {hint && <span id={hintId}>{hint}</span>}
       </span>
       <input

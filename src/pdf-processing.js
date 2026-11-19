@@ -1,11 +1,13 @@
 import { checkpoint, throwIfCancelled } from "./file-validation.js";
 import { pageIndices } from "./page-indices.js";
 import { pdfRenderer } from "./processing.js";
+import { jpegWithRgbProfile, setImageDensity } from "./image-metadata.js";
 import {
   loadImage,
   draw,
   encodeCanvas,
   compressCanvasToTarget,
+  byteBudget,
 } from "./image-processing.js";
 
 const pdfBlob = (bytes) => new Blob([bytes], { type: "application/pdf" });
@@ -53,12 +55,26 @@ async function renderPage(doc, number, dpi, signal) {
   }
 }
 
-// Only ordinary RGB/gray images are recompressed. Masks, custom color spaces,
+// RGB/gray images and ICC RGB JPEGs are recompressed. Masks, other color spaces,
 // decode arrays and predictor streams stay intact so text and artwork survive.
 async function recompressImages(input, dpi, quality, signal, onStatus) {
-  const { PDFDocument, PDFName, PDFRawStream, decodePDFRawStream } =
+  const { PDFDocument, PDFName, PDFArray, PDFRawStream, decodePDFRawStream } =
     await import("pdf-lib");
   const pdf = await PDFDocument.load(input, { updateMetadata: false });
+  // An image can be shared across pages. Bound it using the largest physical
+  // page rather than assuming A4; placement-specific effective DPI remains an
+  // estimate without interpreting every page's image transformation matrix.
+  const longestPageInches = pdf.getPages().reduce((longest, page) => {
+    const unit = page.node.lookup(PDFName.of("UserUnit"))?.asNumber?.() || 1;
+    const size = page.getSize();
+    return Math.max(
+      longest,
+      (Math.max(size.width, size.height) *
+        (Number.isFinite(unit) && unit > 0 ? unit : 1)) /
+        72,
+    );
+  }, 0);
+  const maxImageSide = Math.max(1, Math.ceil(dpi * longestPageInches));
   let changed = 0;
   let seen = 0;
   for (const [ref, object] of pdf.context.enumerateIndirectObjects()) {
@@ -75,7 +91,22 @@ async function recompressImages(input, dpi, quality, signal, onStatus) {
     )
       continue;
     const space = read("ColorSpace");
-    if (space !== PDFName.of("DeviceRGB") && space !== PDFName.of("DeviceGray"))
+    const profile =
+      space instanceof PDFArray &&
+      space.size() === 2 &&
+      space.lookup(0) === PDFName.of("ICCBased")
+        ? space.lookup(1)
+        : null;
+    const iccRgb =
+      profile instanceof PDFRawStream &&
+      profile.dict.lookup(PDFName.of("N"))?.asNumber?.() === 3 &&
+      !profile.dict.has(PDFName.of("Range")) &&
+      !profile.dict.has(PDFName.of("DecodeParms"));
+    if (
+      space !== PDFName.of("DeviceRGB") &&
+      space !== PDFName.of("DeviceGray") &&
+      !iccRgb
+    )
       continue;
     if (read("BitsPerComponent")?.asNumber?.() !== 8) continue;
     const width = read("Width")?.asNumber?.(),
@@ -88,6 +119,7 @@ async function recompressImages(input, dpi, quality, signal, onStatus) {
     )
       continue;
     const filter = read("Filter");
+    if (iccRgb && filter !== PDFName.of("DCTDecode")) continue;
     if (
       filter !== PDFName.of("DCTDecode") &&
       filter !== PDFName.of("FlateDecode")
@@ -101,11 +133,16 @@ async function recompressImages(input, dpi, quality, signal, onStatus) {
     try {
       if (filter === PDFName.of("DCTDecode")) {
         const image = await loadImage(
-          new Blob([object.contents], { type: "image/jpeg" }),
+          iccRgb
+            ? jpegWithRgbProfile(
+                object.contents,
+                decodePDFRawStream(profile).getBytes(4 * 1024 * 1024 + 1),
+              )
+            : new Blob([object.contents], { type: "image/jpeg" }),
         );
         const scale = Math.min(
           1,
-          (dpi * 11.7) / Math.max(image.width, image.height),
+          maxImageSide / Math.max(image.width, image.height),
         );
         canvas = draw(
           image,
@@ -129,7 +166,7 @@ async function recompressImages(input, dpi, quality, signal, onStatus) {
           rgba.data[i * 4 + 3] = 255;
         }
         context.putImageData(rgba, 0, 0);
-        const scale = Math.min(1, (dpi * 11.7) / Math.max(width, height));
+        const scale = Math.min(1, maxImageSide / Math.max(width, height));
         if (scale < 1) {
           const smaller = draw(
             canvas,
@@ -189,14 +226,12 @@ async function rasterPdf(doc, dpi, quality, signal, onStatus) {
     try {
       const encoded = await encodeCanvas(canvas, "image/jpeg", quality);
       const image = await out.embedJpg(await encoded.arrayBuffer());
-      out
-        .addPage([view.width, view.height])
-        .drawImage(image, {
-          x: 0,
-          y: 0,
-          width: view.width,
-          height: view.height,
-        });
+      out.addPage([view.width, view.height]).drawImage(image, {
+        x: 0,
+        y: 0,
+        width: view.width,
+        height: view.height,
+      });
     } finally {
       canvas.width = canvas.height = 1;
     }
@@ -339,14 +374,12 @@ async function imagesToPdf(files, values, signal, onStatus) {
           throw Error(
             "The margins leave no room for this image. Choose a smaller margin.",
           );
-        pdf
-          .addPage(dims)
-          .drawImage(image, {
-            x: (dims[0] - image.width * factor) / 2,
-            y: (dims[1] - image.height * factor) / 2,
-            width: image.width * factor,
-            height: image.height * factor,
-          });
+        pdf.addPage(dims).drawImage(image, {
+          x: (dims[0] - image.width * factor) / 2,
+          y: (dims[1] - image.height * factor) / 2,
+          width: image.width * factor,
+          height: image.height * factor,
+        });
       } finally {
         canvas.width = canvas.height = 1;
       }
@@ -416,13 +449,38 @@ export async function processPdf(
         );
         const canvas = await renderPage(doc, index + 1, dpi, signal);
         try {
-          const encoded = target
-            ? await compressCanvasToTarget(canvas, target, {
-                type: values.format,
-                signal,
-                maxQuality: 0.94,
-              })
+          // Density metadata is part of the upload size, so keep room for it
+          // inside the same 3% safety margin as the encoded image.
+          let encoded = target
+            ? await compressCanvasToTarget(
+                canvas,
+                (byteBudget(target) - 32) / 1000,
+                {
+                  type: values.format,
+                  signal,
+                  maxQuality: 0.94,
+                  headroom: 1,
+                },
+              )
             : await encodeCanvas(canvas, values.format);
+          if (["image/jpeg", "image/png"].includes(encoded.type)) {
+            let density = dpi;
+            if (target) {
+              const image = await loadImage(encoded);
+              // A smaller raster still represents the same physical PDF page.
+              density = Math.max(
+                1,
+                Math.round(
+                  dpi *
+                    Math.min(
+                      image.width / canvas.width,
+                      image.height / canvas.height,
+                    ),
+                ),
+              );
+            }
+            encoded = await setImageDensity(encoded, density);
+          }
           total += encoded.size;
           if (total > 150 * 1048576)
             throw Error(

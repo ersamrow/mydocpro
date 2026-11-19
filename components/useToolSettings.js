@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { defaults, fields } from "../src/tool-settings.js";
+import { resizeUnitPatch } from "../src/settings-ui.js";
+import { resizeFieldProps } from "../src/image-dimensions.js";
 const prefix = "mydocpro:preferences:";
 function safePreferences(id, raw) {
   const result = {};
@@ -14,7 +16,10 @@ function safePreferences(id, raw) {
       ["number", "range"].includes(f.type) &&
       v.trim() &&
       Number.isFinite(+v) &&
-      +v >= f.min &&
+      +v >=
+        (id === "resize-image"
+          ? (resizeFieldProps(f.id, raw).min ?? f.min)
+          : f.min) &&
       +v <= f.max
     )
       result[f.id] = v;
@@ -68,7 +73,12 @@ export default function useToolSettings(id, onEdit) {
   }, [id, values, remember, loaded]);
   const onValues = useCallback(
     (patch) => {
-      const next = { ...current.current, ...patch };
+      const next = {
+        ...current.current,
+        ...(id === "resize-image"
+          ? resizeUnitPatch(current.current, patch)
+          : patch),
+      };
       if (JSON.stringify(next) === JSON.stringify(current.current)) return;
       const now = Date.now();
       if (now - lastEdit.current > 600 || !history.current.length) {
@@ -80,7 +90,7 @@ export default function useToolSettings(id, onEdit) {
       setValues(next);
       editRef.current();
     },
-    [setValues],
+    [id, setValues],
   );
   const undo = () => {
     const previous = history.current.pop();

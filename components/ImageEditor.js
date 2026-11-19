@@ -11,17 +11,30 @@ export function BlobImage({ blob, ...props }) {
   }, [blob]);
   return url ? <img {...props} src={url} /> : null;
 }
-export default function ImageEditor({ files, id, values, onValues, busy }) {
+export default function ImageEditor({
+  files,
+  id,
+  values,
+  onValues,
+  busy,
+  compact = false,
+}) {
   const [result, setResult] = useState(null),
     [note, setNote] = useState(""),
     [updating, setUpdating] = useState(false),
-    [compare, setCompare] = useState(false);
+    [compare, setCompare] = useState(false),
+    [previewSize, setPreviewSize] = useState(null);
   const sourceOnly = id === "jpg-to-pdf";
   const hasManipulator = ["crop-image", "resize-image"].includes(id);
   const ResultContainer = hasManipulator ? "details" : "div";
   const previewQueue = useRef(Promise.resolve());
   useEffect(() => {
     let disposed = false;
+    if (!sourceOnly && !busy) {
+      setResult(null);
+      setUpdating(true);
+      setNote("Updating preview…");
+    }
     const timer = setTimeout(() => {
       // Serialize large canvas operations; obsolete queued previews never run.
       previewQueue.current = previewQueue.current
@@ -55,6 +68,38 @@ export default function ImageEditor({ files, id, values, onValues, busy }) {
       clearTimeout(timer);
     };
   }, [id, files, values, busy, sourceOnly]);
+  if (compact)
+    return (
+      <figure
+        className="ui-live-preview"
+        aria-label="Live output preview"
+        aria-busy={updating}
+      >
+        <figcaption>
+          Live output preview
+          {previewSize?.blob === result &&
+            ` · ${previewSize.width} × ${previewSize.height} px`}
+        </figcaption>
+        <div className="image-edit-stage">
+          {result && (
+            <BlobImage
+              blob={result}
+              alt="Preview with current editing settings"
+              onLoad={(event) =>
+                setPreviewSize({
+                  blob: result,
+                  width: event.currentTarget.naturalWidth,
+                  height: event.currentTarget.naturalHeight,
+                })
+              }
+            />
+          )}
+        </div>
+        <p className="image-preview-note" role="status">
+          {note} Apply this edit to update your download.
+        </p>
+      </figure>
+    );
   return (
     <section
       id="image-previews"

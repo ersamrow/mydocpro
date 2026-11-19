@@ -139,8 +139,8 @@ export const guides = {
   ],
   "white-background": [
     "Whiten a border-connected background",
-    "Start with a plain background visible around the image edges. The tool samples its border colour and whitens similar pixels connected to the border, with a softened edge. Enclosed areas are retained unless a connected path reaches them.",
-    "Start with the default tolerance of 35 and adjust gradually. Higher tolerance includes more colour variation; lower tolerance protects similar-coloured subject details. Uneven shadows or patterned backgrounds may require a cleaner original photo.",
+    "Start with a plain background visible around the image edges. The tool samples the dominant border colour and whitens similar pixels connected to the border, with a softened edge. Enclosed areas are retained unless a connected path reaches them.",
+    "Start with the default tolerance of 35 and adjust gradually. Higher tolerance includes more colour variation; lower tolerance protects similar-coloured subject details. Uneven shadows or patterned backgrounds may require a cleaner original photo. For printing, choose A4 with white space, adjust photo width and margins, and download an A4 PDF. Print at Actual size (100%).",
     "Why are parts of my subject disappearing?",
     "This is colour-based flood fill, not person segmentation. If clothing or skin connects to a similar-coloured border, it can be included. Lower tolerance or use a more distinct plain background, then compare the result with your original.",
     "crop-image",

@@ -50,6 +50,51 @@ body {
 #app :is(input, select, textarea):disabled {
   cursor: not-allowed;
 }
+/* Keep native semantics and keyboard handling while theming the open picker.
+   Older browsers retain their standard system picker. */
+@supports (appearance: base-select) {
+  #app select:not([multiple]):not([size]),
+  #app select:not([multiple]):not([size])::picker(select) {
+    appearance: base-select;
+  }
+  #app select:not([multiple]):not([size]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: var(--ui-control-height);
+    padding: 8px 12px;
+  }
+  #app select::picker(select) {
+    border: 1px solid var(--ui-input-border);
+    border-radius: var(--ui-radius-control);
+    padding: 4px;
+    background: var(--ui-surface);
+    color: var(--ui-ink);
+    box-shadow: 0 6px 20px #123d2f1a;
+    max-height: min(320px, 70vh);
+    overflow-y: auto;
+  }
+  #app select::picker-icon {
+    color: var(--ui-green);
+  }
+  #app select option {
+    min-height: var(--ui-control-height);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font: inherit;
+  }
+  #app select option:is(:hover, :focus-visible) {
+    background: var(--ui-soft);
+    color: var(--ui-ink);
+    outline: none;
+  }
+  #app select option:checked {
+    background: var(--ui-green);
+    color: var(--ui-surface);
+    font-weight: 600;
+  }
+}
 #app
   :is(
     input[type="checkbox"],

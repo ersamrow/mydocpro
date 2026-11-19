@@ -1,5 +1,6 @@
 import { throwIfCancelled, checkpoint } from "./file-validation.js";
 import { setImageDensity } from "./image-metadata.js";
+import { pixelsPerUnit } from "./image-dimensions.js";
 import heifPackage from "libheif-js/package.json" with { type: "json" };
 function canvas(w, h) {
   w = Math.round(w);
@@ -15,7 +16,8 @@ function canvas(w, h) {
 }
 const blob = async (c, type = "image/jpeg", q = 0.92, signal) => {
   if (!["image/jpeg", "image/png", "image/webp"].includes(type)) {
-    const { encodeRaster: encodeAdditionalFormat } = await import("./raster-output-codecs.js");
+    const { encodeRaster: encodeAdditionalFormat } =
+      await import("./raster-output-codecs.js");
     return encodeAdditionalFormat(c, type, q, signal);
   }
   return new Promise((resolve, reject) =>
@@ -142,6 +144,46 @@ export function draw(
   }
   return c;
 }
+// Render the same 300 DPI A4 canvas for preview, raster download and PDF.
+function onA4Page(source, widthMm, marginMm, position) {
+  const pixelsPerMm = 300 / 25.4;
+  const page = canvas(210 * pixelsPerMm, 297 * pixelsPerMm);
+  const context = page.getContext("2d");
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, page.width, page.height);
+  const fit = Math.min(
+    (Math.min(widthMm, 210 - marginMm * 2) * pixelsPerMm) / source.width,
+    ((297 - marginMm * 2) * pixelsPerMm) / source.height,
+  );
+  const width = source.width * fit,
+    height = source.height * fit;
+  context.drawImage(
+    source,
+    (page.width - width) / 2,
+    position === "center" ? (page.height - height) / 2 : marginMm * pixelsPerMm,
+    width,
+    height,
+  );
+  source.width = source.height = 1;
+  return page;
+}
+async function a4Pdf(source, signal) {
+  const { PDFDocument } = await import("pdf-lib");
+  throwIfCancelled(signal);
+  const pdf = await PDFDocument.create();
+  const image = await pdf.embedJpg(
+    await (await blob(source, "image/jpeg", 0.94, signal)).arrayBuffer(),
+  );
+  const page = pdf.addPage([595.28, 841.89]);
+  page.drawImage(image, {
+    x: 0,
+    y: 0,
+    width: page.getWidth(),
+    height: page.getHeight(),
+  });
+  throwIfCancelled(signal);
+  return new Blob([await pdf.save()], { type: "application/pdf" });
+}
 export async function compress(
   c,
   kb,
@@ -227,17 +269,24 @@ export function whitenPaper(c, threshold, darkenInk = false) {
 // Flood from the outer edge only: similarly coloured pixels inside a subject
 // are not background unless connected to that edge.
 export async function whitenConnectedBackground(c, tolerance, signal) {
+  throwIfCancelled(signal);
   const context = c.getContext("2d"),
     pixels = context.getImageData(0, 0, c.width, c.height);
   const data = pixels.data,
     width = c.width,
     height = c.height,
     count = width * height;
-  const samples = [[], [], []];
+  // Keep RGB colours together. Independent channel medians can invent a
+  // colour absent from the border when hair or clothing touches the edges.
+  const samples = new Map();
   const sample = (index) => {
-    for (let channel = 0; channel < 3; channel++)
-      samples[channel].push(data[index * 4 + channel]);
+    const colour = Array.from(data.subarray(index * 4, index * 4 + 3));
+    const key = colour.join(",");
+    const existing = samples.get(key);
+    if (existing) existing.count++;
+    else samples.set(key, { colour, count: 1 });
   };
+  // Fewer than 1,024 samples, independent of input resolution.
   const stride = Math.max(1, Math.floor((width + height) / 256));
   for (let x = 0; x < width; x += stride) {
     sample(x);
@@ -247,9 +296,31 @@ export async function whitenConnectedBackground(c, tolerance, signal) {
     sample(y * width);
     sample(y * width + width - 1);
   }
-  const colour = samples.map(
-    (channel) => channel.sort((a, b) => a - b)[Math.floor(channel.length / 2)],
-  );
+  let dominant,
+    bestScore = -1,
+    checked = 0;
+  for (const candidate of samples.values()) {
+    if ((checked++ & 63) === 0) await checkpoint(signal);
+    let score = 0;
+    for (const sample of samples.values()) {
+      if (
+        Math.max(
+          Math.abs(candidate.colour[0] - sample.colour[0]),
+          Math.abs(candidate.colour[1] - sample.colour[1]),
+          Math.abs(candidate.colour[2] - sample.colour[2]),
+        ) <= tolerance
+      )
+        score += sample.count;
+    }
+    if (
+      score > bestScore ||
+      (score === bestScore && candidate.count > dominant.count)
+    ) {
+      dominant = candidate;
+      bestScore = score;
+    }
+  }
+  const colour = dominant.colour;
   const visited = new Uint8Array(count),
     queue = new Uint32Array(count);
   let head = 0,
@@ -301,6 +372,7 @@ export async function whitenConnectedBackground(c, tolerance, signal) {
       data[index * 4 + channel] += (255 - data[index * 4 + channel]) * blend;
     data[index * 4 + 3] = 255;
   }
+  throwIfCancelled(signal);
   context.putImageData(pixels, 0, 0);
 }
 export function formatPhotoDate(value, format = "DD-MM-YYYY") {
@@ -332,11 +404,11 @@ export async function processImage(id, files, values, preview = false, signal) {
     if (!preview) b = await compress(c, num("target", 1, 25000), false, signal);
   } else if (id === "resize-image") {
     const dpi = num("dpi", 1, 1200),
-      factor = { px: 1, cm: dpi / 2.54, mm: dpi / 25.4, in: dpi }[val("unit")];
+      factor = pixelsPerUnit(val("unit"), dpi);
     c = draw(
       im,
-      num("width", 0.1, 12000) * factor,
-      num("height", 0.1, 12000) * factor,
+      num("width", val("unit") === "px" ? 1 : 0.000001, 12000) * factor,
+      num("height", val("unit") === "px" ? 1 : 0.000001, 12000) * factor,
       val("fit"),
       type === "image/jpeg" || val("fit") === "contain" ? "#fff" : null,
     );
@@ -427,9 +499,19 @@ export async function processImage(id, files, values, preview = false, signal) {
     );
   } else if (id === "signature" || id === "white-background") {
     c = draw(im);
-    if (id === "white-background")
+    if (id === "white-background") {
       await whitenConnectedBackground(c, num("threshold", 0, 255), signal);
-    else whitenPaper(c, num("threshold", 0, 255), true);
+      if (val("printPage") === "a4" || type === "application/pdf") {
+        c = onA4Page(
+          c,
+          val("printWidth") === undefined ? 35 : num("printWidth", 20, 190),
+          val("printMargin") === undefined ? 10 : num("printMargin", 5, 40),
+          val("printPosition"),
+        );
+        outputDpi = 300;
+      }
+      if (type === "application/pdf" && !preview) return a4Pdf(c, signal);
+    } else whitenPaper(c, num("threshold", 0, 255), true);
   } else if (id === "passport-sheet") {
     const dpi = val("dpi") ? num("dpi", 72, 600) : 300;
     outputDpi = dpi;
@@ -559,23 +641,20 @@ export async function processImage(id, files, values, preview = false, signal) {
     images.forEach((image, index) =>
       context.drawImage(image, ...boxes[index].map((value) => value * scale)),
     );
-    if (type === "application/pdf" && !preview) {
-      const { PDFDocument } = await import("pdf-lib");
-      const pdf = await PDFDocument.create();
-      const image = await pdf.embedJpg(await (await blob(c)).arrayBuffer());
-      const page = pdf.addPage([595.28, 841.89]),
-        inset = 28.35;
-      const size = image.scaleToFit(
-        page.getWidth() - inset * 2,
-        page.getHeight() - inset * 2,
+    const a4 =
+      type === "application/pdf" ||
+      val("joinPage") === "a4" ||
+      (val("joinPage") !== "tight" && val("preset") === "aadhaar");
+    if (a4) {
+      c = onA4Page(
+        c,
+        val("joinWidth") === undefined ? 86 : num("joinWidth", 20, 190),
+        val("joinMargin") === undefined ? 10 : num("joinMargin", 5, 40),
+        val("joinPosition"),
       );
-      page.drawImage(image, {
-        x: (page.getWidth() - size.width) / 2,
-        y: (page.getHeight() - size.height) / 2,
-        ...size,
-      });
-      return new Blob([await pdf.save()], { type: "application/pdf" });
+      outputDpi = 300;
     }
+    if (type === "application/pdf" && !preview) return a4Pdf(c, signal);
   } else
     c = draw(
       im,

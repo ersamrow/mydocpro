@@ -1,4 +1,28 @@
 import { fields } from "./tool-settings.js";
+import { pixelsPerUnit, resizeFieldProps } from "./image-dimensions.js";
+
+// Unit-only changes preserve the requested size. Explicit dimensions (presets,
+// framing controls) are already expressed in the new unit and stay untouched.
+export function resizeUnitPatch(values, patch) {
+  if (!patch.unit || patch.unit === values.unit) return patch;
+  const dpi = Number(values.dpi) > 0 ? Number(values.dpi) : 300;
+  const factor =
+    pixelsPerUnit(values.unit, dpi) / pixelsPerUnit(patch.unit, dpi);
+  if (!Number.isFinite(factor)) return patch;
+  const next = { ...patch };
+  for (const key of ["width", "height"]) {
+    if (key in patch || !String(values[key] ?? "").trim()) continue;
+    const dimension = Number(values[key]);
+    if (!Number.isFinite(dimension) || dimension <= 0) continue;
+    const converted = dimension * factor;
+    next[key] = String(
+      patch.unit === "px"
+        ? Math.max(1, Math.round(converted))
+        : Number(converted.toFixed(6)),
+    );
+  }
+  return next;
+}
 
 export function settingsSummary(id, values) {
   return fields(id)
@@ -21,19 +45,42 @@ export function sliderBounds(key, field, values) {
   if (key === "width" || key === "height")
     max = { cm: 30, mm: 300, in: 12, px: 4000 }[values.unit] || 4000;
   return {
-    min: field.min,
+    min: resizeFieldProps(key, values).min ?? field.min,
     max: Math.min(field.max, Math.max(max, Number(values[key]) || 0)),
-    step: field.step || 1,
+    step:
+      values.unit === "px" && ["width", "height"].includes(key)
+        ? 1
+        : field.step || 1,
   };
 }
 export function visibleField(key, values) {
+  if (["printWidth", "printMargin", "printPosition"].includes(key))
+    return values.printPage === "a4" || values.format === "application/pdf";
+  if (key === "printPage" && values.format === "application/pdf") return false;
+  if (["joinWidth", "joinMargin", "joinPosition"].includes(key))
+    return (
+      values.format === "application/pdf" ||
+      values.joinPage === "a4" ||
+      (values.joinPage !== "tight" && values.preset === "aadhaar")
+    );
+  if (key === "joinPage" && values.format === "application/pdf") return false;
   return (
-    !(key === "quality" && !["image/jpeg", "image/webp", "image/avif"].includes(values.format) && values.format) &&
+    !(
+      key === "quality" &&
+      !["image/jpeg", "image/webp", "image/avif"].includes(values.format) &&
+      values.format
+    ) &&
     !(key === "every" && values.mode !== "every") &&
     !(key === "orientation" && values.pageSize === "fit")
   );
 }
 export function settingPresets(key, tool) {
+  if (key === "threshold" && tool === "white-background")
+    return [
+      ["Gentle", "15"],
+      ["Balanced", "35"],
+      ["Stronger", "60"],
+    ];
   return key === "target"
     ? tool === "compress-pdf"
       ? [

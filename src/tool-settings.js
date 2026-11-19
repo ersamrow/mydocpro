@@ -60,7 +60,11 @@ export function fields(id) {
       number("maxKB", "Max size (KB, optional)", "", 1, 25000),
     ],
     "convert-image": [
-      select("format", "Output format", conversionFormats.map(([mime, label]) => [mime, label])),
+      select(
+        "format",
+        "Output format",
+        conversionFormats.map(([mime, label]) => [mime, label]),
+      ),
       number("quality", "Quality (1–100)", 92, 1, 100),
     ],
     "crop-image": [
@@ -101,7 +105,22 @@ export function fields(id) {
         ...number("threshold", "Background tolerance (0–255)", 35, 0, 255, 1),
         type: "range",
       },
-      format(),
+      select("printPage", "Page layout", [
+        ["original", "Image only (original size)"],
+        ["a4", "A4 with white space"],
+      ]),
+      number("printWidth", "Photo width on page (mm)", 35, 20, 190),
+      number("printMargin", "Page margin (mm)", 10, 5, 40),
+      select("printPosition", "Position on page", [
+        ["top", "Top centre"],
+        ["center", "Centre of page"],
+      ]),
+      select("format", "Output format", [
+        ["image/jpeg", "JPG"],
+        ["image/png", "PNG"],
+        ["image/webp", "WebP"],
+        ["application/pdf", "A4 PDF"],
+      ]),
     ],
     "passport-sheet": [
       select("photoSize", "Photo size", [
@@ -146,6 +165,17 @@ export function fields(id) {
         ["grid", "Grid"],
       ]),
       number("spacing", "Spacing (px)", 16, 0, 500),
+      select("joinPage", "Page layout", [
+        ["auto", "Automatic (A4 for Aadhaar)"],
+        ["a4", "A4 with white space"],
+        ["tight", "Image only (no page)"],
+      ]),
+      number("joinWidth", "Combined image width (mm)", 86, 20, 190),
+      number("joinMargin", "Page margin (mm)", 10, 5, 40),
+      select("joinPosition", "Position on page", [
+        ["top", "Top centre"],
+        ["center", "Centre of page"],
+      ]),
       select("format", "Output format", [
         ["image/jpeg", "JPG"],
         ["application/pdf", "A4 PDF"],
@@ -231,7 +261,9 @@ export function validateFiles(
   for (const f of incoming) {
     const isPdf = /\.pdf$/i.test(f.name);
     const isImage =
-      /^image\/(jpeg|png|webp|heic|heif|avif|bmp|x-icon|vnd.microsoft.icon|gif)$/.test(f.type) ||
+      /^image\/(jpeg|png|webp|heic|heif|avif|bmp|x-icon|vnd.microsoft.icon|gif)$/.test(
+        f.type,
+      ) ||
       /\.(avif|bmp|ico|gif)$/i.test(f.name) ||
       /\.hei[cf]$/i.test(f.name);
     if (pdf ? !(isPdf || (allowImages && isImage)) : !isImage)

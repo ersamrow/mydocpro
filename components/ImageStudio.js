@@ -1,10 +1,13 @@
+import { visibleField } from "../src/settings-ui.js";
 import { Button, Card, ToolLayout, ActionBar } from "./ui.js";
 import TrustBadges from "./TrustBadges.js";
 import Dropzone from "./Dropzone.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Icon } from "./Shared.js";
 import ImageManipulator from "./ImageManipulator.js";
+import ImageEditor from "./ImageEditor.js";
+import { resizeFieldProps } from "../src/image-dimensions.js";
 import ToolGuide from "./ToolGuide.js";
 import { tools } from "../src/tools.js";
 import { defaults, fields, size, validateFiles } from "../src/tool-settings.js";
@@ -21,6 +24,7 @@ import {
 import { setImageDensity } from "../src/image-metadata.js";
 import { downloadName } from "../src/download-name.js";
 import { cropBox } from "../src/image-geometry.js";
+import { resizeUnitPatch } from "../src/settings-ui.js";
 
 const operations = [
   "crop-image",
@@ -76,6 +80,7 @@ const notes = {
 function Controls({ id, values, update, advanced = false }) {
   return fields(id)
     .filter((f) => f.id !== "output-name")
+    .filter((f) => !["white-background", "join-images"].includes(id) || visibleField(f.id, values))
     .filter((f) => {
       const extra =
         id === "crop-image"
@@ -86,6 +91,8 @@ function Controls({ id, values, update, advanced = false }) {
       return advanced ? extra.includes(f.id) : !extra.includes(f.id);
     })
     .map(({ id: key, label, options, value, ...props }) => {
+      if (id === "resize-image")
+        Object.assign(props, resizeFieldProps(key, values));
       const inputId = `studio-${id}-${key}`;
       if (options)
         return (
@@ -194,6 +201,7 @@ export default function ImageStudio({ heading }) {
     [future, setFuture] = useState([]);
   const [settings, setSettings] = useState(initialSettings),
     [adjust, setAdjust] = useState(adjustments);
+  const previewFiles = useMemo(() => (current ? [current] : []), [current]);
   const [effectBase, setEffectBase] = useState(null),
     [effectsPending, setEffectsPending] = useState(false);
   const effectQueue = useRef(Promise.resolve());
@@ -211,6 +219,7 @@ export default function ImageStudio({ heading }) {
     [downloadUrl, setDownloadUrl] = useState(""),
     [exportPending, setExportPending] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const uploadInput = useRef(null);
   const lock = useRef(false),
     controller = useRef(null),
@@ -353,7 +362,10 @@ export default function ImageStudio({ heading }) {
   const working = busy || effectsPending || exportPending;
   const update = (id, patch) =>
     setSettings((s) => {
-      const next = { ...s[id], ...patch };
+      const next = {
+        ...s[id],
+        ...(id === "resize-image" ? resizeUnitPatch(s[id], patch) : patch),
+      };
       if (
         id === "crop-image" &&
         ["ratio", "rotation", "zoom"].some((key) => key in patch) &&
@@ -490,7 +502,7 @@ export default function ImageStudio({ heading }) {
       if (result.type === "application/pdf") {
         setDocumentExport(result);
         setStatus(
-          "Your combined A4 PDF is ready to download. The current image remains available for further edits.",
+          "Your A4 PDF is ready to download. The current image remains available for further edits.",
         );
         return;
       }
@@ -637,6 +649,18 @@ export default function ImageStudio({ heading }) {
           </span>
         </label>
       )}
+      {current &&
+        settingsOpen &&
+        (id === "resize-image" || moreOpen) &&
+        ["resize-image", "exam-photo", "passport-sheet"].includes(id) && (
+          <ImageEditor
+            compact
+            files={previewFiles}
+            id={id}
+            values={settings[id]}
+            busy={working}
+          />
+        )}
       {notes[id] && <p>{notes[id]}</p>}
       <Button
         variant="primary"
@@ -820,7 +844,10 @@ export default function ImageStudio({ heading }) {
               </Card>
               {renderOperation("resize-image")}
             </div>
-            <details className="studio-more">
+            <details
+              className="studio-more"
+              onToggle={(event) => setMoreOpen(event.currentTarget.open)}
+            >
               <summary>
                 More tools{" "}
                 <span>

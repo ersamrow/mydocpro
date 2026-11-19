@@ -168,11 +168,11 @@ const notices = {
   "compress-pdf":
     "Text is preserved when embedded images can be compressed. Scanned PDFs may be rebuilt as images. A target size is not guaranteed; inspect the result before submitting.",
   "white-background":
-    "Whiten a plain background connected to the image edges. Adjust tolerance to include similar colours; this is not AI subject segmentation.",
+    "Start with Gentle or Balanced tolerance and compare the preview to protect subject details. Choose A4 with white space to set photo width, margins and position. Print the A4 PDF at Actual size (100%).",
   "crop-image":
     "Drag the crop area or its corners above. Use the fields for precise ratio, rotation and zoom.",
   "join-images":
-    "Choose 2–6 images. Image 1 comes first; use the arrows to reorder. Choose the Aadhaar front + back preset for two sides of a document.",
+    "Choose 2–6 images and reorder with the arrows. The Aadhaar preset leaves white space on an A4 page. Adjust image width, margins and position; print the A4 PDF at Actual size (100%).",
 };
 export default function Workspace({
   tool,
@@ -778,6 +778,9 @@ export default function Workspace({
             <SettingsGroup
               {...(sideLayout
                 ? {
+                    hidden:
+                      !files.length &&
+                      !["compress-image", "convert-image"].includes(id),
                     className:
                       "ui-options-card" +
                       (id === "compress-image"
@@ -937,7 +940,7 @@ export default function Workspace({
                             (key === "width"
                               ? Number(value) / ratio
                               : Number(value) * ratio
-                            ).toFixed(values.unit === "px" ? 0 : 3),
+                            ).toFixed(values.unit === "px" ? 0 : 6),
                           ),
                         );
                     }

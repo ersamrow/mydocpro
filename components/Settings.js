@@ -1,6 +1,7 @@
 import { Button, Card } from "./ui.js";
 import { fieldHints } from "../src/ui-copy.js";
 import { fields } from "../src/tool-settings.js";
+import { resizeFieldProps } from "../src/image-dimensions.js";
 import {
   sliderBounds,
   visibleField,
@@ -25,6 +26,8 @@ export default function Settings({
         )
           return null;
         const bounds = sliderBounds(key, props, values);
+        if (id === "resize-image")
+          Object.assign(props, resizeFieldProps(key, values));
         const presets = settingPresets(key, id);
         const numeric = props.type === "number";
         const slider = numeric || props.type === "range";
@@ -89,7 +92,7 @@ export default function Settings({
                   onChange={(event) => onChange(key, event.target.value)}
                 />
               )}
-              {key === "target" && (
+              {presets.length > 0 && (
                 <div className="ui-control-group">
                   {presets.map(([name, v]) => (
                     <Button
@@ -102,6 +105,9 @@ export default function Settings({
                     </Button>
                   ))}
                 </div>
+              )}
+              {id === "white-background" && key === "threshold" && (
+                <p className="field-hint">Start low to protect similar-coloured skin or clothing. Higher tolerance includes more background shades.</p>
               )}
             </div>
           );

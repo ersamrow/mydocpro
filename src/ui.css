@@ -158,6 +158,17 @@
   margin-top: 10px;
   font-size: 12px;
 }
+.ui-live-preview {
+  margin: 12px 0;
+  min-width: 0;
+}
+.ui-live-preview figcaption {
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.ui-live-preview .image-edit-stage img {
+  max-height: 160px;
+}
 .ui-preview-details > summary {
   cursor: pointer;
   min-height: 44px;

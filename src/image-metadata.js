@@ -33,6 +33,56 @@ export async function jpegSampling(blob) {
   return factors.every((value) => value === 17) ? "4:4:4" : "subsampled";
 }
 
+// PDF images can store their colour profile outside the JPEG. Give it to the
+// browser's colour-managed decoder before drawing into an sRGB canvas.
+export function jpegWithRgbProfile(bytes, profile) {
+  if (
+    profile.length < 128 ||
+    profile.length > 4 * 1024 * 1024 ||
+    new DataView(profile.buffer, profile.byteOffset, 4).getUint32(0) !==
+      profile.length ||
+    String.fromCharCode(...profile.subarray(36, 40)) !== "acsp" ||
+    String.fromCharCode(...profile.subarray(16, 20)) !== "RGB "
+  )
+    throw Error("Unsupported RGB colour profile.");
+  const { segments, scan } = jpegSegments(bytes);
+  const frame = segments.find(({ marker }) => [192, 193, 194].includes(marker));
+  if (!frame || bytes[frame.offset + 9] !== 3)
+    throw Error("The JPG does not contain three colour components.");
+  const signature = "ICC_PROFILE\0";
+  const parts = [bytes.subarray(0, 2)];
+  // The PDF profile takes precedence over any profile already in the JPEG.
+  for (const { marker, offset, length } of segments) {
+    if (
+      marker === 226 &&
+      length >= 16 &&
+      String.fromCharCode(...bytes.subarray(offset + 4, offset + 16)) ===
+        signature
+    )
+      continue;
+    parts.push(bytes.subarray(offset, offset + length + 2));
+  }
+  // ICC JPEG APP2: 2 length bytes + 12 signature bytes + sequence/count.
+  const chunkSize = 65519;
+  const count = Math.ceil(profile.length / chunkSize);
+  for (let i = 0; i < count; i++) {
+    const chunk = profile.subarray(i * chunkSize, (i + 1) * chunkSize);
+    const length = chunk.length + 16;
+    const header = Uint8Array.of(
+      255,
+      226,
+      length >> 8,
+      length & 255,
+      ...Array.from(signature, (character) => character.charCodeAt(0)),
+      i + 1,
+      count,
+    );
+    parts.push(header, chunk);
+  }
+  parts.push(bytes.subarray(scan));
+  return new Blob(parts, { type: "image/jpeg" });
+}
+
 // COM markers do not affect the entropy-coded image, so padding never changes pixels.
 export async function padJpegToBytes(blob, requestedBytes) {
   const target = Math.ceil(requestedBytes);

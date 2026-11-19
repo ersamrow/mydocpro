@@ -1,6 +1,7 @@
 import { Button } from "./ui.js";
 import { useEffect, useRef, useState } from "react";
 import { cropBox, dragCrop, clamp } from "../src/image-geometry.js";
+import { pixelsPerUnit } from "../src/image-dimensions.js";
 export default function ImageManipulator({
   file,
   kind,
@@ -61,13 +62,7 @@ export default function ImageManipulator({
     measure();
     return () => observer.disconnect();
   }, [previewZoom]);
-  const factor =
-    {
-      px: 1,
-      cm: Number(values.dpi) / 2.54,
-      mm: Number(values.dpi) / 25.4,
-      in: Number(values.dpi),
-    }[values.unit] || 1;
+  const factor = pixelsPerUnit(values.unit, values.dpi);
   const w = Number(values.width) * factor,
     h = Number(values.height) * factor;
   const updateRect = (r) =>
@@ -84,13 +79,13 @@ export default function ImageManipulator({
     );
     onValues({
       width: String(
-        Math.max(0.1, (w * scale) / factor).toFixed(
-          values.unit === "px" ? 0 : 3,
+        Math.max(0.000001, (w * scale) / factor).toFixed(
+          values.unit === "px" ? 0 : 6,
         ),
       ),
       height: String(
-        Math.max(0.1, (h * scale) / factor).toFixed(
-          values.unit === "px" ? 0 : 3,
+        Math.max(0.000001, (h * scale) / factor).toFixed(
+          values.unit === "px" ? 0 : 6,
         ),
       ),
     });

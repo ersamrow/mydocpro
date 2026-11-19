@@ -1,4 +1,4 @@
-import { Button, Card, ActionBar } from "./ui.js";
+import { Button, Card, ActionBar, ToolSectionHeading } from "./ui.js";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import {
@@ -21,7 +21,13 @@ function useFileUrl(file) {
   return url;
 }
 
-function ImagePreset({ doc, slug, initialFile, onFileChange }) {
+function ImagePreset({
+  doc,
+  slug,
+  initialFile,
+  onFileChange,
+  documentSelector,
+}) {
   const id = useId();
   const [file, setFile] = useState(initialFile || null);
   const [fit, setFit] = useState(doc.type === "photo" ? "cover" : "contain");
@@ -29,7 +35,6 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
   const [output, setOutput] = useState(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(Boolean(initialFile));
   const [frameRatio, setFrameRatio] = useState(null);
   const active = useRef(null);
   const sourceUrl = useFileUrl(file);
@@ -56,7 +61,6 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
       if (signal.aborted) return;
       setFrameRatio(null);
       setFile(normalized);
-      setSettingsOpen(true);
       onFileChange?.(normalized);
     } catch (error) {
       if (!signal.aborted) setStatus(error.message);
@@ -104,136 +108,148 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
   const hasSize = doc.minKB != null || doc.maxKB != null;
   return (
     <div className={styles.form}>
-      <h3>{doc.label}</h3>
-      <p className={styles.specs}>
-        {[doc.format, formatExamFileRange(doc), ...formatExamDimensions(doc)]
-          .filter((v, i, all) => v && all.indexOf(v) === i)
-          .join(" · ")}
-      </p>
-      {doc.rangeNote && <p>{doc.rangeNote}</p>}
-      {!hasFrame && (
-        <p>
-          To remove extra margins, use the{" "}
-          <Link className={styles.textLink} prefetch={false} href="/crop-image">
-            image cropper
-          </Link>{" "}
-          before choosing your file.
-        </p>
-      )}
-      {triple && (
-        <p>
-          Sign three times on one sheet, one below the other. Choose a scan
-          showing all three signatures.
-        </p>
-      )}
-      <Dropzone
-        id={id}
-        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
-        disabled={busy}
-        title={
-          file
-            ? "Choose another image or drop it here"
-            : "Choose an image or drop it here"
-        }
-        hint="JPG, PNG, WebP or HEIC · up to 25 MB per image"
-        buttonLabel={file ? "Replace image" : "Choose image"}
-        onFiles={(files) => choose(files[0])}
-      />
-      {file && <p className={styles.filename}>{file.name}</p>}
-      <div
-        className="ui-preview-options"
-        data-has-preview={Boolean(sourceUrl || triple)}
-      >
-        {(sourceUrl || triple) && (
-          <figure className={`ui-preview-pane ${styles.figure}`}>
-            <div
-              className={styles.preview}
-              style={{ "--exam-aspect": frameRatio || fixedRatio || 1 }}
-            >
-              {sourceUrl && (
-                <img
-                  src={sourceUrl}
-                  alt="Source image framing"
-                  style={{ objectFit: fit }}
-                  onLoad={async (event) => {
-                    const { naturalWidth, naturalHeight } = event.currentTarget;
-                    const { examFrame } = await import("../src/exam-output.js");
-                    const frame = examFrame(doc, naturalWidth, naturalHeight);
-                    setFrameRatio(frame.width / frame.height);
-                  }}
-                />
+      <div className={`ui-preview-options ${styles.workspace}`}>
+        <section
+          className={`ui-options-pane ${styles.options}`}
+          aria-label="Document options"
+        >
+          <ToolSectionHeading
+            step="1"
+            title="Choose your document"
+            description="Select a preset and review its requirements."
+          />
+          {documentSelector}
+          <h3>{doc.label}</h3>
+          <p className={styles.specs}>
+            {[
+              doc.format,
+              formatExamFileRange(doc),
+              ...formatExamDimensions(doc),
+            ]
+              .filter(
+                (value, index, all) => value && all.indexOf(value) === index,
+              )
+              .join(" · ")}
+          </p>
+          {doc.rangeNote && <p className={styles.hint}>{doc.rangeNote}</p>}
+          {!hasFrame && (
+            <p className={styles.hint}>
+              To remove extra margins, use the{" "}
+              <Link
+                className={styles.textLink}
+                prefetch={false}
+                href="/crop-image"
+              >
+                image cropper
+              </Link>{" "}
+              before choosing your file.
+            </p>
+          )}
+          {triple && (
+            <p className={styles.hint}>
+              Sign three times on one sheet, one below the other. Choose a scan
+              showing all three signatures.
+            </p>
+          )}
+          {(hasFrame || doc.type !== "photo") && (
+            <div className={styles.settings}>
+              {!!hasFrame && (
+                <label>
+                  Framing
+                  <select
+                    value={fit}
+                    disabled={busy}
+                    onChange={(event) =>
+                      changeSetting(setFit, event.target.value)
+                    }
+                  >
+                    <option value="contain">
+                      Keep the entire image (white padding)
+                    </option>
+                    <option value="cover">
+                      Centre crop to the preset shape
+                    </option>
+                  </select>
+                </label>
               )}
-              {triple && (
-                <div className={styles.rows} aria-hidden="true">
-                  {[1, 2, 3].map((n) => (
-                    <span key={n}>{!sourceUrl && `Signature ${n}`}</span>
-                  ))}
-                </div>
+              {doc.type !== "photo" && (
+                <label className={styles.check}>
+                  <input
+                    type="checkbox"
+                    checked={whitePaper}
+                    disabled={busy}
+                    onChange={(event) =>
+                      changeSetting(setWhitePaper, event.target.checked)
+                    }
+                  />
+                  Whiten paper
+                </label>
               )}
             </div>
-            <figcaption>
-              {triple
-                ? "Three-signature guide. Guide lines stay out of the JPG."
-                : "Image framing"}
-            </figcaption>
-          </figure>
-        )}
-        {(hasFrame || doc.type !== "photo") && (
-          <details
-            className={`ui-options-pane tool-settings-details ${styles.settings}`}
-            open={Boolean(file) && settingsOpen}
-            onToggle={(event) =>
-              setSettingsOpen(Boolean(file) && event.currentTarget.open)
+          )}
+        </section>
+        <section
+          className={`ui-preview-pane ${styles.upload}`}
+          aria-label="Upload and preview"
+        >
+          <ToolSectionHeading
+            step="2"
+            title="Upload & preview"
+            description="Your image is processed on this device."
+          />
+          <Dropzone
+            id={id}
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+            disabled={busy}
+            title={
+              file
+                ? "Choose another image or drop it here"
+                : "Choose an image or drop it here"
             }
-          >
-            <summary
-              aria-disabled={!file}
-              onClick={(event) => {
-                if (!file) event.preventDefault();
-              }}
-            >
-              Settings
-              <span className="tool-settings-summary">
-                {[
-                  hasFrame &&
-                    (fit === "contain" ? "Keep entire image" : "Centre crop"),
-                  doc.type !== "photo" &&
-                    `Whiten paper: ${whitePaper ? "on" : "off"}`,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </span>
-            </summary>
-            {!!hasFrame && (
-              <label>
-                Framing
-                <select
-                  value={fit}
-                  disabled={busy}
-                  onChange={(e) => changeSetting(setFit, e.target.value)}
-                >
-                  <option value="contain">
-                    Keep the entire image (white padding)
-                  </option>
-                  <option value="cover">Centre crop to the preset shape</option>
-                </select>
-              </label>
-            )}
-            {doc.type !== "photo" && (
-              <label className={styles.check}>
-                <input
-                  type="checkbox"
-                  checked={whitePaper}
-                  disabled={busy}
-                  onChange={(e) =>
-                    changeSetting(setWhitePaper, e.target.checked)
-                  }
-                />
-                Whiten paper
-              </label>
-            )}
-          </details>
-        )}
+            hint="JPG, PNG, WebP or HEIC · up to 25 MB per image"
+            buttonLabel={file ? "Replace image" : "Choose image"}
+            onFiles={(files) => choose(files[0])}
+          />
+          {file && <p className={styles.filename}>{file.name}</p>}
+          {(sourceUrl || triple) && (
+            <figure className={styles.figure}>
+              <div
+                className={styles.preview}
+                style={{ "--exam-aspect": frameRatio || fixedRatio || 1 }}
+              >
+                {sourceUrl && (
+                  <img
+                    src={sourceUrl}
+                    alt="Source image framing"
+                    style={{ objectFit: fit }}
+                    onLoad={async (event) => {
+                      const { naturalWidth, naturalHeight } =
+                        event.currentTarget;
+                      const { examFrame } =
+                        await import("../src/exam-output.js");
+                      const frame = examFrame(doc, naturalWidth, naturalHeight);
+                      setFrameRatio(frame.width / frame.height);
+                    }}
+                  />
+                )}
+                {triple && (
+                  <div className={styles.rows} aria-hidden="true">
+                    {[1, 2, 3].map((number) => (
+                      <span key={number}>
+                        {!sourceUrl && `Signature ${number}`}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <figcaption>
+                {triple
+                  ? "Three-signature guide. Guide lines stay out of the JPG."
+                  : "Image framing"}
+              </figcaption>
+            </figure>
+          )}
+        </section>
       </div>
       {file && (
         <ActionBar className="process-actions">
@@ -310,7 +326,7 @@ function ImagePreset({ doc, slug, initialFile, onFileChange }) {
   );
 }
 
-function CertificatePreset({ doc }) {
+function CertificatePreset({ doc, documentSelector }) {
   const id = useId();
   const active = useRef(null);
   const [result, setResult] = useState(null);
@@ -337,43 +353,68 @@ function CertificatePreset({ doc }) {
   }
   return (
     <div className={styles.form}>
-      <h3>{doc.label}</h3>
-      <p>{doc.rules.join(" ")}</p>
-      <Dropzone
-        id={id}
-        accept="application/pdf,.pdf"
-        disabled={busy}
-        title="Check your PDF size"
-        hint="Choose your certificate PDF or drop it here."
-        buttonLabel="Choose PDF"
-        onFiles={(files) => check(files[0])}
-      />
-      <div role="status">
-        {busy && "Checking PDF…"}
-        {result && (
-          <>
-            <strong className={result.fits ? styles.success : styles.warning}>
-              {doc.maxKB == null
-                ? "PDF checked"
-                : result.fits
-                  ? "✓ PDF meets the file-size limit"
-                  : "PDF exceeds the file-size limit"}
-            </strong>
-            <p>
-              {(result.bytes / 1000).toFixed(2)} KB · {result.pages}{" "}
-              {result.pages === 1 ? "page" : "pages"}
+      <div className={`ui-preview-options ${styles.workspace}`}>
+        <section
+          className={`ui-options-pane ${styles.options}`}
+          aria-label="Document options"
+        >
+          <ToolSectionHeading
+            step="1"
+            title="Choose your document"
+            description="Select a preset and review its requirements."
+          />
+          {documentSelector}
+          <h3>{doc.label}</h3>
+          <p className={styles.hint}>{doc.rules.join(" ")}</p>
+          <Button as={Link} prefetch={false} href="/compress-pdf">
+            Open PDF compressor
+          </Button>
+        </section>
+        <section
+          className={`ui-preview-pane ${styles.upload}`}
+          aria-label="Upload and check PDF"
+        >
+          <ToolSectionHeading
+            step="2"
+            title="Choose your PDF"
+            description="Check the existing PDF against the listed limit."
+          />
+          <Dropzone
+            id={id}
+            accept="application/pdf,.pdf"
+            disabled={busy}
+            title="Check your PDF size"
+            hint="Choose your certificate PDF or drop it here."
+            buttonLabel="Choose PDF"
+            onFiles={(files) => check(files[0])}
+          />
+          <div role="status">
+            {busy && "Checking PDF…"}
+            {result && (
+              <>
+                <strong
+                  className={result.fits ? styles.success : styles.warning}
+                >
+                  {doc.maxKB == null
+                    ? "PDF checked"
+                    : result.fits
+                      ? "✓ PDF meets the file-size limit"
+                      : "PDF exceeds the file-size limit"}
+                </strong>
+                <p>
+                  {(result.bytes / 1000).toFixed(2)} KB · {result.pages}{" "}
+                  {result.pages === 1 ? "page" : "pages"}
+                </p>
+              </>
+            )}
+          </div>
+          {error && (
+            <p role="alert" className={styles.warning}>
+              {error}
             </p>
-          </>
-        )}
+          )}
+        </section>
       </div>
-      {error && (
-        <p role="alert" className={styles.warning}>
-          {error}
-        </p>
-      )}
-      <Button as={Link} prefetch={false} href="/compress-pdf">
-        Open PDF compressor
-      </Button>
     </div>
   );
 }
@@ -382,37 +423,34 @@ export default function ExamDocumentTool({ exam, initialFile, onFileChange }) {
   const [selected, setSelected] = useState(exam.documents[0].type);
   const doc =
     exam.documents.find((item) => item.type === selected) || exam.documents[0];
+  const documentSelector = exam.documents.length > 1 && (
+    <div className={styles.buttons} role="group" aria-label="Choose a document">
+      {exam.documents.map((item) => (
+        <Button
+          key={item.type}
+          type="button"
+          aria-pressed={item.type === doc.type}
+          onClick={() => setSelected(item.type)}
+        >
+          {item.label}
+        </Button>
+      ))}
+    </div>
+  );
   return (
     <Card
       className={styles.panel}
       aria-label={`${exam.shortName} document tool`}
     >
       <h2>Prepare your document</h2>
-      {exam.documents.length > 1 && (
-        <div
-          className={styles.buttons}
-          role="group"
-          aria-label="Choose a document"
-        >
-          {exam.documents.map((item) => (
-            <Button
-              key={item.type}
-              type="button"
-              aria-pressed={item.type === doc.type}
-              onClick={() => setSelected(item.type)}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </div>
-      )}
       {doc.format === "PDF" ? (
-        <CertificatePreset doc={doc} />
+        <CertificatePreset doc={doc} documentSelector={documentSelector} />
       ) : (
         <ImagePreset
           key={doc.type}
           doc={doc}
           slug={exam.slug}
+          documentSelector={documentSelector}
           initialFile={initialFile}
           onFileChange={onFileChange}
         />

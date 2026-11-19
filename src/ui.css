@@ -167,9 +167,60 @@
 .ui-preview-options {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
   gap: 20px;
   align-items: start;
+}
+.ui-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.ui-section-heading h2 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 28px;
+}
+.ui-section-heading p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+.ui-step-badge {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ui-green);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+.workflow-steps[hidden] {
+  display: none;
+}
+.ui-options-card {
+  padding: 16px;
+}
+.ui-options-card .tool-settings-details {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.ui-source-preview {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f3f6f3;
+}
+.ui-source-preview img {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
 }
 .ui-preview-pane,
 .ui-options-pane {
@@ -181,28 +232,27 @@
 }
 .ui-side-workspace .workpanel .merge-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
-  gap: 16px 24px;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(0, 1.15fr);
+  gap: 20px;
   align-items: start;
 }
 .ui-side-workspace .merge-layout .merge-canvas {
   display: block;
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
   min-width: 0;
 }
 .ui-side-workspace .merge-layout .merge-controls {
   display: contents;
 }
-.ui-side-workspace .merge-controls > .tool-settings-details,
-.ui-side-workspace .merge-controls > .compress-settings-panel {
-  grid-column: 2;
+.ui-side-workspace .merge-controls > .ui-options-card {
+  grid-column: 1;
   grid-row: 1;
   margin-top: 0;
   min-width: 0;
 }
 .ui-side-workspace .merge-controls > .notice {
-  grid-column: 2;
+  grid-column: 1;
   margin: 0;
 }
 .ui-side-workspace
@@ -232,13 +282,15 @@
   gap: 12px;
 }
 @media (max-width: 899px) {
+  .ui-side-workspace .ui-step-badge {
+    display: none;
+  }
   .ui-preview-options,
   .ui-side-workspace .workpanel .merge-layout {
     grid-template-columns: minmax(0, 1fr);
   }
   .ui-side-workspace .merge-layout .merge-canvas,
-  .ui-side-workspace .merge-controls > .tool-settings-details,
-  .ui-side-workspace .merge-controls > .compress-settings-panel,
+  .ui-side-workspace .merge-controls > .ui-options-card,
   .ui-side-workspace .merge-controls > .notice {
     grid-column: 1;
     grid-row: auto;

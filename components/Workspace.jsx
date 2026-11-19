@@ -1,5 +1,12 @@
 import TrustBadges from "./TrustBadges.js";
-import { Button, Card, ToolLayout, ActionBar, FileRow } from "./ui.js";
+import {
+  Button,
+  Card,
+  ToolLayout,
+  ActionBar,
+  FileRow,
+  ToolSectionHeading,
+} from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -86,6 +93,15 @@ function FileThumbnail({ file }) {
       width="40"
       height="40"
     />
+  ) : null;
+}
+
+function SelectedImagePreview({ file }) {
+  const url = useResultUrl(file);
+  return url ? (
+    <div className="ui-source-preview">
+      <img src={url} alt={`Selected image: ${file.name}`} />
+    </div>
   ) : null;
 }
 
@@ -454,8 +470,12 @@ export default function Workspace({
   const PreferenceContainer = isMerge || embedded ? "details" : "div";
   const Heading = embedded ? "h2" : "h1";
   const compactSettings = !["convert-image", "merge-pdf"].includes(id);
-  const sideLayout = compactSettings;
-  const SettingsGroup = id === "compress-image" ? "div" : Fragment;
+  const sideLayout = !isMerge;
+  const SettingsGroup = sideLayout
+    ? Card
+    : id === "compress-image"
+      ? "div"
+      : Fragment;
   const summary = settingsSummary(id, values);
   return (
     <Container
@@ -532,7 +552,11 @@ export default function Workspace({
           (isPdf && files.length ? "pdf-editor-panel" : "")
         }
       >
-        <ol className="workflow-steps" aria-label="Tool workflow">
+        <ol
+          className="workflow-steps"
+          aria-label="Tool workflow"
+          hidden={sideLayout && files.length > 0}
+        >
           {(isMerge
             ? ["Add PDFs or images", "Arrange pages", "Merge & download"]
             : ["Choose files", "Adjust settings", "Download"]
@@ -554,6 +578,13 @@ export default function Workspace({
         </ol>
         <div className="merge-layout">
           <div className="merge-canvas">
+            {sideLayout && files.length > 0 && (
+              <ToolSectionHeading
+                step="2"
+                title="Upload & preview"
+                description="Check your file before saving."
+              />
+            )}
             <Dropzone
               id="upload"
               inputRef={upload}
@@ -693,6 +724,9 @@ export default function Workspace({
                 ))}
               </ul>
             </FileContainer>
+            {id === "convert-image" && files.length > 0 && (
+              <SelectedImagePreview file={files[0]} />
+            )}
             <PreviewContainer
               className="merge-page-editor"
               open={isMerge && (embedded || !!pdf.error) ? true : undefined}
@@ -742,10 +776,25 @@ export default function Workspace({
               </div>
             )}
             <SettingsGroup
-              {...(id === "compress-image"
-                ? { className: "compress-settings-panel" }
-                : {})}
+              {...(sideLayout
+                ? {
+                    className:
+                      "ui-options-card" +
+                      (id === "compress-image"
+                        ? " compress-settings-panel"
+                        : ""),
+                  }
+                : id === "compress-image"
+                  ? { className: "compress-settings-panel" }
+                  : {})}
             >
+              {sideLayout && files.length > 0 && (
+                <ToolSectionHeading
+                  step="1"
+                  title="Adjust settings"
+                  description="Choose the size and format you need."
+                />
+              )}
               {id === "convert-image" && (
                 <section
                   className="convert-options"
@@ -839,7 +888,9 @@ export default function Workspace({
                 >
                   {id === "convert-image"
                     ? "Filename & preferences"
-                    : "Adjust settings"}
+                    : sideLayout
+                      ? "Size & output options"
+                      : "Adjust settings"}
                   <span className="tool-settings-summary" title={summary}>
                     {summary}
                   </span>

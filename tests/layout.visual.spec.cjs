@@ -25,7 +25,10 @@ for (const route of [
       content: "nextjs-portal{display:none!important}",
     });
     await page.locator(".site-header").waitFor();
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(async () => {
+      await document.fonts.load('700 24px "DM Sans Headings"');
+      await document.fonts.ready;
+    });
     if (route === "resize-image") {
       await page.locator("#upload").setInputFiles(fixture("photo.png"));
       await expect(page.locator("#process")).toBeEnabled();
@@ -33,7 +36,9 @@ for (const route of [
         "open",
       );
       await expect(
-        page.getByText("Set exact dimensions in the options.", { exact: false }),
+        page.getByText("Set exact dimensions in the options.", {
+          exact: false,
+        }),
       ).toBeVisible();
       await page.locator(".ui-settings--compact").scrollIntoViewIfNeeded();
     }
@@ -46,13 +51,13 @@ for (const route of [
     if (["resize-image", "compress-pdf"].includes(route)) {
       const preview = await page.locator(".merge-canvas").boundingBox();
       const options = await page
-        .locator(".merge-controls > .tool-settings-details")
+        .locator(".merge-controls > .ui-options-card")
         .boundingBox();
       if (page.viewportSize().width >= 900)
         expect(
-          options.x,
+          preview.x,
           "Desktop settings sit beside the preview",
-        ).toBeGreaterThanOrEqual(preview.x + preview.width);
+        ).toBeGreaterThanOrEqual(options.x + options.width);
       else
         expect(
           options.y,

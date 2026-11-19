@@ -12,10 +12,29 @@
   font-size: 1.05rem;
 }
 .buttons {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  margin-bottom: 16px;
+  margin: 0;
+}
+.buttons > button {
+  justify-content: flex-start;
+  text-align: left;
+}
+.workspace {
+  width: 100%;
+}
+.options,
+.upload {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  min-width: 0;
+}
+.hint {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ui-muted);
 }
 .form {
   display: grid;
@@ -81,7 +100,8 @@
   display: grid;
   position: relative;
   background: var(--ui-surface);
-  width: min(100%, 28rem, calc(20rem * var(--exam-aspect)));
+  width: min(100%, 28rem, calc(18rem * var(--exam-aspect)));
+  margin-inline: auto;
   aspect-ratio: var(--exam-aspect);
   border: 1px solid var(--ui-border);
 }

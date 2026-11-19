@@ -2,6 +2,22 @@ import { forwardRef } from "react";
 
 const classes = (...values) => values.filter(Boolean).join(" ");
 
+export function ToolSectionHeading({ step, title, description }) {
+  return (
+    <div className="ui-section-heading">
+      {step && (
+        <span className="ui-step-badge" aria-hidden="true">
+          {step}
+        </span>
+      )}
+      <div>
+        <h2>{title}</h2>
+        {description && <p>{description}</p>}
+      </div>
+    </div>
+  );
+}
+
 // Native elements stay native: links keep href/download and buttons keep type,
 // disabled, keyboard behavior and form semantics.
 export const Button = forwardRef(function Button(

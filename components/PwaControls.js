@@ -125,15 +125,18 @@ export default function PwaControls() {
         <Button
           className={`app-status ${styles.statusButton}`}
           data-install-app={prompt && !installed ? true : undefined}
-          aria-label={`App and offline status: ${status}`}
+          aria-label={`${installed ? "App and offline status" : "Install MyDocPro"}: ${status}`}
           onClick={() => dialog.current.showModal()}
         >
-          {(installed || prompt) && (
-            <span className={styles.installLabel}>
-              {installed ? "App & offline" : "Install app"}
-            </span>
-          )}
-          <span data-app-status role="status" key={status}>
+          <span className={styles.installLabel}>
+            {installed ? "App & offline" : "Install app"}
+          </span>
+          <span
+            className={styles.offlineStatus}
+            data-app-status
+            role="status"
+            title={status}
+          >
             {status}
           </span>
         </Button>

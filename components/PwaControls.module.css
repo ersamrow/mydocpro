@@ -1,31 +1,49 @@
-.statusButton {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 2px;
+:global(.site-header) button.statusButton {
+  display: grid;
+  grid-template-rows: 18px 12px;
+  align-content: center;
+  justify-items: center;
+  gap: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--ui-control-height);
   min-height: var(--ui-control-height);
-  border: 0;
-  padding: 0;
-  background: transparent;
+  border: 1px solid #f4fbf6;
+  padding: 6px 8px;
+  background: #f4fbf6;
+  color: #143f33;
   font-family: inherit;
-  text-align: right;
+  text-align: center;
   cursor: pointer;
 }
 
 .installLabel {
   font-size: 12px;
   font-weight: 700;
-  color: var(--ui-focus-inverse);
+  color: inherit;
+  line-height: 18px;
 }
 
-.statusButton:hover,
-.statusButton:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.offlineStatus {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 12px;
+  color: #28553e;
 }
 
-.statusButton:focus-visible {
-  outline: 2px solid var(--ui-focus);
+:global(.site-header) button.statusButton:hover {
+  background: #dceedd;
+  border-color: #dceedd;
+  color: #143f33;
+}
+
+:global(.site-header) button.statusButton:focus-visible {
+  outline: 2px solid var(--ui-focus-inverse);
   outline-offset: var(--ui-focus-offset);
 }

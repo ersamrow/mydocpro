@@ -7,7 +7,7 @@
 - [Free Online Photo Editor, No Sign-up](https://mydocpro.co.in/image-editor): Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser and download without a watermark.
 - [Free PDF Tools Online – Merge, Split, Compress](https://mydocpro.co.in/pdf-toolkit): Merge, split, compress or organize PDFs for free in your browser. Turn photos into PDFs or export pages as images, with no upload or sign-up.
 - [Free Image Compressor – 20 KB, 50 KB or 100 KB](https://mydocpro.co.in/compress-image): Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.
-- [Free Image Resizer in CM, MM, Inches or Pixels](https://mydocpro.co.in/resize-image): Resize photos free in pixels, cm, mm or inches. Choose DPI and a crop or white padding, then save as JPG, PNG or WebP.
+- [Resize Image in CM, MM & Pixels Free](https://mydocpro.co.in/resize-image): Resize photos in cm, mm or pixels and set a KB limit. Choose DPI, preview your image and download free. No sign-up; files stay on your device.
 - [Convert JPG, PNG and WebP Images Online Free](https://mydocpro.co.in/convert-image): Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image.
 - [Crop Images Online Free – Custom Aspect Ratios](https://mydocpro.co.in/crop-image): Crop images free with a custom, square, 4:3, 16:9 or 35:45 frame. Rotate your photo, check the framing and download in your browser.
 - [Merge PDF Files Online Free – Combine PDFs](https://mydocpro.co.in/merge-pdf): Merge PDFs and images free into one file. Arrange pages in the order you need and download the merged document. Your files stay on your device.

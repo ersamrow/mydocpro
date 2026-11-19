@@ -17,8 +17,8 @@ export const toolSearch = {
     "Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.",
   ],
   "resize-image": [
-    "Free Image Resizer in CM, MM, Inches or Pixels",
-    "Resize photos free in pixels, cm, mm or inches. Choose DPI and a crop or white padding, then save as JPG, PNG or WebP.",
+    "Resize Image in CM, MM & Pixels Free",
+    "Resize photos in cm, mm or pixels and set a KB limit. Choose DPI, preview your image and download free. No sign-up; files stay on your device.",
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",

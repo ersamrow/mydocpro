@@ -1,6 +1,7 @@
 import { Button, Card, ActionBar, FileRow } from "./ui.js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import PdfEditor from "./PdfEditor.js";
+import { useObjectUrl } from "./useObjectUrl.js";
 import { validateFiles } from "../src/tool-settings.js";
 import { inspectFiles } from "../src/file-validation.js";
 import { processPdf } from "../src/processing.js";
@@ -16,7 +17,7 @@ export default function PdfWorkbench({
   const [busy, setBusy] = useState(false),
     [status, setStatus] = useState("");
   const [result, setResult] = useState(null),
-    [url, setUrl] = useState("");
+    url = useObjectUrl(result);
   const abort = useRef(null),
     alive = useRef(true),
     lock = useRef(false);
@@ -43,15 +44,6 @@ export default function PdfWorkbench({
   useEffect(() => {
     if (!files.length) setPdf({ entries: [], ready: false, error: "" });
   }, [files]);
-  useEffect(() => {
-    if (!result) {
-      setUrl("");
-      return;
-    }
-    const u = URL.createObjectURL(result);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [result]);
   async function add(incoming) {
     if (!incoming.length || lock.current || loading) return;
     lock.current = true;

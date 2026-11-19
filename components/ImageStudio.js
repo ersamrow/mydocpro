@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Icon } from "./Shared.js";
 import ImageManipulator from "./ImageManipulator.js";
 import ImageEditor from "./ImageEditor.js";
+import { useObjectUrl } from "./useObjectUrl.js";
 import { resizeFieldProps } from "../src/image-dimensions.js";
 import ToolGuide from "./ToolGuide.js";
 import { tools } from "../src/tools.js";
@@ -209,14 +210,13 @@ export default function ImageStudio({ heading }) {
     [busy, setBusy] = useState(false),
     [status, setStatus] = useState("Upload an image to start editing."),
     [error, setError] = useState(false);
-  const [url, setUrl] = useState(""),
-    [filename, setFilename] = useState(""),
+  const [filename, setFilename] = useState(""),
     [dimensions, setDimensions] = useState("");
   const [outputFormat, setOutputFormat] = useState("keep");
   const [documentExport, setDocumentExport] = useState(null);
   const exportOptions = useRef(new WeakMap());
   const [downloadBlob, setDownloadBlob] = useState(null),
-    [downloadUrl, setDownloadUrl] = useState(""),
+    downloadUrl = useObjectUrl(downloadBlob),
     [exportPending, setExportPending] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -236,16 +236,17 @@ export default function ImageStudio({ heading }) {
     const u = URL.createObjectURL(current),
       im = new Image();
     let dead = false;
-    setUrl(u);
     im.src = u;
     im.decode()
       .then(() => {
         if (!dead) setDimensions(`${im.width} × ${im.height} px`);
       })
-      .catch(() => {});
+      .catch(() => {})
+      // Revoke after decode settles so Strict Mode's effect re-run doesn't
+      // invalidate the URL mid-fetch (ERR_FILE_NOT_FOUND).
+      .finally(() => URL.revokeObjectURL(u));
     return () => {
       dead = true;
-      URL.revokeObjectURL(u);
     };
   }, [current]);
   useEffect(() => {
@@ -285,15 +286,6 @@ export default function ImageStudio({ heading }) {
       abort.abort();
     };
   }, [current, original, outputFormat, documentExport]);
-  useEffect(() => {
-    if (!downloadBlob) {
-      setDownloadUrl("");
-      return;
-    }
-    const next = URL.createObjectURL(downloadBlob);
-    setDownloadUrl(next);
-    return () => URL.revokeObjectURL(next);
-  }, [downloadBlob]);
   useEffect(() => {
     if (!effectBase) return;
     let stale = false;
@@ -408,6 +400,9 @@ export default function ImageStudio({ heading }) {
     controller.current = null;
     setBusy(true);
     setError(false);
+    setStatus(
+      "Reading your photo… large or HEIC files can take a few seconds.",
+    );
     try {
       const selected = extra ? Array.from(file) : [file];
       if (extra && selected.length > 5)

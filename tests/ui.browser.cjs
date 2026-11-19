@@ -108,7 +108,7 @@ const path = require("node:path");
       /sans-serif/,
     );
     await page
-      .getByRole("button", { name: /^App and offline status:/ })
+      .getByRole("button", { name: /^(App and offline status|Install MyDocPro):/ })
       .click();
     let bounds = await page.locator(".pwa-dialog").boundingBox();
     await page.mouse.click(bounds.x + 5, bounds.y + 5);

@@ -1,4 +1,11 @@
+import { createRequire } from "node:module";
+
+const { version: heifVersion } = createRequire(import.meta.url)(
+  "libheif-js/package.json",
+);
+
 export default {
+  env: { NEXT_PUBLIC_HEIF_VERSION: heifVersion },
   reactStrictMode: true,
   experimental: { optimizeCss: true },
   images: { unoptimized: true },

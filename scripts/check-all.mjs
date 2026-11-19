@@ -110,6 +110,8 @@ try {
     server.stdout.on("data", ready);
   });
   for (const file of [
+    "object-url",
+    "resize-presets",
     "pdf-previews",
     "next",
     "all-tools",

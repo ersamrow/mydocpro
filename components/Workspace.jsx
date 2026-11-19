@@ -22,6 +22,8 @@ import Settings from "./Settings.js";
 import Dropzone from "./Dropzone.js";
 import { settingsSummary } from "../src/settings-ui.js";
 import ToolGuide from "./ToolGuide.js";
+import ResizeImageSizes, { ResizePresets } from "./ResizeImageSizes.js";
+import { resizePresetValues } from "../src/resize-presets.js";
 import {
   batchTools,
   pdfTools,
@@ -31,6 +33,7 @@ import {
 } from "../src/tool-settings.js";
 import { pageSeo } from "../src/seo.js";
 import { pageIndices } from "../src/page-indices.js";
+import { useObjectUrl } from "./useObjectUrl.js";
 import { downloadName, toolOutputName } from "../src/download-name.js";
 import {
   conversionAccept,
@@ -44,16 +47,7 @@ const ImageEditor = dynamic(() => import("./ImageEditor.js"));
 const PdfEditor = dynamic(() => import("./PdfEditor.js"));
 const UpscSignaturePreset = dynamic(() => import("./UpscSignaturePreset.js"));
 
-function useResultUrl(blob) {
-  const [resource, setResource] = useState(null);
-  useEffect(() => {
-    if (!blob) return;
-    const u = URL.createObjectURL(blob);
-    setResource({ blob, url: u });
-    return () => URL.revokeObjectURL(u);
-  }, [blob]);
-  return resource?.blob === blob ? resource.url : "";
-}
+const useResultUrl = useObjectUrl;
 
 function Download({ result }) {
   const url = useResultUrl(result.blob);
@@ -477,6 +471,10 @@ export default function Workspace({
       ? "div"
       : Fragment;
   const summary = settingsSummary(id, values);
+  const selectResizePreset = (preset) => {
+    onValues(resizePresetValues(preset));
+    setSettingsOpen(true);
+  };
   return (
     <Container
       as={embedded ? "section" : "main"}
@@ -875,6 +873,13 @@ export default function Workspace({
                   />
                 </div>
               )}
+              {id === "resize-image" && (
+                <ResizePresets
+                  values={values}
+                  onSelect={selectResizePreset}
+                  disabled={busy || validating}
+                />
+              )}
               <details
                 className="settings-disclosure tool-settings-details"
                 hidden={(embedded || compactSettings) && !files.length}
@@ -1125,33 +1130,45 @@ export default function Workspace({
           </div>
         </div>
       </Card>
-      <HelpContainer as="details" className="merge-help ui-help">
-        <summary>
-          Need a hand? <span>Instructions, tips & related tools</span>
-        </summary>
-        <ToolGuide id={id} />
-        <div className="steps">
-          {[
-            [
-              "01. Choose your file",
-              "Add a file from your device. It stays in your browser.",
-            ],
-            [
-              "02. Make it yours",
-              "Adjust the settings for the form or document you need.",
-            ],
-            [
-              "03. Save & carry on",
-              "Download the result. Your original file stays unchanged.",
-            ],
-          ].map(([title, body]) => (
-            <div key={title}>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </div>
-          ))}
-        </div>
-      </HelpContainer>
+      {id === "resize-image" && !embedded && (
+        <>
+          <ResizeImageSizes
+            values={values}
+            onSelect={selectResizePreset}
+            disabled={busy || validating}
+          />
+          <ToolGuide id={id} />
+        </>
+      )}
+      {id !== "resize-image" && (
+        <HelpContainer as="details" className="merge-help ui-help">
+          <summary>
+            Need a hand? <span>Instructions, tips & related tools</span>
+          </summary>
+          <ToolGuide id={id} />
+          <div className="steps">
+            {[
+              [
+                "01. Choose your file",
+                "Add a file from your device. It stays in your browser.",
+              ],
+              [
+                "02. Make it yours",
+                "Adjust the settings for the form or document you need.",
+              ],
+              [
+                "03. Save & carry on",
+                "Download the result. Your original file stays unchanged.",
+              ],
+            ].map(([title, body]) => (
+              <div key={title}>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </div>
+            ))}
+          </div>
+        </HelpContainer>
+      )}
     </Container>
   );
 }

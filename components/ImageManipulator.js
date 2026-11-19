@@ -45,22 +45,29 @@ export default function ImageManipulator({
   const fitWidth = Math.min(viewWidth, (previewHeight * width) / height);
   const fitHeight = (fitWidth * height) / width;
   useEffect(() => {
-    if (!previewZoom || !board.current) return;
+    const element = board.current;
+    if (!previewZoom || !element) return;
+    let disposed = false;
     const measure = () => {
-      const style = getComputedStyle(board.current);
+      // A queued observer callback can run after React clears the ref.
+      if (disposed || !element.isConnected || board.current !== element) return;
+      const style = getComputedStyle(element);
       setViewWidth(
         Math.max(
           1,
-          board.current.clientWidth -
+          element.clientWidth -
             parseFloat(style.paddingLeft) -
             parseFloat(style.paddingRight),
         ),
       );
     };
     const observer = new ResizeObserver(measure);
-    observer.observe(board.current);
+    observer.observe(element);
     measure();
-    return () => observer.disconnect();
+    return () => {
+      disposed = true;
+      observer.disconnect();
+    };
   }, [previewZoom]);
   const factor = pixelsPerUnit(values.unit, values.dpi);
   const w = Number(values.width) * factor,
@@ -101,10 +108,12 @@ export default function ImageManipulator({
       })
       .catch(() => {
         if (!dead) setError("Unable to load editing controls.");
-      });
+      })
+      // Revoke only after the fetch/decode settles; revoking in cleanup breaks
+      // the in-flight request when React Strict Mode re-runs effects.
+      .finally(() => URL.revokeObjectURL(url));
     return () => {
       dead = true;
-      URL.revokeObjectURL(url);
     };
   }, [file]);
   useEffect(() => {

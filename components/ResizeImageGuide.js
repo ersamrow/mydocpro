@@ -21,7 +21,8 @@ export default function ResizeImageGuide() {
         </li>
         <li>
           Choose a Fit option and an output format accepted by the destination,
-          then process and download the image.
+          then enter Max size (KB, optional) if the form also has a file-size
+          limit. Process and download the image.
         </li>
         <li>
           Open the download and check its dimensions, framing, readability and
@@ -54,19 +55,29 @@ export default function ResizeImageGuide() {
       </ul>
       <h3>Does DPI set the printed photo size?</h3>
       <p>
-        DPI here calculates the output pixel dimensions. It does not guarantee
-        matching resolution metadata in the downloaded file. Set the intended
-        physical size in your print settings, disable automatic fit or
-        enlargement, and measure a trial print. Increasing DPI cannot restore
-        missing detail from a blurry source.
+        DPI calculates the output pixel dimensions. JPG and PNG downloads also
+        include the selected DPI in their resolution metadata. Print at Actual
+        size (100%), disable automatic fit or enlargement, and measure a trial
+        print because printer settings can override the intended size. WebP
+        output does not include this print-density metadata. Increasing DPI
+        cannot restore missing detail from a blurry source.
       </p>
-      <h3>Why is my resized image still too large in KB?</h3>
+      <h3>How do I resize a photo in cm and KB together?</h3>
       <p>
         Width and height control dimensions; KB measures file size. Format and
-        image detail also affect file size. If your form has a KB limit,
-        compress the resized image next and recheck its final pixel dimensions.
-        Resizing alone does not guarantee any particular file size or
-        application acceptance.
+        image detail also affect file size. Set your dimensions and DPI first,
+        then enter the maximum allowed KB in Max size (KB, optional). For
+        example, 3.5 × 4.5 cm at 300 DPI with a 50 KB maximum requests a 413 ×
+        531 pixel image within that limit. The resizer preserves those exact
+        pixel dimensions while adjusting compression. If it cannot meet the
+        limit, it reports an error instead of shrinking the image. Try JPG or
+        WebP if the destination accepts it, or a larger permitted limit. PNG is
+        lossless and may not fit a small KB target.
+      </p>
+      <p>
+        Check the downloaded dimensions, size and framing against the receiving
+        form’s current requirements. A size preset does not certify acceptance
+        by an exam or passport authority.
       </p>
     </>
   );

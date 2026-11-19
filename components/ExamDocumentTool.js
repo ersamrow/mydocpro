@@ -7,19 +7,10 @@ import {
 } from "../src/exam-requirements.js";
 import styles from "./ExamDocumentTool.module.css";
 import Dropzone from "./Dropzone.js";
+import { useObjectUrl } from "./useObjectUrl.js";
 import { downloadName } from "../src/download-name.js";
 
-function useFileUrl(file) {
-  const [url, setUrl] = useState("");
-  useEffect(() => {
-    const next = file ? URL.createObjectURL(file) : "";
-    setUrl(next);
-    return () => {
-      if (next) URL.revokeObjectURL(next);
-    };
-  }, [file]);
-  return url;
-}
+const useFileUrl = useObjectUrl;
 
 function ImagePreset({
   doc,

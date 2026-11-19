@@ -574,3 +574,8 @@
     padding: 0 12px 12px;
   }
 }
+
+html {
+  /* Keep focused fields clear of the sticky action bar. */
+  scroll-padding-bottom: 96px;
+}

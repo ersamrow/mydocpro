@@ -54,6 +54,14 @@ export default function PwaControls() {
       setInstalled(true);
       setPrompt(null);
     });
+    if (process.env.NODE_ENV !== "production") {
+      // A worker left over from `next start` on this origin would serve stale
+      // dev chunks (404s on /_next/static/chunks/*), so drop it in dev.
+      navigator.serviceWorker
+        ?.getRegistrations()
+        .then((regs) => regs.forEach((reg) => reg.unregister()))
+        .catch(() => {});
+    }
     if (process.env.NODE_ENV === "production") {
       if (!("serviceWorker" in navigator) || !window.isSecureContext)
         setFailed(true);
@@ -115,7 +123,7 @@ export default function PwaControls() {
     : !online
       ? "Offline · setup incomplete"
       : process.env.NODE_ENV !== "production"
-        ? "Offline setup in published app"
+        ? "Offline: live app only"
         : failed
           ? "Offline setup unavailable"
           : "Preparing offline tools…";

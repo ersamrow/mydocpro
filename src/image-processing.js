@@ -1,7 +1,6 @@
 import { throwIfCancelled, checkpoint } from "./file-validation.js";
 import { setImageDensity } from "./image-metadata.js";
 import { pixelsPerUnit } from "./image-dimensions.js";
-import heifPackage from "libheif-js/package.json" with { type: "json" };
 function canvas(w, h) {
   w = Math.round(w);
   h = Math.round(h);
@@ -35,7 +34,7 @@ const normalizedImages = new WeakMap();
 let heifDecoder;
 function loadHeifDecoder() {
   if (!heifDecoder) {
-    const decoderUrl = `/heic-decoder-${heifPackage.version}.js`;
+    const decoderUrl = `/heic-decoder-${process.env.NEXT_PUBLIC_HEIF_VERSION}.js`;
     heifDecoder = import(/* webpackIgnore: true */ decoderUrl)
       .then((module) => module.default())
       .catch((error) => {

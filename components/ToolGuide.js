@@ -46,6 +46,34 @@ export default function ToolGuide({ id }) {
           )}
         </>
       )}
+      {id === "compress-image" && (
+        <p>
+          Need exact dimensions as well as a file-size limit?{" "}
+          <Link href="/resize-image">
+            Resize your photo in cm or mm and set a KB limit
+          </Link>{" "}
+          in one step. This preserves the requested pixel dimensions;
+          compression here may reduce them to meet a very small target.
+        </p>
+      )}
+      {id === "exam-photo" && (
+        <p>
+          If your form specifies a size outside these presets,{" "}
+          <Link href="/resize-image">
+            set custom photo dimensions in centimetres or millimetres
+          </Link>
+          , choose DPI and enter a maximum KB size. Check the current form’s
+          requirements before choosing the values.
+        </p>
+      )}
+      {id === "passport-sheet" && (
+        <p>
+          Need one digital photo rather than a printable sheet?{" "}
+          <Link href="/resize-image">Resize a single photo in cm or mm</Link>{" "}
+          and optionally set its KB limit. Use this sheet tool when you need
+          several copies arranged for printing.
+        </p>
+      )}
       <h3>Related tools</h3>
       <ul className="related-tools">
         {related.map((t) => (

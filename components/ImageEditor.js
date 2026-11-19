@@ -2,13 +2,9 @@ import { Button } from "./ui.js";
 import { useEffect, useRef, useState } from "react";
 import { processImage } from "../src/processing.js";
 import ImageManipulator from "./ImageManipulator.js";
+import { useObjectUrl } from "./useObjectUrl.js";
 export function BlobImage({ blob, ...props }) {
-  const [url, setUrl] = useState("");
-  useEffect(() => {
-    const u = URL.createObjectURL(blob);
-    setUrl(u);
-    return () => URL.revokeObjectURL(u);
-  }, [blob]);
+  const url = useObjectUrl(blob);
   return url ? <img {...props} src={url} /> : null;
 }
 export default function ImageEditor({

@@ -1,7 +1,10 @@
+import ResizeFaqs from "./ResizeFaqs.js";
+import PhotoSizeLinks from "./PhotoSizeLinks.js";
+import { resizeFaqs } from "../src/photo-sizes.js";
 export default function ResizeImageGuide() {
   return (
     <>
-      <h2>How to resize an image in cm or mm</h2>
+      <h2>How to resize a photo in cm</h2>
       <p>
         Set exact photo dimensions in centimetres, millimetres, inches or
         pixels. Resize JPG, PNG and WebP images locally in your browser without
@@ -79,6 +82,8 @@ export default function ResizeImageGuide() {
         form’s current requirements. A size preset does not certify acceptance
         by an exam or passport authority.
       </p>
+      <ResizeFaqs faqs={resizeFaqs} />
+      <PhotoSizeLinks />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import { tools } from "./tools.js";
 import { sitePages } from "./site-content.js";
+import { organizationProfiles } from "./organization-profiles.js";
+import { resizeFaqs, faqSchema } from "./photo-sizes.js";
 
 export const siteOrigin = "https://mydocpro.co.in";
 // Descriptions explain real functionality; no invented ratings or acceptance claims.
@@ -17,8 +19,8 @@ export const toolSearch = {
     "Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.",
   ],
   "resize-image": [
-    "Resize Image in CM, MM & Pixels Free",
-    "Resize photos in cm, mm or pixels and set a KB limit. Choose DPI, preview your image and download free. No sign-up; files stay on your device.",
+    "Resize Image in CM, MM & Pixels Online Free – Photo Size Changer",
+    "Change photo size in cm, mm, inches or pixels. 3.5×4.5 cm, 2×2.5 cm, 4×6 cm and more at 300 DPI. Free, no upload – files stay on your device.",
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",
@@ -79,7 +81,16 @@ export const toolSearch = {
 };
 export function pageSeo(id = "") {
   const tool = tools.find((t) => t[0] === id);
-  const page = Object.hasOwn(sitePages, id) ? sitePages[id] : null;
+  const page =
+    id === "cm-to-pixels"
+      ? {
+          title: "CM to Pixels Converter – Free",
+          description:
+            "Convert cm, mm or inches to pixels and pixels to physical sizes at your chosen DPI. Check photo size tables and open a pre-filled image resizer free.",
+        }
+      : Object.hasOwn(sitePages, id)
+        ? sitePages[id]
+        : null;
   const known = id === "" || Boolean(tool || page);
   const name = tool
     ? toolSearch[id][0]
@@ -104,6 +115,9 @@ export function pageSeo(id = "") {
           name: "MyDocPro",
           url: siteOrigin + "/",
           logo: siteOrigin + "/brand/mydocpro-1024.png",
+          sameAs: Object.values(organizationProfiles).filter((url) =>
+            /^https:\/\//.test(url),
+          ),
           telephone: "+919781843043",
           address: {
             "@type": "PostalAddress",
@@ -137,14 +151,19 @@ export function pageSeo(id = "") {
           isPartOf: { "@id": siteOrigin + "/#website" },
           ...(id ? { breadcrumb: { "@id": url + "#breadcrumb" } } : {}),
         },
-        ...(tool ? [{
-          "@type": "WebApplication",
-          name,
-          url,
-          applicationCategory: "MultimediaApplication",
-          operatingSystem: "Any",
-          offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
-        }] : []),
+        ...(tool
+          ? [
+              {
+                "@type": "WebApplication",
+                name,
+                url,
+                applicationCategory: "MultimediaApplication",
+                operatingSystem: "Any",
+                offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+              },
+            ]
+          : []),
+        ...(id === "resize-image" ? [faqSchema(resizeFaqs)] : []),
         ...(id
           ? [
               {
@@ -171,7 +190,12 @@ export function pageSeo(id = "") {
     : [];
   return {
     name,
-    title: name.includes("MyDocPro") ? name : name + " | MyDocPro",
+    title:
+      id === ""
+        ? "MyDocPro – Free Image & PDF Tools, No Upload"
+        : id === "resize-image" || name.includes("MyDocPro")
+          ? name
+          : name + " | MyDocPro",
     description,
     url,
     known,

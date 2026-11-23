@@ -34,7 +34,7 @@ export function ResizePresets({ values, onSelect, disabled }) {
 export default function ResizeImageSizes({ values, onSelect, disabled }) {
   return (
     <Card className={styles.reference} aria-labelledby="resize-sizes-heading">
-      <h2 id="resize-sizes-heading">Photo sizes in CM, MM and pixels</h2>
+      <h2 id="resize-sizes-heading">Common photo sizes</h2>
       <p>
         Choose a size below, then upload a photo or adjust your current image.
         These examples use {resizePresetDpi} DPI; check your form’s current
@@ -53,9 +53,11 @@ export default function ResizeImageSizes({ values, onSelect, disabled }) {
           </caption>
           <thead>
             <tr>
-              <th scope="col">Size</th>
+              <th scope="col">Millimetres</th>
               <th scope="col">Centimetres</th>
+              <th scope="col">Inches (approx.)</th>
               <th scope="col">Pixels</th>
+              <th scope="col">Preset</th>
             </tr>
           </thead>
           <tbody>
@@ -67,7 +69,20 @@ export default function ResizeImageSizes({ values, onSelect, disabled }) {
                 <td>
                   {preset.width / 10} × {preset.height / 10} cm
                 </td>
+                <td>
+                  {(preset.width / 25.4).toFixed(2)} ×{" "}
+                  {(preset.height / 25.4).toFixed(2)} in
+                </td>
                 <td>{presetPixels(preset).join(" × ")} px</td>
+                <td>
+                  <Button
+                    disabled={disabled}
+                    onClick={() => onSelect(preset)}
+                    aria-label={`Use ${preset.label} at ${resizePresetDpi} DPI`}
+                  >
+                    Use size
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>

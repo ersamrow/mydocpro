@@ -27,8 +27,16 @@ function safePreferences(id, raw) {
   if (id === "white-background") result.backgroundMode = "edge-connected";
   return result;
 }
-export default function useToolSettings(id, onEdit) {
-  const [values, setValuesState] = useState(() => defaults(id)),
+export default function useToolSettings(
+  id,
+  onEdit,
+  initialSettings,
+  storageId = id,
+) {
+  const [values, setValuesState] = useState(() => ({
+      ...defaults(id),
+      ...initialSettings,
+    })),
     [remember, setRemember] = useState(false),
     [loaded, setLoaded] = useState(false),
     [canUndo, setCanUndo] = useState(false),
@@ -46,31 +54,37 @@ export default function useToolSettings(id, onEdit) {
   }, []);
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(prefix + id) || "null");
+      const saved = JSON.parse(
+        localStorage.getItem(prefix + storageId) || "null",
+      );
       if (saved) {
-        setValues((v) => ({ ...v, ...safePreferences(id, saved) }));
+        setValues((v) => ({
+          ...v,
+          ...safePreferences(id, saved),
+          ...initialSettings,
+        }));
         setRemember(true);
       }
     } catch {
       setStorageNote("Saved preferences could not be loaded.");
     }
     setLoaded(true);
-  }, [id, setValues]);
+  }, [id, storageId, setValues]);
   useEffect(() => {
     if (!loaded) return;
     try {
       if (remember)
         localStorage.setItem(
-          prefix + id,
+          prefix + storageId,
           JSON.stringify(safePreferences(id, values)),
         );
-      else localStorage.removeItem(prefix + id);
+      else localStorage.removeItem(prefix + storageId);
     } catch {
       setStorageNote(
         "Browser storage is unavailable; changes apply only to this session.",
       );
     }
-  }, [id, values, remember, loaded]);
+  }, [id, storageId, values, remember, loaded]);
   const onValues = useCallback(
     (patch) => {
       const next = {
@@ -107,6 +121,7 @@ export default function useToolSettings(id, onEdit) {
     lastEdit.current = 0;
     setValues({
       ...defaults(id),
+      ...initialSettings,
       ...(id === "name-date"
         ? { date: new Date().toISOString().slice(0, 10) }
         : {}),

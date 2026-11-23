@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Icon } from "./Shared.js";
 import ToolCards from "./ToolCards.js";
 import { tools } from "../src/tools.js";
+import { photoSizes } from "../src/photo-sizes.js";
 export default function Home({ heading, cards, examLinks }) {
   const router = useRouter();
   const [filter, setFilter] = useState("all"),
@@ -75,10 +76,24 @@ export default function Home({ heading, cards, examLinks }) {
               ["compress-image?kb=20", "Photo under 20 KB"],
               ["compress-image?kb=50", "Photo under 50 KB"],
               ["resize-image", "Resize in cm"],
+              ...photoSizes.map(({ slug, label }) => [
+                "resize-image/" + slug,
+                label,
+              ]),
+              ["cm-to-pixels", "CM to pixels"],
               ["merge-pdf", "Merge PDFs"],
               ["passport-sheet", "Passport photos"],
             ].map(([id, label]) => (
-              <Link className="chip" key={id} href={"/" + id}>
+              <Link
+                prefetch={
+                  id.startsWith("resize-image/") || id === "cm-to-pixels"
+                    ? false
+                    : undefined
+                }
+                className="chip"
+                key={id}
+                href={"/" + id}
+              >
                 {label}
               </Link>
             ))}

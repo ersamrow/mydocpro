@@ -1,0 +1,17 @@
+Generated using the built-in image_gen tool.
+
+Use case: ads-marketing.
+Create a polished landscape social launch graphic for a Reddit founder post about MyDocPro, a free browser-based image and PDF tools app. Green-and-white visual identity: deep forest teal #124437, emerald accents, warm off-white background, subtle mint cards, high contrast dark text, generous whitespace. Editorial product design rather than a noisy advertisement. Large readable typography, elegant simple paper and image illustrations, crisp layout. No photographic people, no fake UI screenshots, no invented reviews, no ratings, no usage numbers, no Google or Reddit logos.
+Exact text only:
+"MyDocPro"
+"Free image & PDF tools."
+"Files stay on your device."
+Three concise feature cards with simple illustrative icons:
+"Resize photos"
+"Compress images"
+"Merge PDFs"
+Bottom trust line:
+"No sign-up · No watermark"
+Footer:
+"mydocpro.co.in"
+Visual story: a few photo and PDF document cards neatly organized into a clean output stack, suggesting simple useful local processing. Keep the text clear at mobile feed size. Brand name and headline most prominent. Render as a finished high-quality landscape social image, approximately 1536x1024.

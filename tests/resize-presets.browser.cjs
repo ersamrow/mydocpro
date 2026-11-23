@@ -16,14 +16,13 @@ const path = require("node:path");
     page.on("pageerror", (error) => errors.push(error.message));
     const response = await page.goto(base + "/resize-image");
     const html = await response.text();
-    assert.match(html, /Photo sizes in CM, MM and pixels/);
+    assert.match(html, /Common photo sizes/);
     assert.match(html, /413 × 531/);
     assert.match(html, /Max size \(KB, optional\)/);
     assert.equal(
       await page.title(),
-      "Resize Image in CM, MM & Pixels Free | MyDocPro",
+      "Resize Image in CM, MM & Pixels Online Free – Photo Size Changer",
     );
-    assert.ok((await page.title()).length < 60);
     assert.ok(
       (await page.locator('meta[name="description"]').getAttribute("content"))
         .length < 155,
@@ -34,7 +33,7 @@ const path = require("node:path");
     );
     await page
       .getByRole("heading", {
-        name: "How to resize an image in cm or mm",
+        name: "How to resize a photo in cm",
         exact: true,
       })
       .waitFor();

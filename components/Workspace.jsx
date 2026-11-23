@@ -173,6 +173,9 @@ export default function Workspace({
   examLinks,
   embedded = false,
   initialFiles = [],
+  initialSettings,
+  metaOverride,
+  headingExtra,
   onFilesChange,
   onWorkingChange,
 }) {
@@ -207,10 +210,15 @@ export default function Workspace({
     undo,
     reset,
     storageNote,
-  } = useToolSettings(id, () => {
-    setOutputs([]);
-    setStatus("");
-  });
+  } = useToolSettings(
+    id,
+    () => {
+      setOutputs([]);
+      setStatus("");
+    },
+    initialSettings,
+    metaOverride?.url || id,
+  );
   const upload = useRef(null),
     replace = useRef(false),
     alive = useRef(true),
@@ -218,7 +226,7 @@ export default function Workspace({
   const isPdf = pdfTools.includes(id),
     isMerge = id === "merge-pdf",
     multi = multiTools.includes(id),
-    meta = pageSeo(id);
+    meta = metaOverride || pageSeo(id);
   const sameSourceFormat = (format) =>
     files.length > 0 && files.every((file) => sourceImageType(file) === format);
   useEffect(() => {
@@ -514,6 +522,7 @@ export default function Workspace({
             : meta.description}{" "}
         </p>
         {!embedded && <TrustBadges toolId={id} />}
+        {headingExtra}
       </div>
       {!embedded && id === "exam-photo" && (
         <>
@@ -1120,10 +1129,7 @@ export default function Workspace({
                 </p>
               )}
               {outputs.map((result, i) => (
-                <ResultPreview
-                  key={i}
-                  result={result}
-                />
+                <ResultPreview key={i} result={result} />
               ))}
             </div>
           </div>
@@ -1136,7 +1142,7 @@ export default function Workspace({
             onSelect={selectResizePreset}
             disabled={busy || validating}
           />
-          <ToolGuide id={id} />
+          {!metaOverride && <ToolGuide id={id} />}
         </>
       )}
       {id !== "resize-image" && (

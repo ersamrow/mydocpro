@@ -1,4 +1,5 @@
 import { pixelsPerUnit } from "./image-dimensions.js";
+import { photoSizes } from "./photo-sizes.js";
 
 export const resizePresetDpi = 300;
 // Reference dimensions, not claims of compliance with an exam or authority.
@@ -8,6 +9,16 @@ export const resizePresets = [
   { id: "20x25", label: "20 × 25 mm", width: 20, height: 25 },
   { id: "2inch", label: "2 × 2 inches", width: 50.8, height: 50.8 },
   { id: "20x45", label: "20 × 45 mm", width: 20, height: 45 },
+  ...photoSizes
+    .filter(({ slug }) =>
+      ["5x5-cm", "4x6-cm", "3x4-cm", "4-5x3-5-cm"].includes(slug),
+    )
+    .map((size) => ({
+      id: size.slug,
+      label: size.label,
+      width: size.width * 10,
+      height: size.height * 10,
+    })),
 ];
 
 export function resizePresetValues(preset) {

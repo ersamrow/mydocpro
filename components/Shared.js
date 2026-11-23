@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card } from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
+import PhotoSizeLinks from "./PhotoSizeLinks.js";
 import {
   Files,
   ShieldCheck,
@@ -166,6 +167,7 @@ export function Footer({ examLinks }) {
         </div>
       </nav>
       <ExamLinks exams={examLinks} footer />
+      <PhotoSizeLinks />
       <div className="footer-bottom">
         <nav className="foot-links" aria-label="MyDocPro information">
           <ContentLinks />

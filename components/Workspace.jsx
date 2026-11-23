@@ -111,7 +111,7 @@ function DownloadActions({ outputs }) {
   );
 }
 
-function ResultPreview({ result, individual }) {
+function ResultPreview({ result }) {
   const image = [
     "image/jpeg",
     "image/png",
@@ -121,7 +121,7 @@ function ResultPreview({ result, individual }) {
     "image/x-icon",
     "image/gif",
   ].includes(result.blob.type);
-  const url = useResultUrl(image || individual ? result.blob : null);
+  const url = useResultUrl(result.blob);
   return (
     <FileRow as="div" className="output result-preview ui-result-row">
       {image && url && (
@@ -141,7 +141,7 @@ function ResultPreview({ result, individual }) {
           </small>
         ))}
       </span>
-      {individual && url && (
+      {url && (
         <Button
           as="a"
           variant="primary"
@@ -1123,7 +1123,6 @@ export default function Workspace({
                 <ResultPreview
                   key={i}
                   result={result}
-                  individual={outputs.length > 1}
                 />
               ))}
             </div>

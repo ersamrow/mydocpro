@@ -51,6 +51,37 @@ Deploy the project to a **Node.js-capable host** using those build and start com
 
 `npm run preview` starts the same production server on port 4173. The contact endpoint runs in development and production. Keep SMTP settings server-only. Host HTTPS at the reverse proxy, redirect the production domain to `https://mydocpro.co.in`, and check direct tool URLs, unknown-page HTTP 404, sitemap and ads.txt after deployment.
 
+## Notify search engines with IndexNow
+
+The root verification file `public/mydocpro-indexnow.txt` and `npm run indexnow`
+support IndexNow without adding browser scripts or changing page URLs. The key
+is an IndexNow ownership-verification value, not a Bing account password. Keep
+this file stable across deployments.
+
+Deploy the application and `public/` before submitting. Preview the initial list
+of canonical, indexable pages with `npm run indexnow`; this makes no network
+requests. After deployment, send the initial list once:
+
+```sh
+npm run indexnow -- --all --submit
+```
+
+For later releases, preview only the pages whose content changed, then submit:
+
+```sh
+npm run indexnow -- /contact /help /updates
+npm run indexnow -- --submit /contact /help /updates
+```
+
+The command verifies the matching key at
+`https://mydocpro.co.in/mydocpro-indexnow.txt` before sending anything. A missing,
+redirected or mismatched key stops submission. HTTP 200 confirms receipt; HTTP
+202 means key validation is pending. Neither response guarantees indexing. The
+command rejects unknown pages, external domains, assets and query-string URLs.
+It runs only when invoked, not during builds or visitor sessions. Do not send
+unchanged URLs repeatedly; run the changed-URL command after meaningful updates.
+See the [official protocol](https://www.indexnow.org/documentation).
+
 ## Structure
 
 - `pages/[[...slug]].js`: statically generated public routes and Next.js client navigation.

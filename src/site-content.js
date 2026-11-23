@@ -12,15 +12,16 @@ export const sitePages = {
   contact: {
     title: "Contact Us",
     description:
-      "Questions, feedback or a tool request? Get in touch with the MyDocPro team.",
+      "Contact MyDocPro with questions, feedback, bug reports or tool requests. Find our support details and send a message about our free image and PDF tools.",
   },
   help: {
     title: "Help & FAQ – How to Use MyDocPro Tools",
     description:
-      "Find help with image dimensions and file size limits, PDF processing, downloads and using MyDocPro offline.",
+      "Get help with MyDocPro's free image and PDF tools. Learn about photo dimensions, KB limits, PDF processing, downloads, offline use and common problems.",
   },
   updates: {
     title: "What’s New",
-    description: "The latest tools, features and improvements added to MyDocPro.",
+    description:
+      "Read MyDocPro's update log for image and PDF tool guidance, photo sizing, troubleshooting and site navigation changes. Learn how to report tool issues.",
   },
 };

@@ -24,9 +24,9 @@
 - [Whiten a Light Photo Background Online Free](https://mydocpro.co.in/white-background): Whiten a plain photo background free using edge-connected colour matching. Adjust tolerance and preview the result before downloading.
 - [About MyDocPro – Free, Private Document Tools](https://mydocpro.co.in/about): Learn how MyDocPro’s free image and PDF tools process your files in your browser and what to check before submitting a document.
 - [Privacy Policy](https://mydocpro.co.in/privacy): Learn which files MyDocPro processes on your device and how it handles browser storage, advertising, analytics and messages sent through the contact form.
-- [Contact Us](https://mydocpro.co.in/contact): Questions, feedback or a tool request? Get in touch with the MyDocPro team.
-- [Help & FAQ – How to Use MyDocPro Tools](https://mydocpro.co.in/help): Find help with image dimensions and file size limits, PDF processing, downloads and using MyDocPro offline.
-- [What’s New](https://mydocpro.co.in/updates): The latest tools, features and improvements added to MyDocPro.
+- [Contact Us](https://mydocpro.co.in/contact): Contact MyDocPro with questions, feedback, bug reports or tool requests. Find our support details and send a message about our free image and PDF tools.
+- [Help & FAQ – How to Use MyDocPro Tools](https://mydocpro.co.in/help): Get help with MyDocPro's free image and PDF tools. Learn about photo dimensions, KB limits, PDF processing, downloads, offline use and common problems.
+- [What’s New](https://mydocpro.co.in/updates): Read MyDocPro's update log for image and PDF tool guidance, photo sizing, troubleshooting and site navigation changes. Learn how to report tool issues.
 - [NEET UG Photo, Signature & Thumb Resizer](https://mydocpro.co.in/exam-photo/neet-ug): Prepare JPGs of your passport photo, signature and hand impressions for NEET UG 2026. Check the file sizes privately before uploading them to NTA.
 - [JEE Main Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/jee-main): Resize photo (10–200KB) and signature (10–100KB) for JEE Main 2027 in JPG format. Free, no sign-up, no upload.
 - [UPSC Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/upsc): Resize your UPSC photo (20–200KB) and triple signature (20–100KB) in JPG. Free, private, works on mobile. Files never leave your device.

@@ -25,12 +25,12 @@ export const toolSearch = {
     "Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image.",
   ],
   "crop-image": [
-    "Crop Images Online Free – Custom Aspect Ratios",
-    "Crop images free with a custom, square, 4:3, 16:9 or 35:45 frame. Rotate your photo, check the framing and download in your browser.",
+    "Crop & Rotate Images Online Free",
+    "Crop photos online free with square, passport or custom ratios. Rotate, drag the crop area and preview before downloading. No sign-up; files stay local.",
   ],
   "merge-pdf": [
     "Merge PDF Files Online Free – Combine PDFs",
-    "Merge PDFs and images free into one file. Arrange pages in the order you need and download the merged document. Your files stay on your device.",
+    "Merge PDFs and images online free. Arrange page thumbnails, combine documents and download one PDF. No sign-up or watermark; files stay on your device.",
   ],
   "split-pdf": [
     "Split PDF Online Free – Extract PDF Pages",
@@ -74,7 +74,7 @@ export const toolSearch = {
   ],
   "white-background": [
     "Whiten a Light Photo Background Online Free",
-    "Whiten a plain photo background free using edge-connected colour matching. Adjust tolerance and preview the result before downloading.",
+    "Whiten a plain photo background online free. Adjust edge-connected colour matching, preview and download an image or A4 PDF. Files stay on your device.",
   ],
 };
 export function pageSeo(id = "") {

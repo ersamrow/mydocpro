@@ -74,6 +74,28 @@ export default function ToolGuide({ id }) {
           several copies arranged for printing.
         </p>
       )}
+      {id === "merge-pdf" && (
+        <p>
+          Need only part of a document? <Link href="/split-pdf">Extract PDF pages</Link>{" "}
+          before merging. After combining files, <Link href="/compress-pdf">compress the PDF</Link>{" "}
+          if your destination sets a file-size limit, then check the final size and readability.
+        </p>
+      )}
+      {id === "crop-image" && (
+        <p>
+          A crop changes the frame. To set the final dimensions,{" "}
+          <Link href="/resize-image">resize the cropped photo in cm, mm or pixels</Link>.
+          For several printed copies, <Link href="/passport-sheet">make a passport photo sheet</Link>{" "}
+          after checking the required photo size.
+        </p>
+      )}
+      {id === "white-background" && (
+        <p>
+          Finish the background first, then <Link href="/crop-image">crop the photo</Link>{" "}
+          and <Link href="/resize-image">set its final dimensions and KB limit</Link>.
+          For repeated copies on paper, use the <Link href="/passport-sheet">passport photo sheet maker</Link>.
+        </p>
+      )}
       <h3>Related tools</h3>
       <ul className="related-tools">
         {related.map((t) => (

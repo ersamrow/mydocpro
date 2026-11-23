@@ -120,9 +120,11 @@ export function draw(
   h = im.height,
   fit = "contain",
   background = "#fff",
+  smoothingQuality,
 ) {
   const c = canvas(w, h),
     x = c.getContext("2d");
+  if (smoothingQuality) x.imageSmoothingQuality = smoothingQuality;
   if (background) {
     x.fillStyle = background;
     x.fillRect(0, 0, c.width, c.height);
@@ -194,6 +196,9 @@ export async function compress(
     preserveDimensions,
     signal,
     maxQuality,
+    // Keep fixed-size form outputs unchanged. General compression can trade
+    // pixel dimensions for cleaner JPEG detail instead of severe blocking.
+    minQuality: preserveDimensions ? 0.03 : 0.7,
   });
 }
 export function byteBudget(kb, minKB = 0, factor = 0.97) {
@@ -209,19 +214,26 @@ export async function compressCanvasToTarget(
     preserveDimensions = false,
     signal,
     maxQuality = 0.98,
+    minQuality = 0.03,
     minKB = 0,
     headroom = 0.97,
   } = {},
 ) {
   const max = byteBudget(kb, minKB, headroom);
+  const source = c;
+  const minimumQuality = Math.min(minQuality, maxQuality);
   for (let attempt = 0; attempt < 24; attempt++) {
     await checkpoint(signal);
     const highQuality = await blob(c, type, maxQuality);
     if (highQuality.size <= max) return highQuality;
-    let low = 0.03,
+    const lowestQuality =
+      type === "image/png" || minimumQuality === maxQuality
+        ? highQuality
+        : await blob(c, type, minimumQuality, signal);
+    let low = minimumQuality,
       high = maxQuality,
-      best = null;
-    for (let i = 0; i < (type === "image/png" ? 0 : 11); i++) {
+      best = lowestQuality.size <= max ? lowestQuality : null;
+    for (let i = 0; best && i < (type === "image/png" ? 0 : 11); i++) {
       await checkpoint(signal);
       const q = (low + high) / 2,
         b = await blob(c, type, q);
@@ -235,13 +247,24 @@ export async function compressCanvasToTarget(
       throw Error(
         "Cannot reach this file size at the requested dimensions. Increase the size limit or lower the DPI.",
       );
-    c = draw(
-      c,
-      Math.max(1, c.width * 0.85),
-      Math.max(1, c.height * 0.85),
+    if (c.width === 1 && c.height === 1) break;
+    const reduction =
+      minQuality > 0.03
+        ? Math.min(
+            0.85,
+            Math.max(0.5, Math.sqrt(max / lowestQuality.size) * 0.98),
+          )
+        : 0.85;
+    const smaller = draw(
+      source,
+      Math.max(1, c.width * reduction),
+      Math.max(1, c.height * reduction),
       "contain",
       type === "image/jpeg" ? "#fff" : null,
+      "high",
     );
+    if (c !== source) c.width = c.height = 1;
+    c = smaller;
   }
   throw Error("Cannot reach the requested size. Try a larger limit.");
 }

@@ -20,9 +20,9 @@ export const guides = {
   "compress-image": [
     "Fit a photo into an upload limit",
     "Choose a JPG, PNG, WebP or HEIC image, enter the maximum KB and set the maximum width. Quick presets cover 20, 50, 100 and 200 KB. The output is JPG. Start with the dimensions required by your form instead of immediately choosing a very small size.",
-    "This tool counts 1 KB as 1,000 bytes and leaves 3% below the maximum: a 50 KB setting targets at most 48,500 bytes. It searches JPEG quality first and reduces dimensions if necessary. Check both pixel dimensions and facial detail after downloading.",
+    "This tool counts 1 KB as 1,000 bytes and leaves 3% below the maximum: a 50 KB setting targets at most 48,500 bytes. For small limits, it reduces pixel dimensions before using heavy JPEG compression. This helps avoid blocky faces and backgrounds. Check the downloaded dimensions against your form’s minimum size.",
     "Why is my photo blurry?",
-    "A very low size target can require heavy compression or fewer pixels. Use a larger limit if permitted. If exact dimensions are mandatory, use Photo presets, which reports an error rather than shrinking those dimensions.",
+    "Start from the original photo rather than an already compressed copy. A 20 KB image cannot retain every detail of a large original, and enlarging the result can make it look soft. Use a larger KB limit if allowed. For exact dimensions, use Resize image with its optional KB limit or Photo presets; those tools report an error instead of shrinking required dimensions.",
     "exam-photo",
   ],
   "resize-image": [

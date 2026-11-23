@@ -107,7 +107,16 @@ export default function Settings({
                 </div>
               )}
               {id === "white-background" && key === "threshold" && (
-                <p className="field-hint">Start low to protect similar-coloured skin or clothing. Higher tolerance includes more background shades.</p>
+                <p className="field-hint">
+                  Start low to protect similar-coloured skin or clothing. Higher
+                  tolerance includes more background shades.
+                </p>
+              )}
+              {id === "compress-image" && key === "target" && (
+                <p className="field-hint">
+                  Small KB limits may reduce pixel dimensions to keep the JPEG
+                  clearer. Start from your original photo for the best result.
+                </p>
               )}
             </div>
           );

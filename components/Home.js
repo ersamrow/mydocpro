@@ -1,4 +1,6 @@
-import { Button } from "./ui.js";
+import { Button, Card } from "./ui.js";
+import ResizeFaqs from "./ResizeFaqs.js";
+import { homeFaqs } from "../src/tool-faqs.js";
 import TrustBadges from "./TrustBadges.js";
 import ExamLinks from "./ExamLinks.js";
 import { useEffect, useState } from "react";
@@ -189,6 +191,9 @@ export default function Home({ heading, cards, examLinks }) {
           </div>
           <span className="badge">Private by design</span>
         </div>
+        <Card className="tool-guide">
+          <ResizeFaqs faqs={homeFaqs} />
+        </Card>
       </main>
     </>
   );

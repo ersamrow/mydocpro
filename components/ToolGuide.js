@@ -4,6 +4,8 @@ import { guides, combinedGuideDetails } from "../src/tool-guides.js";
 import { guideDetails } from "../src/tool-guide-details.js";
 import { tools } from "../src/tools.js";
 import ResizeImageGuide from "./ResizeImageGuide.js";
+import ResizeFaqs from "./ResizeFaqs.js";
+import { toolFaqs } from "../src/tool-faqs.js";
 export default function ToolGuide({ id }) {
   const g = guides[id],
     tool = tools.find((t) => t[0] === id),
@@ -36,8 +38,6 @@ export default function ToolGuide({ id }) {
           )}
           <h3>Worked example and checks</h3>
           <p>{g[2]}</p>
-          <h3>{g[3]}</h3>
-          <p>{g[4]}</p>
           {detail && (
             <>
               <h3>Check your download</h3>
@@ -76,25 +76,37 @@ export default function ToolGuide({ id }) {
       )}
       {id === "merge-pdf" && (
         <p>
-          Need only part of a document? <Link href="/split-pdf">Extract PDF pages</Link>{" "}
-          before merging. After combining files, <Link href="/compress-pdf">compress the PDF</Link>{" "}
-          if your destination sets a file-size limit, then check the final size and readability.
+          Need only part of a document?{" "}
+          <Link href="/split-pdf">Extract PDF pages</Link> before merging. After
+          combining files, <Link href="/compress-pdf">compress the PDF</Link> if
+          your destination sets a file-size limit, then check the final size and
+          readability.
         </p>
       )}
       {id === "crop-image" && (
         <p>
           A crop changes the frame. To set the final dimensions,{" "}
-          <Link href="/resize-image">resize the cropped photo in cm, mm or pixels</Link>.
-          For several printed copies, <Link href="/passport-sheet">make a passport photo sheet</Link>{" "}
-          after checking the required photo size.
+          <Link href="/resize-image">
+            resize the cropped photo in cm, mm or pixels
+          </Link>
+          . For several printed copies,{" "}
+          <Link href="/passport-sheet">make a passport photo sheet</Link> after
+          checking the required photo size.
         </p>
       )}
       {id === "white-background" && (
         <p>
-          Finish the background first, then <Link href="/crop-image">crop the photo</Link>{" "}
-          and <Link href="/resize-image">set its final dimensions and KB limit</Link>.
-          For repeated copies on paper, use the <Link href="/passport-sheet">passport photo sheet maker</Link>.
+          Finish the background first, then{" "}
+          <Link href="/crop-image">crop the photo</Link> and{" "}
+          <Link href="/resize-image">
+            set its final dimensions and KB limit
+          </Link>
+          . For repeated copies on paper, use the{" "}
+          <Link href="/passport-sheet">passport photo sheet maker</Link>.
         </p>
+      )}
+      {["image-editor", "pdf-toolkit"].includes(id) && (
+        <ResizeFaqs faqs={toolFaqs(id)} />
       )}
       <h3>Related tools</h3>
       <ul className="related-tools">

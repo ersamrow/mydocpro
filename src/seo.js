@@ -1,7 +1,8 @@
 import { tools } from "./tools.js";
 import { sitePages } from "./site-content.js";
 import { organizationProfiles } from "./organization-profiles.js";
-import { resizeFaqs, faqSchema } from "./photo-sizes.js";
+import { faqSchema } from "./photo-sizes.js";
+import { homeFaqs, calculatorFaqs, toolFaqs } from "./tool-faqs.js";
 
 export const siteOrigin = "https://mydocpro.co.in";
 // Descriptions explain real functionality; no invented ratings or acceptance claims.
@@ -163,7 +164,17 @@ export function pageSeo(id = "") {
               },
             ]
           : []),
-        ...(id === "resize-image" ? [faqSchema(resizeFaqs)] : []),
+        ...(id === "" || tool || id === "cm-to-pixels"
+          ? [
+              faqSchema(
+                id === ""
+                  ? homeFaqs
+                  : id === "cm-to-pixels"
+                    ? calculatorFaqs
+                    : toolFaqs(id),
+              ),
+            ]
+          : []),
         ...(id
           ? [
               {

@@ -22,6 +22,8 @@ import Settings from "./Settings.js";
 import Dropzone from "./Dropzone.js";
 import { settingsSummary } from "../src/settings-ui.js";
 import ToolGuide from "./ToolGuide.js";
+import ResizeFaqs from "./ResizeFaqs.js";
+import { toolFaqs } from "../src/tool-faqs.js";
 import ResizeImageSizes, { ResizePresets } from "./ResizeImageSizes.js";
 import { resizePresetValues } from "../src/resize-presets.js";
 import {
@@ -1173,6 +1175,11 @@ export default function Workspace({
             ))}
           </div>
         </HelpContainer>
+      )}
+      {!embedded && id !== "resize-image" && (
+        <Card className="tool-guide">
+          <ResizeFaqs faqs={toolFaqs(id)} />
+        </Card>
       )}
     </Container>
   );

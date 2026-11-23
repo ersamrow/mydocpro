@@ -4,6 +4,8 @@ import { Card, ToolLayout } from "./ui.js";
 import TrustBadges from "./TrustBadges.js";
 import { photoSizes, sizePixels } from "../src/photo-sizes.js";
 import styles from "./CmToPixels.module.css";
+import ResizeFaqs from "./ResizeFaqs.js";
+import { calculatorFaqs } from "../src/tool-faqs.js";
 
 const units = {
   cm: { label: "Centimetres (cm)", perInch: 2.54 },
@@ -208,6 +210,9 @@ export default function CmToPixels() {
           Measure a trial print because printer settings can override the
           requested dimensions.
         </p>
+      </Card>
+      <Card className="tool-guide">
+        <ResizeFaqs faqs={calculatorFaqs} />
       </Card>
     </ToolLayout>
   );

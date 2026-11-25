@@ -4,7 +4,7 @@
 
 ## Tools and site information
 
-- [Free Online Photo Editor, No Sign-up](https://mydocpro.co.in/image-editor): Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser and download without a watermark.
+- [Free Online Photo Editor, No Sign-up](https://mydocpro.co.in/image-editor): Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser, then download the edited image without a watermark or upload.
 - [Free PDF Tools Online – Merge, Split, Compress](https://mydocpro.co.in/pdf-toolkit): Merge, split, compress or organize PDFs for free in your browser. Turn photos into PDFs or export pages as images, with no upload or sign-up.
 - [Free Image Compressor – 20 KB, 50 KB or 100 KB](https://mydocpro.co.in/compress-image): Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.
 - [Resize Image in CM, MM & Pixels Online Free – Photo Size Changer](https://mydocpro.co.in/resize-image): Change photo size in cm, mm, inches or pixels. 3.5×4.5 cm, 2×2.5 cm, 4×6 cm and more at 300 DPI. Free, no upload – files stay on your device.
@@ -28,11 +28,11 @@
 - [Help & FAQ – How to Use MyDocPro Tools](https://mydocpro.co.in/help): Get help with MyDocPro's free image and PDF tools. Learn about photo dimensions, KB limits, PDF processing, downloads, offline use and common problems.
 - [What’s New](https://mydocpro.co.in/updates): Read MyDocPro's update log for image and PDF tool guidance, photo sizing, troubleshooting and site navigation changes. Learn how to report tool issues.
 - [NEET UG Photo, Signature & Thumb Resizer](https://mydocpro.co.in/exam-photo/neet-ug): Prepare JPGs of your passport photo, signature and hand impressions for NEET UG 2026. Check the file sizes privately before uploading them to NTA.
-- [JEE Main Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/jee-main): Resize photo (10–200KB) and signature (10–100KB) for JEE Main 2027 in JPG format. Free, no sign-up, no upload.
+- [JEE Main Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/jee-main): Resize your photo (10–200 KB) and signature (10–100 KB) for JEE Main 2027 in JPG format. Free, no sign-up, and files stay on your device.
 - [UPSC Photo & Signature Resizer](https://mydocpro.co.in/exam-photo/upsc): Resize your UPSC photo (20–200KB) and triple signature (20–100KB) in JPG. Free, private, works on mobile. Files never leave your device.
 - [SSC Signature Resizer (CGL, CHSL, MTS, GD)](https://mydocpro.co.in/exam-photo/ssc): Prepare a 10–20 KB JPG signature for SSC forms. Check your scan, read live photo tips and resize privately in your browser.
 - [IBPS Photo, Signature, Thumb & Declaration Resizer](https://mydocpro.co.in/exam-photo/ibps): Resize your IBPS photo, signature, thumb impression or handwritten declaration. Use the scanned image presets and check your recruitment’s instructions.
-- [RRB NTPC Signature Resizer](https://mydocpro.co.in/exam-photo/rrb-ntpc): Resize your signature for RRB NTPC 2026: 30–49KB JPG, min 140×60 px. Photo is captured live. Free, no upload.
+- [RRB NTPC Signature Resizer](https://mydocpro.co.in/exam-photo/rrb-ntpc): Resize your signature for RRB NTPC 2026 to a 30–49 KB JPG of at least 140×60 px. The photo is captured live. Free, and files never leave your device.
 - [Resize Photo to 3.5 × 4.5 cm (413 × 531 px) – Free](https://mydocpro.co.in/resize-image/3-5x4-5-cm): Resize a photo to 3.5 × 4.5 cm: 413 × 531 pixels at 300 DPI. Centre-crop, set an optional KB limit and download free. Files stay on your device.
 - [Resize Photo to 2 × 2.5 cm (236 × 295 px) – Free](https://mydocpro.co.in/resize-image/2x2-5-cm): Resize a photo to 2 × 2.5 cm: 236 × 295 pixels at 300 DPI. Centre-crop, set an optional KB limit and download free. Files stay on your device.
 - [Resize Photo to 2 × 4.5 cm (236 × 531 px) – Free](https://mydocpro.co.in/resize-image/2x4-5-cm): Resize a photo to 2 × 4.5 cm: 236 × 531 pixels at 300 DPI. Centre-crop, set an optional KB limit and download free. Files stay on your device.

@@ -9,7 +9,7 @@ export const siteOrigin = "https://mydocpro.co.in";
 export const toolSearch = {
   "image-editor": [
     "Free Online Photo Editor, No Sign-up",
-    "Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser and download without a watermark.",
+    "Crop, rotate and resize photos for free. Adjust brightness and contrast in your browser, then download the edited image without a watermark or upload.",
   ],
   "pdf-toolkit": [
     "Free PDF Tools Online – Merge, Split, Compress",

@@ -119,7 +119,7 @@ export const exams = [
     lastVerified,
     title: "JEE Main 2027 Photo & Signature Size – Resize Free | MyDocPro",
     metaDescription:
-      "Resize photo (10–200KB) and signature (10–100KB) for JEE Main 2027 in JPG format. Free, no sign-up, no upload.",
+      "Resize your photo (10–200 KB) and signature (10–100 KB) for JEE Main 2027 in JPG format. Free, no sign-up, and files stay on your device.",
     h1: "JEE Main Photo & Signature Resizer",
     intro:
       "Prepare your scanned passport photo and signature for JEE Main 2027, then complete the live camera step in the NTA form.",
@@ -508,7 +508,7 @@ export const exams = [
     lastVerified,
     title: "RRB NTPC 2026 Signature Size (30–49KB) – Resize Free | MyDocPro",
     metaDescription:
-      "Resize your signature for RRB NTPC 2026: 30–49KB JPG, min 140×60 px. Photo is captured live. Free, no upload.",
+      "Resize your signature for RRB NTPC 2026 to a 30–49 KB JPG of at least 140×60 px. The photo is captured live. Free, and files never leave your device.",
     h1: "RRB NTPC Signature Resizer",
     intro:
       "Prepare your signature for RRB NTPC Graduate CEN 06/2026. The portal captures your photo live and has a separate PDF field for eligible travel-pass applicants.",

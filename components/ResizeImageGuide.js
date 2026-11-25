@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ResizeFaqs from "./ResizeFaqs.js";
 import PhotoSizeLinks from "./PhotoSizeLinks.js";
 import { resizeFaqs } from "../src/photo-sizes.js";
@@ -38,6 +39,22 @@ export default function ResizeImageGuide() {
         300 ≈ 413 pixels; a height of 4.5 cm gives approximately 531 pixels.
         Entering 35 × 45 mm at the same DPI gives the same result. For
         millimetres, use pixels = millimetres ÷ 25.4 × DPI.
+      </p>
+      <p>
+        Start with the{" "}
+        <Link href="/resize-image/3-5x4-5-cm" prefetch={false}>
+          3.5 × 4.5 cm photo resizer (413 × 531 pixels at 300 DPI)
+        </Link>{" "}
+        for these dimensions, or choose the{" "}
+        <Link href="/resize-image/2-5x3-5-cm" prefetch={false}>
+          2.5 × 3.5 cm preset (295 × 413 pixels)
+        </Link>{" "}
+        when your instructions specify that size. To calculate another size
+        first, use the{" "}
+        <Link href="/cm-to-pixels" prefetch={false}>
+          cm-to-pixels calculator
+        </Link>
+        .
       </p>
       <h3>Should I crop or add white padding?</h3>
       <ul>

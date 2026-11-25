@@ -21,7 +21,7 @@ export const toolSearch = {
   ],
   "resize-image": [
     "Resize Image in CM, MM & Pixels Online Free – Photo Size Changer",
-    "Change photo size in cm, mm, inches or pixels. 3.5×4.5 cm, 2×2.5 cm, 4×6 cm and more at 300 DPI. Free, no upload – files stay on your device.",
+    "Resize images in cm, mm or pixels with an optional KB limit. Set 3.5 × 4.5 cm at 300 DPI, preview the crop and download free. Files stay on your device.",
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",
@@ -32,8 +32,8 @@ export const toolSearch = {
     "Crop photos online free with square, passport or custom ratios. Rotate, drag the crop area and preview before downloading. No sign-up; files stay local.",
   ],
   "merge-pdf": [
-    "Merge PDF Files Online Free – Combine PDFs",
-    "Merge PDFs and images online free. Arrange page thumbnails, combine documents and download one PDF. No sign-up or watermark; files stay on your device.",
+    "Merge PDF Free – Combine Files, No Upload",
+    "Merge PDF files and images into one document free, without uploading. Reorder page thumbnails, check the preview and download with no sign-up or watermark.",
   ],
   "split-pdf": [
     "Split PDF Online Free – Extract PDF Pages",

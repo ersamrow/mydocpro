@@ -75,13 +75,39 @@ export default function ToolGuide({ id }) {
         </p>
       )}
       {id === "merge-pdf" && (
-        <p>
-          Need only part of a document?{" "}
-          <Link href="/split-pdf">Extract PDF pages</Link> before merging. After
-          combining files, <Link href="/compress-pdf">compress the PDF</Link> if
-          your destination sets a file-size limit, then check the final size and
-          readability.
-        </p>
+        <>
+          <h3>Combine PDFs and photos in one file</h3>
+          <p>
+            For example, add a two-page PDF application and a one-page PDF
+            certificate, then add a JPG receipt. Put the application first,
+            certificate second and receipt last: the result should have four
+            pages. The receipt becomes an A4 page; the PDF pages retain their
+            existing sizes. Check the thumbnails before merging and count the
+            pages in the downloaded file.
+          </p>
+          <h3>Which documents can I merge here?</h3>
+          <p>
+            Use PDF files and supported images. Word documents, Excel workbooks
+            and PowerPoint presentations must first be exported to PDF in their
+            original application. This tool combines pages; it does not perform
+            Word mail merge, OCR or edit the wording inside a PDF.
+          </p>
+          <h3>Merge without uploading your documents</h3>
+          <p>
+            Your browser reads the selected files and creates the combined PDF
+            locally. No account is needed to process or download it. Keep this
+            tab open until the download is ready, and retain signed originals:
+            merging can invalidate digital signatures.
+          </p>
+          <p>
+            Need only part of a document?{" "}
+            <Link href="/split-pdf">Extract PDF pages</Link> before merging.
+            After combining files,{" "}
+            <Link href="/compress-pdf">compress the PDF</Link> if your
+            destination sets a file-size limit, then check the final size and
+            readability.
+          </p>
+        </>
       )}
       {id === "crop-image" && (
         <p>

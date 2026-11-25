@@ -178,6 +178,35 @@ export default function Home({ heading, cards, examLinks }) {
           )}
         </ToolCards>
         <ExamLinks exams={examLinks} />
+        <Card className="tool-guide">
+          <h2>Choose a tool for your application documents</h2>
+          <ul>
+            <li>
+              <Link href="/resize-image">Resize a photo in cm and KB</Link>: set
+              dimensions, DPI and a maximum file size together. For a specific
+              shape, open the{" "}
+              <Link href="/resize-image/3-5x4-5-cm" prefetch={false}>
+                3.5 × 4.5 cm photo preset
+              </Link>{" "}
+              and check your form’s requirements.
+            </li>
+            <li>
+              <Link href="/merge-pdf">
+                Merge PDFs and images without uploading
+              </Link>
+              : arrange applications, certificates and photos into one PDF, then
+              check the page order before submitting.
+            </li>
+            <li>
+              <Link href="/join-images">
+                Join Aadhaar front and back for A4 printing
+              </Link>
+              : choose the matching preset and A4 output, then adjust white
+              space and placement before downloading. Use non-sensitive samples
+              when sharing examples or reporting a problem.
+            </li>
+          </ul>
+        </Card>
         <div className="trust">
           <span className="tool-icon">
             <Icon name="shield-check" />

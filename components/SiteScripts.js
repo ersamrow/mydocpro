@@ -50,8 +50,13 @@ export default function SiteScripts() {
     }
     function schedule() {
       cancel();
-      if (!navigator.onLine || document.readyState !== "complete") return;
-      for (const task of production ? [loadAds, loadAnalytics] : [loadAds]) {
+      if (
+        !production ||
+        !navigator.onLine ||
+        document.readyState !== "complete"
+      )
+        return;
+      for (const task of [loadAds, loadAnalytics]) {
         pending.push(
           window.requestIdleCallback
             ? window.requestIdleCallback(task, { timeout: 1500 })

@@ -1,13 +1,36 @@
 // Physical dimensions are references, not guarantees of application acceptance.
 export const photoSizes = [
-  { slug: "3-5x4-5-cm", width: 3.5, height: 4.5, label: "3.5 × 4.5 cm" },
-  { slug: "2x2-5-cm", width: 2, height: 2.5, label: "2 × 2.5 cm" },
-  { slug: "2x4-5-cm", width: 2, height: 4.5, label: "2 × 4.5 cm" },
+  {
+    slug: "3-5x4-5-cm",
+    width: 3.5,
+    height: 4.5,
+    label: "3.5 × 4.5 cm",
+    framing:
+      "This portrait shape is slightly wider than a 3:4 camera photo. Fill removes a little from the top and bottom, so check hair and shoulders before saving. A crop ratio alone does not establish the head size required by an application.",
+  },
+  {
+    slug: "2x2-5-cm",
+    width: 2,
+    height: 2.5,
+    label: "2 × 2.5 cm",
+    framing:
+      "This small portrait uses a 4:5 ratio. Keep the subject large enough to recognise at a 2 cm printed width, while leaving any space required around the head. Inspect the downloaded image at its actual pixel size instead of judging only an enlarged preview.",
+  },
+  {
+    slug: "2x4-5-cm",
+    width: 2,
+    height: 4.5,
+    label: "2 × 4.5 cm",
+    framing:
+      "This is a narrow portrait, not the more common 3.5 × 4.5 cm shape. Fill can remove a substantial part of the left and right edges of a camera photo. Use Fit inside if keeping those edges matters, and confirm that the resulting white padding is allowed.",
+  },
   {
     slug: "2-5x3-5-cm",
     width: 2.5,
     height: 3.5,
     label: "2.5 × 3.5 cm",
+    framing:
+      "The 5:7 portrait ratio is a little narrower than a 3:4 camera photo. Check both side edges after the centre crop. The PAN reference here sets only the image dimensions; background, framing and upload limits must come from your current application instructions.",
     note: "PAN card photo size reference: use this only if your current application asks for 2.5 × 3.5 cm. Check the official instructions for framing and KB limits.",
   },
   {
@@ -15,11 +38,34 @@ export const photoSizes = [
     width: 5,
     height: 5,
     label: "5 × 5 cm",
+    framing:
+      "A square crop removes the top and bottom of a portrait photo. Leave room above the hair before choosing Fill. If the instructions specify two inches, change both dimensions to 5.08 cm rather than using this 5 cm preset.",
     note: "5 × 5 cm is not exactly 2 × 2 inches. Two inches is 5.08 cm, giving 600 × 600 pixels at 300 DPI; 5 cm gives 591 × 591 pixels. Use the exact dimensions your form requests.",
   },
-  { slug: "4x6-cm", width: 4, height: 6, label: "4 × 6 cm" },
-  { slug: "3x4-cm", width: 3, height: 4, label: "3 × 4 cm" },
-  { slug: "4-5x3-5-cm", width: 4.5, height: 3.5, label: "4.5 × 3.5 cm" },
+  {
+    slug: "4x6-cm",
+    width: 4,
+    height: 6,
+    label: "4 × 6 cm",
+    framing:
+      "This is a 2:3 portrait measuring four by six centimetres, not a 4 × 6 inch print. A 3:4 source loses some width with Fill. Check details near the side edges; use the passport sheet tool if you need repeated copies arranged on paper.",
+  },
+  {
+    slug: "3x4-cm",
+    width: 3,
+    height: 4,
+    label: "3 × 4 cm",
+    framing:
+      "A portrait camera photo already in a 3:4 ratio can fit this shape without cropping. Other source ratios still need a crop or padding. Matching the shape does not guarantee enough resolution: enlarging a small source cannot recover facial detail.",
+  },
+  {
+    slug: "4-5x3-5-cm",
+    width: 4.5,
+    height: 3.5,
+    label: "4.5 × 3.5 cm",
+    framing:
+      "This preset is landscape: width is 4.5 cm and height is 3.5 cm. It is not interchangeable with the upright 3.5 × 4.5 cm preset. Rotate an incorrectly oriented source before resizing; Stretch would distort it rather than rotate it.",
+  },
 ];
 export function sizePixels(size, dpi = 300) {
   return [size.width, size.height].map((cm) => Math.round((cm / 2.54) * dpi));

@@ -47,7 +47,7 @@ export const pageBodies = {
       <>
         <p>
           {
-            "Updated 28 October 2026. This notice describes the application included in this release."
+            "Updated 25 November 2026. This notice describes the application included in this release."
           }
         </p>
         <h2>{"Your selected files"}</h2>
@@ -97,6 +97,21 @@ export const pageBodies = {
           {
             ". Hosting-level services configured separately are outside the application code."
           }
+        </p>
+        <p>
+          Third-party vendors, including Google and its advertising partners,
+          may use advertising cookies to serve personalised ads based on visits
+          to MyDocPro and other websites. You can opt out of personalised Google
+          advertising through Google My Ad Center above. Some other vendors
+          provide opt-out choices at{" "}
+          <a
+            href="https://www.aboutads.info/choices/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            the Digital Advertising Alliance’s consumer choice page
+          </a>
+          . Opting out of personalisation does not remove all advertisements.
         </p>
         <h2>{"Contact form and support email"}</h2>
         <p>
@@ -191,6 +206,19 @@ export const pageBodies = {
   updates: function Content() {
     return (
       <>
+        <h2>25 November 2026 — Photo sizing and tool guidance</h2>
+        <p>
+          Added a centimetre, millimetre and pixel size table with presets,
+          eight pre-filled photo-size pages, and a two-way DPI calculator. Exact
+          2-inch photos are distinguished from 5 cm photos. Each tool now has
+          visible answers about its settings and limitations.
+        </p>
+        <p>
+          Individual result rows include download buttons. General image
+          compression can reduce dimensions for small KB targets, while exact
+          photo-size tools preserve the requested dimensions. Check the
+          downloaded dimensions and readability before submitting a file.
+        </p>
         <h2>{"27 October 2026 — Tool guidance and navigation"}</h2>
         <p>
           {

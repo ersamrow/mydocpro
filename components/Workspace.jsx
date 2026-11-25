@@ -1148,32 +1148,15 @@ export default function Workspace({
         </>
       )}
       {id !== "resize-image" && (
-        <HelpContainer as="details" className="merge-help ui-help">
+        <HelpContainer
+          as="details"
+          open={!embedded}
+          className="merge-help ui-help"
+        >
           <summary>
             Need a hand? <span>Instructions, tips & related tools</span>
           </summary>
           <ToolGuide id={id} />
-          <div className="steps">
-            {[
-              [
-                "01. Choose your file",
-                "Add a file from your device. It stays in your browser.",
-              ],
-              [
-                "02. Make it yours",
-                "Adjust the settings for the form or document you need.",
-              ],
-              [
-                "03. Save & carry on",
-                "Download the result. Your original file stays unchanged.",
-              ],
-            ].map(([title, body]) => (
-              <div key={title}>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </div>
-            ))}
-          </div>
         </HelpContainer>
       )}
       {!embedded && id !== "resize-image" && (

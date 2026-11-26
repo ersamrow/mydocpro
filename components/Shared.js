@@ -37,6 +37,7 @@ import {
   Trash2,
   ScanFace,
   FileSignature,
+  ScanLine,
 } from "lucide-react";
 const icons = {
   Menu,
@@ -72,6 +73,7 @@ const icons = {
   Trash2,
   ScanFace,
   FileSignature,
+  ScanLine,
 };
 export function Icon({ name }) {
   const Component =

@@ -153,6 +153,17 @@ export const guideDetails = {
       "Confirm that every image appears in the intended order with no cropped details. Check that the receiving form accepts a combined JPG or PDF rather than separate uploads.",
     related: ["signature", "crop-image", "resize-image"],
   },
+  "scan-pdf": {
+    steps: [
+      "Take a photo of a page, or choose pictures you already have. Add all the pages you need.",
+      "Check the corner dots on each page and drag them onto the page corners if needed.",
+      "Choose Enhanced, Black and white or Original, and rotate the page if it is sideways.",
+      "Put the pages in order, choose a page size and download the PDF.",
+    ],
+    checks:
+      "Open the PDF and zoom in on each page. Confirm no edges are cut off, the text is sharp, and the pages are in the right order and the right way up. Compress it afterwards if the receiving form has a size limit.",
+    related: ["compress-pdf", "merge-pdf", "jpg-to-pdf"],
+  },
   "sign-pdf": {
     steps: [
       "Choose the PDF you need to sign. Unlock it first if it is password-protected.",

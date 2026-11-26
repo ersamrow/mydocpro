@@ -137,6 +137,14 @@ export const guides = {
     "Use separate files when the form provides separate photo and signature fields. A combined image is useful only when the destination explicitly expects both items in a single file.",
     "signature",
   ],
+  "scan-pdf": [
+    "How to scan documents to PDF with your phone",
+    "Take a photo of each page or choose pictures you already have. The tool looks for the page edges, straightens the photo and removes shadows, then you can drag the four corner dots if the edges were missed. Pick a filter, rotate if needed, arrange the pages and download a single PDF. Everything happens in your browser.",
+    "For the cleanest scan, place the page on a darker, plain surface in good light, hold the phone directly above it and keep all four corners in view. Use Enhanced for coloured documents, Black and white for printed text, and Original for photos or stamps. Check the corners of every page before creating the PDF.",
+    "Why are the page edges not found automatically?",
+    "Automatic detection needs the page to be clearly lighter than what is behind it. On a white desk, with a dark page, or when a corner is out of frame, drag the dots by hand or choose Whole photo.",
+    "compress-pdf",
+  ],
   "sign-pdf": [
     "How to sign and fill a PDF online",
     "Open your PDF, create a signature by drawing, typing your name or uploading a photo of your handwriting, then click the page to place it. You can also add text, today's date and check marks, drag items into position and resize them. The finished PDF is created in your browser; your document is not uploaded.",

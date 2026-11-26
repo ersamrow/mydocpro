@@ -17,6 +17,7 @@ export const actionLabels = {
   "white-background": "Whiten background – free",
   "remove-background": "Remove background – free",
   "sign-pdf": "Sign PDF – free",
+  "scan-pdf": "Scan to PDF – free",
 };
 export const fieldHints = {
   target: "Choose the maximum file size allowed by your form.",

@@ -21,6 +21,7 @@ import "../src/typography.css";
 import "../src/convert-workspace.css";
 import "../src/ui.css";
 import "../src/sign-pdf.css";
+import "../src/scan-pdf.css";
 import "../src/exam-checker.css";
 import Header from "../components/Header.js";
 import SiteScripts from "../components/SiteScripts.js";

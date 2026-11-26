@@ -1,0 +1,135 @@
+.scan-pdf .scan-add,
+.scan-pdf .scan-adjust,
+.scan-pdf .scan-pages {
+  margin-bottom: 16px;
+}
+.scan-add-row {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0;
+}
+.scan-status {
+  margin: 6px 0 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+}
+.scan-warning {
+  color: var(--ui-danger);
+}
+.scan-hint {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+.scan-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+#app .scan-pdf svg.scan-svg {
+  height: auto;
+}
+.scan-svg {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  background: #20332d;
+  border-radius: var(--ui-radius-control);
+  touch-action: none;
+}
+.scan-quad {
+  fill: rgba(24, 100, 78, 0.18);
+  stroke: #3ddc97;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+.scan-quad.scan-bad {
+  stroke: #ff6b5e;
+  fill: rgba(255, 107, 94, 0.2);
+}
+.scan-handle {
+  fill: #fff;
+  stroke: #18644e;
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+  cursor: grab;
+}
+.scan-handle:focus-visible {
+  outline: none;
+  fill: #b7e3c7;
+  stroke-width: 7;
+}
+.scan-result {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  background: #e8eee9;
+  border-radius: var(--ui-radius-control);
+}
+.scan-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.scan-buttons .ui-button[aria-pressed="true"] {
+  outline: 2px solid var(--ui-green);
+  outline-offset: 2px;
+}
+.scan-list {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.scan-thumb {
+  width: 120px;
+}
+.scan-thumb-image {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 150px;
+  padding: 4px;
+  border: 2px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  background: #fff;
+  cursor: pointer;
+}
+.scan-selected .scan-thumb-image {
+  border-color: var(--ui-green);
+}
+.scan-thumb-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.scan-thumb-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 13px;
+}
+.scan-thumb-actions button {
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.scan-thumb-actions button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.scan-size {
+  display: grid;
+  gap: 6px;
+  max-width: 280px;
+  font-size: 14px;
+}

@@ -201,6 +201,24 @@ const extraFaqs = {
       "Join two to six images in a vertical, horizontal or grid layout. Arrange their order and adjust spacing before downloading. Use separate files instead when your destination has separate upload fields.",
     ],
   ],
+  "scan-pdf": [
+    [
+      "Are my document photos uploaded?",
+      "No. Page detection, straightening, cleanup and PDF creation all run in your browser, so your photos stay on your device.",
+    ],
+    [
+      "How many pages can I scan at once?",
+      "Up to 20 pages. Each photo can be up to 25 MB. For a longer document, create several PDFs and join them with Merge PDF.",
+    ],
+    [
+      "Can I make the PDF smaller?",
+      "Yes. After downloading, use Compress PDF to reduce the file size for an upload limit. Choosing Black and white also gives smaller files for text pages.",
+    ],
+    [
+      "Is the scan text-searchable?",
+      "No. Each page is saved as an image, like a photocopy. It does not run text recognition (OCR).",
+    ],
+  ],
   "sign-pdf": [
     [
       "Is my PDF uploaded when I sign it?",

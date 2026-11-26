@@ -75,6 +75,10 @@ export const toolSearch = {
     "Join Images Online Free – JPG or A4 PDF",
     "Join 2–6 images free in a row, column or grid. Arrange Aadhaar front and back with white space for A4 printing. Download JPG or PDF without uploading.",
   ],
+  "scan-pdf": [
+    "Scan Documents to PDF Online Free – Camera Scanner",
+    "Scan paper documents to PDF free: photograph pages, straighten and clean them, then download one PDF. Works on your phone and never uploads your photos.",
+  ],
   "sign-pdf": [
     "Sign PDF Online Free – Add Signature, Text & Date",
     "Sign and fill a PDF free: draw, type or upload your signature, add text, today's date and check marks, then download. Files stay on your device.",

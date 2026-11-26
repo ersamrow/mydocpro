@@ -37,7 +37,10 @@
 #app .main,
 #app .site-footer,
 #app .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout) {
+  /* Older rules capped some of these at 1176px, which left home and footer
+     content 12px out of line with the tool pages. */
   width: min(100% - 2 * var(--ds-gutter), var(--ds-page-max));
+  max-width: none;
   margin-inline: auto;
 }
 #app .site-header {
@@ -438,73 +441,6 @@
   }
 }
 
-/* ---------- Home: search-first hero ---------- */
-#app .hero {
-  display: block;
-  text-align: center;
-  padding-block: var(--ds-6) var(--ds-3);
-}
-#app .hero > div:first-child {
-  max-width: 760px;
-  margin-inline: auto;
-}
-#app .hero .art {
-  display: none;
-}
-#app .hero p {
-  max-width: 58ch;
-  margin-inline: auto;
-}
-#app .hero .search.hero-search {
-  position: relative;
-  max-width: 640px;
-  margin: var(--ds-4) auto 0;
-}
-#app .hero .search.hero-search input {
-  width: 100%;
-  height: 56px;
-  padding: 0 var(--ds-5) 0 52px;
-  border: 1px solid var(--ui-input-border);
-  border-radius: 16px;
-  background: var(--ui-surface);
-  box-shadow: var(--ds-shadow);
-  font-size: 16px;
-}
-#app .hero .search.hero-search input:focus {
-  border-color: var(--ui-green);
-  box-shadow: 0 0 0 4px rgba(24, 100, 78, 0.14);
-}
-#app .hero .search.hero-search > svg {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  width: 20px;
-  height: 20px;
-  color: var(--ui-muted);
-  pointer-events: none;
-}
-#app .hero .search.hero-search .clear-search {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  min-height: 44px;
-  width: 44px;
-  padding: 0;
-}
-#app .hero .hero-checks,
-#app .hero .trust-badges {
-  justify-content: center;
-}
-@media (max-width: 650px) {
-  #app .hero .search.hero-search input {
-    height: 52px;
-    font-size: 16px; /* 16px stops iOS zooming into the field */
-  }
-  #app .hero .search.hero-search > svg {
-    top: 16px;
-  }
-}
-
 /* ---------- Phones: file, then settings, then preview ---------- */
 @media (max-width: 900px) {
   #app .ui-side-workspace .merge-layout {
@@ -621,5 +557,483 @@
   #app .ui-button--primary:hover:not(:disabled),
   #app .grid .card:hover {
     transform: none;
+  }
+}
+
+/* ---------- Header ---------- */
+@media (min-width: 801px) {
+  /* A slimmer bar leaves more of the screen for the tool. */
+  #app .site-header {
+    height: 72px;
+    min-height: 72px;
+    padding-block: 8px;
+  }
+}
+#app .site-header {
+  position: relative;
+  z-index: 60;
+}
+#app .site-header .nav-scrim {
+  display: none;
+}
+@media (max-width: 479px) {
+  #app .site-header {
+    height: 64px;
+    min-height: 64px;
+    padding: 8px var(--ds-gutter);
+    gap: var(--ds-3);
+  }
+  #app .site-header .header-identity {
+    justify-self: start;
+  }
+  /* Menu button: a clear 44px target that becomes ✕ while open. */
+  #app .site-header .mobile-menu-toggle {
+    border-color: rgba(244, 251, 246, 0.35);
+    color: #f4fbf6;
+  }
+  #app .site-header .mobile-menu-toggle[aria-expanded="true"] {
+    background: #f4fbf6;
+    border-color: #f4fbf6;
+    color: #123e33;
+  }
+  /* Install: one compact line; the full offline status is in its dialog. */
+  #app .site-header .app-controls {
+    width: auto;
+    max-width: none;
+    min-width: 0;
+  }
+  #app .site-header button[data-install-app],
+  #app .site-header .app-controls button {
+    width: auto;
+    min-width: 96px;
+    height: 44px;
+    padding: 0 14px;
+    grid-template-rows: auto;
+    border-radius: 12px;
+  }
+  #app .site-header .app-controls button [data-app-status] {
+    display: none;
+  }
+  #app .site-header .app-controls button > span:first-child {
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  /* Menu panel: full width under the bar, with big, clear rows. */
+  #app .site-header nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: none;
+    grid-template-columns: 1fr;
+    gap: var(--ds-1);
+    padding: var(--ds-2) var(--ds-gutter) var(--ds-4);
+    border: 0;
+    border-radius: 0 0 var(--ui-radius-card) var(--ui-radius-card);
+    background: var(--ui-surface);
+    box-shadow: 0 24px 40px rgba(10, 30, 24, 0.28);
+  }
+  #app .site-header nav.mobile-nav-open {
+    display: grid;
+  }
+  #app .site-header nav a,
+  #app .site-header nav a:last-child {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-3);
+    min-height: 52px;
+    padding: var(--ds-3) var(--ds-4);
+    border-radius: var(--ui-radius-control);
+    color: var(--ui-ink);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  #app .site-header nav a svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    opacity: 1;
+    color: var(--ui-green);
+  }
+  #app .site-header nav a::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    margin: 0 var(--ds-1) 0 auto;
+    border-top: 2px solid #9ab3a8;
+    border-right: 2px solid #9ab3a8;
+    transform: rotate(45deg);
+  }
+  #app .site-header nav a:hover,
+  #app .site-header nav a:focus-visible {
+    background: var(--ui-soft);
+    color: var(--ui-ink);
+  }
+  #app .site-header nav a.nav-active {
+    background: var(--ui-soft);
+    color: var(--ui-green);
+    font-weight: 700;
+    box-shadow: inset 4px 0 0 var(--ui-green);
+  }
+  /* Dim the page behind the open menu; tapping it closes the menu. */
+  #app .site-header .nav-scrim {
+    display: block;
+    position: fixed;
+    inset: 64px 0 0 0;
+    z-index: 1;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(10, 30, 24, 0.5);
+    cursor: default;
+  }
+}
+
+/* ---------- FAQ rows: scan the questions, open the answer you need ---------- */
+#app .faq-list {
+  margin: var(--ds-3) 0 0;
+  border-top: 1px solid var(--ui-border);
+}
+#app .faq-item {
+  border-bottom: 1px solid var(--ui-border);
+}
+#app .faq-item > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  min-height: 56px;
+  padding: var(--ds-3) var(--ds-2);
+  border-radius: var(--ui-radius-control);
+  cursor: pointer;
+  list-style: none;
+}
+#app .faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+#app .faq-item > summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  margin: 0 var(--ds-2) 3px auto;
+  border-right: 2px solid var(--ui-muted);
+  border-bottom: 2px solid var(--ui-muted);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+#app .faq-item[open] > summary::after {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+#app .faq-item > summary:hover {
+  background: var(--ui-soft);
+}
+#app .faq-item .faq-question {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--ui-ink);
+}
+#app .faq-item[open] .faq-question {
+  color: var(--ui-green);
+}
+#app .faq-item .faq-answer {
+  padding: 0 var(--ds-2) var(--ds-4);
+}
+#app .faq-item .faq-answer p {
+  max-width: none;
+  margin: 0;
+  font-size: var(--ds-text);
+  line-height: 1.65;
+  color: #3d554c;
+}
+#app .faq-item .faq-answer p + p {
+  margin-top: var(--ds-3);
+}
+#app .faq-card > section > h2,
+#app .faq-card > h2 {
+  margin: 0;
+  font-size: 20px;
+}
+/* The tool-guide rules must not enlarge accordion titles. */
+#app .ds-disclosure > summary > .ds-disclosure-title {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+/* ---------- Information pages: same header, readable two-column text ---------- */
+#app .page-intro {
+  margin: 0 0 var(--ds-4);
+  padding: 0;
+  border: 0;
+}
+#app .page-intro .breadcrumbs,
+#app .page-intro nav[aria-label="Breadcrumb"] {
+  margin-bottom: var(--ds-3);
+}
+#app .page-intro .page-kicker {
+  display: none;
+}
+#app .page-intro .page-intro-heading {
+  gap: var(--ds-3);
+}
+#app .page-intro .page-emblem {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+#app .page-intro .page-emblem svg {
+  width: 22px;
+  height: 22px;
+}
+#app .page-intro .page-intro-heading h1 {
+  font-size: clamp(24px, 1.6vw + 14px, 32px);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+#app .page-description {
+  max-width: 75ch;
+  margin: var(--ds-2) 0 0;
+  font-size: var(--ds-text);
+  line-height: 1.55;
+}
+#app .information-layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: var(--ds-gap);
+  align-items: start;
+}
+#app .information-sidebar {
+  position: sticky;
+  top: var(--ds-4);
+}
+#app .information-content {
+  padding: var(--ds-6);
+}
+/* About, Privacy, What's new: section title on the left, text on the right. */
+#app :is(.information-about, .information-privacy, .information-updates)
+  .information-content {
+  display: grid;
+  grid-template-columns: minmax(150px, 230px) minmax(0, 1fr);
+  column-gap: var(--ds-6);
+  align-items: start;
+}
+#app :is(.information-about, .information-privacy, .information-updates)
+  .information-content
+  > * {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0 0 var(--ds-3);
+  font-size: var(--ds-text);
+  line-height: 1.7;
+  color: #3d554c;
+}
+#app :is(.information-about, .information-privacy, .information-updates)
+  .information-content
+  > h2 {
+  grid-column: 1;
+  margin: 0;
+  padding-top: var(--ds-5);
+  border-top: 1px solid var(--ui-border);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ui-ink);
+}
+#app :is(.information-about, .information-privacy, .information-updates)
+  .information-content
+  > h2
+  + * {
+  padding-top: var(--ds-5);
+  border-top: 1px solid var(--ui-border);
+}
+/* The opening paragraph spans the full width as a short lead-in. */
+#app :is(.information-about, .information-privacy)
+  .information-content
+  > :first-child:not(h2) {
+  grid-column: 1 / -1;
+  margin-bottom: var(--ds-5);
+  font-size: 17px;
+}
+#app .information-content ul,
+#app .information-content ol {
+  padding-left: var(--ds-5);
+}
+/* Help: the troubleshooting list uses the FAQ rows. */
+#app .information-help .information-content > .faq-item:first-child {
+  border-top: 1px solid var(--ui-border);
+}
+@media (max-width: 800px) {
+  #app .information-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #app .information-sidebar {
+    position: static;
+  }
+  #app .information-content {
+    padding: var(--ds-card-pad);
+  }
+  #app :is(.information-about, .information-privacy, .information-updates)
+    .information-content {
+    display: block;
+  }
+  #app :is(.information-about, .information-privacy, .information-updates)
+    .information-content
+    > h2 {
+    margin-top: var(--ds-4);
+    padding-top: var(--ds-4);
+  }
+  #app :is(.information-about, .information-privacy, .information-updates)
+    .information-content
+    > h2
+    + * {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+/* ---------- Converter inputs match the rest of the app ---------- */
+#app input[type="text"],
+#app input[type="number"],
+#app input:not([type]) {
+  min-height: var(--ui-control-height);
+}
+
+/* ---------- Polish from the page-by-page review ---------- */
+/* Old information-page heading rules must not add lines or size to FAQ rows. */
+#app .information-content .faq-item .faq-question {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+#app .information-content .faq-item .faq-answer p {
+  margin: 0;
+  font-size: var(--ds-text);
+}
+/* Contact: section titles match the rest of the information pages. */
+#app .information-contact .information-content h2 {
+  font-size: 18px;
+  line-height: 1.3;
+}
+#app .information-contact .information-content > h2 {
+  margin-top: var(--ds-5);
+  padding-top: var(--ds-5);
+}
+/* Text fields keep a comfortable inner margin. */
+#app [class*="fields"] input {
+  padding-inline: 12px;
+}
+
+/* ---------- Guide card inside "Need a hand?" ---------- */
+/* The generic "card in a card" flattening must keep the guide's own padding. */
+#app .ui-help > .ui-card.tool-guide,
+#app .ui-help > .tool-guide {
+  margin: 0;
+  padding: var(--ds-card-pad);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#app .ui-help .tool-guide > :is(p, ol, ul) {
+  max-width: none;
+}
+#app .tool-guide :is(p, li) {
+  color: #3d554c;
+}
+#app .tool-guide :is(ol, ul) {
+  padding-left: var(--ds-5);
+}
+#app .tool-guide li + li {
+  margin-top: var(--ds-2);
+}
+#app .tool-guide .related-tools {
+  padding-left: 0;
+}
+#app .tool-guide .related-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-2);
+  margin: var(--ds-2) 0 var(--ds-3);
+  list-style: none;
+}
+#app .tool-guide .related-tools a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--ui-surface);
+  font-size: var(--ds-text-sm);
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--ui-green);
+}
+#app .tool-guide .related-tools a:hover {
+  background: var(--ui-soft);
+  border-color: var(--ui-green);
+}
+
+/* ---------- Tool steps: identical headings, read left to right ---------- */
+#app .ui-section-heading {
+  align-items: flex-start;
+  gap: var(--ds-3);
+  margin: 0 0 var(--ds-4);
+}
+#app .ui-section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+}
+#app .ui-section-heading p {
+  margin: 2px 0 0;
+  font-size: var(--ds-text-sm);
+  line-height: 1.4;
+}
+#app .ui-step-badge {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  line-height: 1;
+}
+@media (min-width: 900px) {
+  /* Step 1 (your file) on the left, step 2 (settings) on the right. */
+  #app .ui-side-workspace .workpanel .merge-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  }
+  #app .ui-side-workspace .merge-layout .merge-canvas {
+    grid-column: 1;
+  }
+  #app .ui-side-workspace .merge-controls > .ui-options-card,
+  #app .ui-side-workspace .merge-controls > .notice {
+    grid-column: 2;
+  }
+}
+
+/* ---------- One card, one background: file (left) and settings (right) ---------- */
+/* The pale-green and grey boxes that used to sit inside the file side made the
+   two halves look different. Both halves now sit on the card's white surface. */
+@media (min-width: 900px) {
+  #app .ui-side-workspace .merge-page-editor {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  #app .ui-side-workspace .image-result-panel {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
 }

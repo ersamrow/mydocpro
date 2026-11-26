@@ -12,6 +12,12 @@ export default function Header({ id }) {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setHash(router.asPath.split("#")[1] || ""), [router.asPath]);
   useEffect(() => setMenuOpen(false), [router.asPath]);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event) => event.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
   const active =
     category || (["image", "pdf"].includes(hash) ? hash : !id ? "all" : null);
   return (
@@ -28,9 +34,18 @@ export default function Header({ id }) {
         aria-controls="main-navigation"
         onClick={() => setMenuOpen((v) => !v)}
       >
-        <Icon name="menu" />
+        <Icon name={menuOpen ? "x" : "menu"} />
         <span>Menu</span>
       </Button>
+      {menuOpen && (
+        <button
+          type="button"
+          className="nav-scrim"
+          aria-label="Close navigation menu"
+          tabIndex={-1}
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       <nav
         id="main-navigation"
         className={menuOpen ? "mobile-nav-open" : ""}

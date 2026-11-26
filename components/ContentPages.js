@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ContactForm from "./ContactForm.js";
+import { FaqItem } from "./FaqList.js";
 export const pageBodies = {
   about: function Content() {
     return (
@@ -163,36 +164,45 @@ export const pageBodies = {
   help: function Content() {
     return (
       <>
-        <h2>{"File size and dimensions are different"}</h2>
-        <p>
-          {
-            "A form may require both a pixel size and a maximum file size. Resize first, then compress and check the final dimensions again. General image compression can reduce dimensions to meet a low target. Photo presets preserve their calculated dimensions and report an error when the target is unattainable."
-          }
-        </p>
-        <h2>{"My PDF is too large or processing stopped"}</h2>
-        <p>
-          {
-            "PDF inputs are limited to 100 MB total and 300 pages. Mobile devices may run out of memory below those limits. Try fewer pages or a lower rendering DPI, close other tabs and keep the browser open while processing. For protected or damaged PDFs, obtain a valid unlocked copy from its source."
-          }
-        </p>
-        <h2>{"The download is missing"}</h2>
-        <p>
-          {
-            "Wait for the result link and select it. Check your browser’s Downloads list or the Files app. Some mobile browsers open a preview first; use its Save or Share action to save a copy. For multiple files, use Download all (ZIP) or the individual download links. Your original file is unchanged."
-          }
-        </p>
-        <h2>{"The output is unreadable or larger"}</h2>
-        <p>
-          {
-            "Compare it with the original before deleting anything. Lower JPEG quality and DPI reduce detail; PNG may be larger than JPG. PDF compression first recompresses supported embedded images while retaining text; scanned PDFs may use image-only pages. A PDF that does not shrink is not offered for download. Keep the original when forms, accessibility or signatures matter."
-          }
-        </p>
-        <h2>{"Offline use and updates"}</h2>
-        <p>
-          {
-            "Open the site online and wait for “✓ Works offline” before disconnecting. Browser storage eviction can remove the cache. Updates wait until all MyDocPro windows close to avoid interrupting work. Reopen online to receive a new version. If problems persist, save your downloads before clearing the site’s browser storage."
-          }
-        </p>
+        <FaqItem
+          question="File size and dimensions are different"
+          level={2}
+          open
+        >
+          <p>
+            {
+              "A form may require both a pixel size and a maximum file size. Resize first, then compress and check the final dimensions again. General image compression can reduce dimensions to meet a low target. Photo presets preserve their calculated dimensions and report an error when the target is unattainable."
+            }
+          </p>
+        </FaqItem>
+        <FaqItem question="My PDF is too large or processing stopped" level={2}>
+          <p>
+            {
+              "PDF inputs are limited to 100 MB total and 300 pages. Mobile devices may run out of memory below those limits. Try fewer pages or a lower rendering DPI, close other tabs and keep the browser open while processing. For protected or damaged PDFs, obtain a valid unlocked copy from its source."
+            }
+          </p>
+        </FaqItem>
+        <FaqItem question="The download is missing" level={2}>
+          <p>
+            {
+              "Wait for the result link and select it. Check your browser’s Downloads list or the Files app. Some mobile browsers open a preview first; use its Save or Share action to save a copy. For multiple files, use Download all (ZIP) or the individual download links. Your original file is unchanged."
+            }
+          </p>
+        </FaqItem>
+        <FaqItem question="The output is unreadable or larger" level={2}>
+          <p>
+            {
+              "Compare it with the original before deleting anything. Lower JPEG quality and DPI reduce detail; PNG may be larger than JPG. PDF compression first recompresses supported embedded images while retaining text; scanned PDFs may use image-only pages. A PDF that does not shrink is not offered for download. Keep the original when forms, accessibility or signatures matter."
+            }
+          </p>
+        </FaqItem>
+        <FaqItem question="Offline use and updates" level={2}>
+          <p>
+            {
+              "Open the site online and wait for “✓ Works offline” before disconnecting. Browser storage eviction can remove the cache. Updates wait until all MyDocPro windows close to avoid interrupting work. Reopen online to receive a new version. If problems persist, save your downloads before clearing the site’s browser storage."
+            }
+          </p>
+        </FaqItem>
         <h2>{"Still stuck?"}</h2>
         <p>
           <Link href={"/contact"}>{"Contact MyDocPro"}</Link>

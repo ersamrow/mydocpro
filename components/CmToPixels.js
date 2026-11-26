@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
-import { Card, ToolLayout } from "./ui.js";
+import { Button, Card, ToolLayout } from "./ui.js";
+import { Icon } from "./Shared.js";
 import TrustBadges from "./TrustBadges.js";
 import { photoSizes, sizePixels } from "../src/photo-sizes.js";
 import styles from "./CmToPixels.module.css";
@@ -40,9 +41,13 @@ export default function CmToPixels() {
 
   return (
     <ToolLayout className={styles.page}>
-      <div className={styles.intro}>
+      <div className={`tool-heading ${styles.intro}`}>
+        <Button as={Link} className="back" href="/">
+          <Icon name="grid2x2" />
+          All tools
+        </Button>
         <h1>CM to Pixels Converter – Free</h1>
-        <p>
+        <p className="intro">
           Convert cm, mm or inches to pixels, or calculate physical size from
           pixels at your chosen DPI. All calculations run in your browser.
         </p>

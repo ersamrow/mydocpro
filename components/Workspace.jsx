@@ -8,7 +8,6 @@ import {
   ToolSectionHeading,
 } from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
-import Disclosure from "./Disclosure.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
@@ -592,7 +591,7 @@ export default function Workspace({
           <div className="merge-canvas">
             {sideLayout && files.length > 0 && (
               <ToolSectionHeading
-                step="1"
+                step="✓"
                 title="Your file"
                 description="Check it before saving."
               />
@@ -1166,13 +1165,9 @@ export default function Workspace({
         </HelpContainer>
       )}
       {!embedded && id !== "resize-image" && (
-        <Disclosure
-          title="Frequently asked questions"
-          hint="Quick answers about this tool"
-          className="tool-guide"
-        >
-          <ResizeFaqs faqs={toolFaqs(id)} showHeading={false} />
-        </Disclosure>
+        <Card className="tool-guide faq-card">
+          <ResizeFaqs faqs={toolFaqs(id)} />
+        </Card>
       )}
     </Container>
   );

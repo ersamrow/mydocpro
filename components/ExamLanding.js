@@ -8,6 +8,7 @@ import {
 import ExamDocumentTool from "./ExamDocumentTool.js";
 import ExamChecker from "./ExamChecker.js";
 import Disclosure from "./Disclosure.js";
+import FaqList from "./FaqList.js";
 import SeoHead from "./SeoHead.js";
 import TrustBadges from "./TrustBadges.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
@@ -166,21 +167,15 @@ export default function ExamLanding({ exam, relatedExams }) {
               ))}
             </ul>
           </Disclosure>
-          <Disclosure
-            id="faq"
-            title="Frequently asked questions"
-            hint={`${exam.faqs.length} answers`}
-            className={styles.faq}
-          >
-            <dl>
-              {exam.faqs.map(({ question, answer }) => (
-                <Fragment key={question}>
-                  <dt>{question}</dt>
-                  <dd>{answer}</dd>
-                </Fragment>
-              ))}
-            </dl>
-          </Disclosure>
+          <section id="faq" className={styles.faq}>
+            <h2>Frequently asked questions</h2>
+            <FaqList
+              items={exam.faqs.map(({ question, answer }) => [
+                question,
+                answer,
+              ])}
+            />
+          </section>
           <Disclosure
             title="Official requirements"
             hint="Sources and last-checked date"

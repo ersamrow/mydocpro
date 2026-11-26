@@ -1,0 +1,131 @@
+.ec-card {
+  margin-top: 16px;
+}
+.ec-list {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.ec-row {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  padding: 14px;
+  background: var(--ui-surface);
+}
+.ec-row.ec-pass {
+  border-color: #8fc7ad;
+}
+.ec-row.ec-warn {
+  border-color: #dcc27a;
+}
+.ec-row.ec-fail {
+  border-color: #e0a29c;
+}
+.ec-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.ec-head h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.ec-spec {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+.ec-badge {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--ui-soft);
+  color: var(--ui-muted);
+  font-weight: 700;
+}
+.ec-pass .ec-badge {
+  background: var(--ui-success);
+  color: #fff;
+}
+.ec-warn .ec-badge {
+  background: var(--ui-warning-soft);
+  color: var(--ui-warning);
+  border: 1px solid var(--ui-warning);
+}
+.ec-fail .ec-badge {
+  background: var(--ui-danger);
+  color: #fff;
+}
+.ec-state {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-muted);
+}
+.ec-pass .ec-state {
+  color: var(--ui-success);
+}
+.ec-warn .ec-state {
+  color: var(--ui-warning);
+}
+.ec-fail .ec-state {
+  color: var(--ui-danger);
+}
+.ec-file {
+  margin: 10px 0 4px;
+  font-size: 13px;
+  color: var(--ui-muted);
+  overflow-wrap: anywhere;
+}
+.ec-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.ec-checks li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 8px;
+  font-size: 14px;
+}
+.ec-checks .ec-pass > span:first-child {
+  color: var(--ui-success);
+}
+.ec-checks .ec-warn > span:first-child {
+  color: var(--ui-warning);
+}
+.ec-checks .ec-fail > span:first-child {
+  color: var(--ui-danger);
+}
+.ec-problem {
+  color: var(--ui-danger);
+  font-size: 14px;
+}
+.ec-note,
+.ec-disclaimer,
+.ec-summary {
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+.ec-summary {
+  font-weight: 600;
+}
+.ec-fix {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+@media (max-width: 520px) {
+  .ec-head {
+    grid-template-columns: auto 1fr;
+  }
+  .ec-state {
+    grid-column: 2;
+  }
+}

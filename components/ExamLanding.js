@@ -6,6 +6,7 @@ import {
   formatExamFileRange,
 } from "../src/exam-requirements.js";
 import ExamDocumentTool from "./ExamDocumentTool.js";
+import ExamChecker from "./ExamChecker.js";
 import SeoHead from "./SeoHead.js";
 import TrustBadges from "./TrustBadges.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
@@ -121,7 +122,10 @@ export default function ExamLanding({ exam, relatedExams }) {
           <TrustBadges toolId="exam-photo" />
         </div>
 
-        <ExamDocumentTool key={exam.slug} exam={exam} />
+        <div id="exam-prepare">
+          <ExamDocumentTool key={exam.slug} exam={exam} />
+        </div>
+        <ExamChecker key={"check-" + exam.slug} exam={exam} />
 
         <Card as="article" className={styles.guide}>
           <section className={styles.live} aria-labelledby="live-photo-title">

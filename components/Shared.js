@@ -90,7 +90,7 @@ export function Logo() {
         src="/icons/icon.svg"
         width="48"
         height="48"
-        alt=""
+        alt="MyDocPro logo"
       />
       <span>
         MyDoc<span>Pro</span>
@@ -160,13 +160,13 @@ export function Footer({ examLinks }) {
               <span className="footer-product-brand">
                 <img
                   src="/brand/myledgerpro-logo.png"
-                  alt=""
+                  alt="MyLedgerPro"
                   width="512"
                   height="512"
                   loading="lazy"
                   decoding="async"
                 />
-                MyLedgerPro
+                <span aria-hidden="true">MyLedgerPro</span>
               </span>
               <ArrowUpRight aria-hidden="true" />
             </strong>

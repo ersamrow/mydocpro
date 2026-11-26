@@ -1,0 +1,351 @@
+/*
+  MyDocPro design system – the single source of truth for layout rhythm,
+  surfaces, buttons and page headers. It is imported last so every page
+  (home, tools, exam pages) shares the same sizes, spacing and look.
+  Page CSS may add content geometry; it should not redefine these.
+*/
+:root {
+  /* Spacing scale (4 px base). */
+  --ds-1: 4px;
+  --ds-2: 8px;
+  --ds-3: 12px;
+  --ds-4: 16px;
+  --ds-5: 24px;
+  --ds-6: 32px;
+  --ds-7: 48px;
+  /* Page frame. */
+  --ds-gutter: clamp(16px, 4vw, 32px);
+  --ds-page-max: 1200px;
+  --ds-gap: 20px; /* space between sections on a page */
+  --ds-card-pad: 20px;
+  /* Surfaces and type. */
+  --ds-shadow: 0 1px 2px rgba(24, 59, 51, 0.05),
+    0 6px 18px rgba(24, 59, 51, 0.05);
+  --ds-text: 15px;
+  --ds-text-sm: 13px;
+  --ds-text-xs: 12px;
+}
+@media (max-width: 650px) {
+  :root {
+    --ds-gap: 14px;
+    --ds-card-pad: 14px;
+  }
+}
+
+/* ---------- Page frame: one width and one gutter everywhere ---------- */
+#app .hero,
+#app .main,
+#app .site-footer,
+#app .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout) {
+  width: min(100% - 2 * var(--ds-gutter), var(--ds-page-max));
+  margin-inline: auto;
+}
+#app .site-header {
+  padding-inline: max(
+    var(--ds-gutter),
+    calc((100% - var(--ds-page-max)) / 2)
+  );
+}
+#app .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout) {
+  margin-block: var(--ds-5) var(--ds-7);
+}
+/* Consistent vertical rhythm between the sections of a tool page. */
+#app .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout) > * {
+  margin-block: 0;
+}
+#app
+  .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout)
+  > * + *:not(:empty):not([hidden]) {
+  margin-top: var(--ds-gap);
+}
+@media (max-width: 650px) {
+  #app .ui-tool-layout:not(.ui-tool-layout .ui-tool-layout) {
+    margin-block: var(--ds-3) var(--ds-6);
+  }
+}
+
+/* ---------- Surfaces: one card ---------- */
+#app .ui-card {
+  padding: var(--ds-card-pad);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  box-shadow: var(--ds-shadow);
+}
+/* A card inside a card becomes a plain section, so there are no double boxes.
+   It is divided from the content above it, unless it is the first thing. */
+#app .ui-card .ui-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#app .ui-card :not(:first-child).ui-card {
+  margin-top: var(--ds-4);
+  padding-top: var(--ds-4);
+  border-top: 1px solid var(--ui-border);
+}
+#app .ui-card > h2:first-child,
+#app .ui-card > .ui-section-heading h2 {
+  margin: 0 0 var(--ds-3);
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+/* ---------- Buttons: one size, one shape ---------- */
+#app .ui-button {
+  min-height: var(--ui-control-height);
+  padding: 10px 18px;
+  border-radius: var(--ui-radius-control);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+#app .ui-button--icon {
+  width: var(--ui-control-height);
+  padding: 8px;
+}
+#app .ui-button:focus-visible {
+  outline: 3px solid var(--ui-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Tool page header: compact, so the tool is on screen ---------- */
+#app .tool-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--ds-4);
+  row-gap: var(--ds-2);
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#app .tool-heading-meta {
+  display: contents;
+}
+#app .tool-heading .eyebrow,
+#app .tool-heading .page-kicker,
+#app .tool-heading .page-emblem {
+  display: none;
+}
+#app .tool-heading .back {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 8px 14px; /* keeps the shared 44px touch target */
+  font-size: var(--ds-text-sm);
+}
+#app .tool-heading .page-intro-heading,
+#app .tool-heading > h1 {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  min-width: 0;
+}
+#app .tool-heading h1,
+#app .workspace .page-intro-heading h1 {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(24px, 1.6vw + 14px, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+#app .tool-heading .intro {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  max-width: 75ch;
+  margin: 0;
+  padding: 0;
+  font-size: var(--ds-text);
+  line-height: 1.55;
+}
+#app .tool-heading .trust-badges {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  min-width: 0; /* a grid item must be allowed to shrink and scroll */
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-1) var(--ds-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--ds-text-xs);
+}
+/* Badges are one short line; release the fixed height reserved for them. */
+#app .trust-badges {
+  height: auto;
+  min-height: 20px;
+  font-size: var(--ds-text-xs);
+  line-height: 20px;
+}
+#app .trust-badges li,
+#app .trust-badges li > span {
+  font-size: var(--ds-text-xs);
+}
+/* Exam and landing pages: breadcrumbs sit above the title. */
+#app .tool-heading:has(> .breadcrumbs) .breadcrumbs {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin: 0;
+}
+#app .tool-heading:has(> .breadcrumbs) > h1 {
+  grid-row: 2;
+}
+#app .tool-heading:has(> .breadcrumbs) .intro {
+  grid-row: 3;
+}
+#app .tool-heading:has(> .breadcrumbs) .trust-badges {
+  grid-row: 4;
+}
+@media (max-width: 650px) {
+  #app .tool-heading .back {
+    padding: 8px 12px;
+  }
+  /* One tidy line of badges instead of a wrapped block. */
+  #app .tool-heading .trust-badges {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  #app .tool-heading .trust-badges::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------- Guides, FAQs and long text: denser, still readable ---------- */
+#app .tool-guide,
+#app .ui-card.tool-guide {
+  margin: 0;
+  line-height: 1.65;
+}
+#app .tool-guide p,
+#app .privacy-page p {
+  font-size: var(--ds-text);
+  line-height: 1.65;
+}
+#app .tool-guide h2,
+#app .ui-card.tool-guide h2 {
+  font-size: 20px;
+}
+#app .tool-guide h3 {
+  margin-top: var(--ds-4);
+  font-size: 16px;
+}
+
+/* ---------- Home: show the tools without a long scroll ---------- */
+#app .hero {
+  min-height: 0;
+  padding-block: var(--ds-6) var(--ds-4);
+}
+#app .hero h1 {
+  margin-block: var(--ds-3);
+  font-size: clamp(32px, 3.6vw + 8px, 48px);
+  line-height: 1.1;
+}
+#app .hero p {
+  margin-block: var(--ds-3) 0;
+}
+#app .hero .hero-checks,
+#app .hero .trust-badges {
+  margin-top: var(--ds-3);
+  font-size: var(--ds-text-xs);
+}
+#app .main .quick {
+  padding: var(--ds-3) var(--ds-4);
+}
+#app .section-head {
+  margin-block: var(--ds-6) var(--ds-4);
+}
+#app .filters {
+  margin-bottom: var(--ds-4);
+  padding-bottom: var(--ds-3);
+}
+@media (max-width: 650px) {
+  #app .hero {
+    padding-block: var(--ds-4) var(--ds-3);
+  }
+  #app .hero h1 {
+    font-size: 30px;
+  }
+  /* "In a hurry" shortcuts become one swipeable row, not a screenful. */
+  #app .quick-links {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: var(--ds-2);
+    padding-bottom: var(--ds-1);
+    scrollbar-width: none;
+  }
+  #app .quick-links::-webkit-scrollbar {
+    display: none;
+  }
+  #app .quick-links .chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  #app .main .quick {
+    padding: var(--ds-3);
+  }
+  /* Category filters: one swipeable row instead of four stacked buttons. */
+  #app .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: var(--ds-2);
+    scrollbar-width: none;
+  }
+  #app .filters::-webkit-scrollbar {
+    display: none;
+  }
+  #app .filters .filter {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  #app .filters .result-count {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  #app .section-head {
+    margin-block: var(--ds-5) var(--ds-3);
+  }
+  #app .grid .card p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ---------- Exam pages ---------- */
+/* The step headings already label this section; keep the title for
+   assistive technology and search engines only. */
+#app .ds-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* The file checker rows use a compact upload strip instead of a large zone. */
+#app .ec-row .shared-dropzone {
+  flex-wrap: wrap;
+  padding: var(--ds-3) var(--ds-4);
+  gap: var(--ds-3);
+}
+#app .ec-row .shared-dropzone .ui-button {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+#app .ec-row .shared-dropzone [class*="copy"] > span {
+  display: none;
+}
+#app .ec-row .shared-dropzone > svg {
+  width: 28px;
+  height: 28px;
+}

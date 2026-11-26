@@ -9,7 +9,7 @@ const path=require('node:path');
   page.on('pageerror',e=>errors.push(e.message));
   const base=process.env.TEST_URL||'http://127.0.0.1:4173';
   await page.goto(base);await page.locator('#search').waitFor();
-  assert.equal(await page.locator('.card').count(),18);
+  assert.equal(await page.locator('.card').count(),21);
   await page.locator('#search').fill('merge');assert.equal(await page.locator('.card').count(),2);
   await page.goto(base+'/resize-image');await page.locator('#upload').setInputFiles(path.join(__dirname,'photo.png'));
   await page.locator('#unit').selectOption('px');await page.locator('#width').fill('100');await page.locator('#height').fill('120');

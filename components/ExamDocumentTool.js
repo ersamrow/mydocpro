@@ -433,7 +433,7 @@ export default function ExamDocumentTool({ exam, initialFile, onFileChange }) {
       className={styles.panel}
       aria-label={`${exam.shortName} document tool`}
     >
-      <h2>Prepare your document</h2>
+      <h2 className="ds-visually-hidden">Prepare your document</h2>
       {doc.format === "PDF" ? (
         <CertificatePreset doc={doc} documentSelector={documentSelector} />
       ) : (

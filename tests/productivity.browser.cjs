@@ -69,6 +69,8 @@ const fs = require("node:fs/promises");
       .locator(".ui-result-heading")
       .filter({ hasText: "Conversion complete" })
       .waitFor();
+    // Outputs are added one image at a time, so wait for the second one.
+    await page.locator(".result-preview").nth(1).waitFor();
     assert.equal(await page.locator(".result-preview").count(), 2);
     const names = await page
       .locator(".result-preview a[download]")

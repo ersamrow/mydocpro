@@ -23,6 +23,7 @@ import "../src/ui.css";
 import "../src/sign-pdf.css";
 import "../src/scan-pdf.css";
 import "../src/exam-checker.css";
+import "../src/design-system.css";
 import Header from "../components/Header.js";
 import SiteScripts from "../components/SiteScripts.js";
 import { Footer } from "../components/Shared.js";

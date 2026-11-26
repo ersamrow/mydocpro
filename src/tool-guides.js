@@ -137,6 +137,14 @@ export const guides = {
     "Use separate files when the form provides separate photo and signature fields. A combined image is useful only when the destination explicitly expects both items in a single file.",
     "signature",
   ],
+  "remove-background": [
+    "How to remove a photo background online",
+    "Upload a portrait and the tool detects the person with an AI model that runs inside your browser, then replaces everything else with white, blue, red, grey or a transparent background. Nothing is uploaded; the model and its runtime are downloaded once from this site and the cutout is made on your device.",
+    "For an application photo, choose a clear, evenly lit portrait, pick White or the colour your form asks for, and download a JPG. For a logo, sticker or design, choose Transparent with PNG or WebP. Then use Crop image and Resize image to reach the required dimensions and KB limit.",
+    "Why does the first run take longer?",
+    "The first cutout downloads about 10 MB of AI runtime, which your browser then keeps for later visits. After that the cutout usually takes a few seconds, depending on your device and the photo size.",
+    "white-background",
+  ],
   "white-background": [
     "How to whiten a plain photo background",
     "Use a photo with a plain, light background visible around its edges. The tool samples the dominant border colour and whitens similar pixels connected to the border, with a softened edge. It changes the background to white rather than making it transparent. Enclosed areas stay unchanged unless a matching path reaches them.",

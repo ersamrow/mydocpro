@@ -16,5 +16,6 @@ export const tools = [
  ['organize-pdf','Organize PDF','Reorder, rotate or remove pages in your PDF.','pdf','layers',''],
  ['name-date','Add name & date','Add a simple text strip underneath your photo.','image','type',''],
  ['join-images','Join images','Arrange 2–6 images together as a JPG or A4 PDF.','image','combine',''],
+ ['remove-background','Remove background','Cut out the person and set a white, blue or transparent background.','image','scan-face','NEW'],
  ['white-background','Whiten background','Whiten a plain background connected to the image edges.','image','sun','']
 ];

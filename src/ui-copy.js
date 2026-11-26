@@ -15,6 +15,7 @@ export const actionLabels = {
   "name-date": "Add name & date – free",
   "join-images": "Combine images – free",
   "white-background": "Whiten background – free",
+  "remove-background": "Remove background – free",
 };
 export const fieldHints = {
   target: "Choose the maximum file size allowed by your form.",

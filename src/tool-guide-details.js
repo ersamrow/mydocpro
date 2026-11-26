@@ -153,6 +153,17 @@ export const guideDetails = {
       "Confirm that every image appears in the intended order with no cropped details. Check that the receiving form accepts a combined JPG or PDF rather than separate uploads.",
     related: ["signature", "crop-image", "resize-image"],
   },
+  "remove-background": {
+    steps: [
+      "Choose a portrait with one clearly visible person and even lighting.",
+      "Pick the new background: white for most forms, a colour if requested, or Transparent for PNG or WebP.",
+      "Wait for the first-run download, then inspect hair, ears and shoulders in the preview.",
+      "Adjust Edge softness or Cutout size if needed, then download in the format your form accepts.",
+    ],
+    checks:
+      "Compare the result with the original at full size. Check hair, glasses, ears and clothing edges for missing or leftover areas, and confirm the receiving form allows an edited background.",
+    related: ["crop-image", "resize-image", "exam-photo"],
+  },
   "white-background": {
     steps: [
       "Choose an image whose plain background reaches the outer edges; patterned or strongly shadowed backgrounds may not clean evenly.",

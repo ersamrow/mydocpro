@@ -163,6 +163,8 @@ const notices = {
     "These are generic sizes, not verified exam requirements. Check the current official notification for dimensions, file size, and live-photo rules before submitting.",
   "compress-pdf":
     "Text is preserved when embedded images can be compressed. Scanned PDFs may be rebuilt as images. A target size is not guaranteed; inspect the result before submitting.",
+  "remove-background":
+    "Works best on one clearly visible person. Compare hair and shoulders at full size; raise Edge softness for fuzzy hair or use Cutout size to trim a halo. The first run downloads about 10 MB and then runs entirely on your device.",
   "white-background":
     "Start with Gentle or Balanced tolerance and compare the preview to protect subject details. Choose A4 with white space to set photo width, margins and position. Print the A4 PDF at Actual size (100%).",
   "crop-image":

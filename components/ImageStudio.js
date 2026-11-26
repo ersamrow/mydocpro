@@ -32,6 +32,7 @@ const operations = [
   "resize-image",
   "compress-image",
   "convert-image",
+  "remove-background",
   "white-background",
   "signature",
   "name-date",
@@ -60,6 +61,7 @@ const initialSettings = () =>
           "resize-image",
           "signature",
           "white-background",
+          "remove-background",
         ].includes(id)
           ? { format: "image/png" }
           : {}),
@@ -69,6 +71,8 @@ const initialSettings = () =>
 const notes = {
   "compress-image":
     "Creates a JPG; dimensions may shrink to meet the target. Compress after other edits.",
+  "remove-background":
+    "Detects the person on your device and replaces the background. Works best on portraits; the first run downloads about 10 MB.",
   "white-background":
     "Whiten background connected to the image edges. Tolerance controls which similar colours are included.",
   signature: "Darkens signature strokes and whitens light paper.",

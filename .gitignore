@@ -15,6 +15,7 @@ public/heic-decoder-*.js
 public/heic-decoder-LICENSE.txt
 public/~partytown/
 public/codecs/
+public/mediapipe/
 
 public/sw.js
 public/sitemap.xml

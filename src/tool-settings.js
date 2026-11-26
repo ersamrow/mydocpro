@@ -100,6 +100,29 @@ export function fields(id) {
       },
       format(),
     ],
+    "remove-background": [
+      select("background", "New background", [
+        ["white", "White"],
+        ["transparent", "Transparent (PNG or WebP)"],
+        ["light-blue", "Light blue"],
+        ["blue", "Blue"],
+        ["red", "Red"],
+        ["grey", "Light grey"],
+      ]),
+      {
+        ...number("edge", "Edge softness (0–100)", 30, 0, 100, 1),
+        type: "range",
+      },
+      {
+        ...number("shift", "Cutout size (−30 to 30)", 0, -30, 30, 1),
+        type: "range",
+      },
+      select("format", "Output format", [
+        ["image/png", "PNG"],
+        ["image/jpeg", "JPG"],
+        ["image/webp", "WebP"],
+      ]),
+    ],
     "white-background": [
       {
         ...number("threshold", "Background tolerance (0–255)", 35, 0, 255, 1),

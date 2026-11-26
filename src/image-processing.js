@@ -1,5 +1,6 @@
 import { throwIfCancelled, checkpoint } from "./file-validation.js";
 import { setImageDensity } from "./image-metadata.js";
+import { removeBackground } from "./background-removal.js";
 import { pixelsPerUnit } from "./image-dimensions.js";
 function canvas(w, h) {
   w = Math.round(w);
@@ -519,6 +520,24 @@ export async function processImage(id, files, values, preview = false, signal) {
       c.width,
       c.height,
     );
+  } else if (id === "remove-background") {
+    const background = val("background") || "white";
+    c = await removeBackground(
+      draw(im),
+      { background, edge: num("edge", 0, 100), shift: num("shift", -30, 30) },
+      signal,
+    );
+    if (background === "transparent" && type === "image/jpeg") {
+      const flat = canvas(c.width, c.height),
+        flatContext = flat.getContext("2d");
+      flatContext.fillStyle = "#fff";
+      flatContext.fillRect(0, 0, flat.width, flat.height);
+      flatContext.drawImage(c, 0, 0);
+      c = flat;
+      warnings.push(
+        "JPG cannot store transparency, so the background was filled with white. Choose PNG or WebP to keep it transparent.",
+      );
+    }
   } else if (id === "signature" || id === "white-background") {
     c = draw(im);
     if (id === "white-background") {

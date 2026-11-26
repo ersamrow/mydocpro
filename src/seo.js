@@ -75,6 +75,10 @@ export const toolSearch = {
     "Join Images Online Free – JPG or A4 PDF",
     "Join 2–6 images free in a row, column or grid. Arrange Aadhaar front and back with white space for A4 printing. Download JPG or PDF without uploading.",
   ],
+  "remove-background": [
+    "Remove Photo Background Online Free – On Device",
+    "Remove the background from a portrait free and replace it with white, blue or transparent. AI runs in your browser, so your photo is never uploaded.",
+  ],
   "white-background": [
     "Whiten a Light Photo Background Online Free",
     "Make a plain photo background white free using edge-connected colour matching. Adjust tolerance and preview before downloading. Files stay on your device.",

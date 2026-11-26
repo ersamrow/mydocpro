@@ -22,6 +22,7 @@
     "test:visual": "playwright test --config playwright.visual.config.cjs"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.21",
     "@qwik.dev/partytown": "1.0.5",
     "critters": "npm:beasties@0.4.3",
     "gifenc": "1.0.3",

@@ -6,6 +6,8 @@ async function walk(root, prefix = "") {
   for (const entry of await readdir(root, { withFileTypes: true })) {
     // Analytics is online-only. Its worker has a separate, narrower scope.
     if (entry.name.startsWith(".") || entry.name === "~partytown") continue;
+    // The ~10 MB background-remover runtime loads on demand, not at install.
+    if (entry.name === "mediapipe") continue;
     if (entry.isDirectory())
       files.push(
         ...(await walk(

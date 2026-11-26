@@ -201,6 +201,24 @@ const extraFaqs = {
       "Join two to six images in a vertical, horizontal or grid layout. Arrange their order and adjust spacing before downloading. Use separate files instead when your destination has separate upload fields.",
     ],
   ],
+  "remove-background": [
+    [
+      "Is my photo uploaded when I remove the background?",
+      "No. The segmentation model runs in your browser. The tool downloads the model and runtime from this site, but your photo is never sent to a server.",
+    ],
+    [
+      "What kind of photo works best?",
+      "A single, clearly visible person facing the camera, with even light and some contrast between hair and background. Group photos, pets, products and busy scenes may not cut out cleanly.",
+    ],
+    [
+      "How do I fix rough or halo edges around hair?",
+      "Raise Edge softness to blend fine hair, or lower Cutout size to trim a light halo. Always compare the result with the original at full size before submitting it.",
+    ],
+    [
+      "Can I keep a transparent background?",
+      "Yes. Choose Transparent and download PNG or WebP. JPG cannot store transparency, so JPG output uses a white background instead.",
+    ],
+  ],
   "white-background": [
     [
       "How can I make a photo background white?",

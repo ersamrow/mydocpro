@@ -349,3 +349,277 @@
   width: 28px;
   height: 28px;
 }
+
+/* ---------- Accordions: one look for guides, FAQs and help ---------- */
+#app .ds-disclosure,
+#app .ui-help {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  box-shadow: var(--ds-shadow);
+}
+#app .ds-disclosure > summary,
+#app .ui-help > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  min-height: 56px;
+  padding: var(--ds-3) var(--ds-card-pad);
+  border: 0;
+  cursor: pointer;
+  list-style: none;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--ui-ink);
+}
+#app .ds-disclosure > summary::-webkit-details-marker,
+#app .ui-help > summary::-webkit-details-marker {
+  display: none;
+}
+#app .ds-disclosure > summary::after,
+#app .ui-help > summary::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  margin: 0 var(--ds-1) 3px auto;
+  border-right: 2px solid var(--ui-muted);
+  border-bottom: 2px solid var(--ui-muted);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+#app .ds-disclosure[open] > summary::after,
+#app .ui-help[open] > summary::after {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+#app .ds-disclosure > summary:hover,
+#app .ui-help > summary:hover {
+  background: var(--ui-soft);
+}
+#app .ds-disclosure[open] > summary,
+#app .ui-help[open] > summary {
+  border-bottom: 1px solid var(--ui-border);
+}
+#app .ds-disclosure-title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+#app .ds-disclosure-hint,
+#app .ui-help > summary > span {
+  font-size: var(--ds-text-sm);
+  font-weight: 400;
+  color: var(--ui-muted);
+}
+#app .ds-disclosure-body {
+  padding: var(--ds-card-pad);
+}
+@media (max-width: 650px) {
+  #app .ds-disclosure-hint,
+  #app .ui-help > summary > span {
+    display: none;
+  }
+  /* Keep the preview compact so the settings below it stay in reach. */
+  #app .image-edit-stage,
+  #app .ui-source-preview {
+    min-height: 0;
+    padding: var(--ds-3);
+  }
+  #app .image-edit-stage img,
+  #app .ui-source-preview img {
+    max-height: 30vh;
+    object-fit: contain;
+  }
+}
+
+/* ---------- Home: search-first hero ---------- */
+#app .hero {
+  display: block;
+  text-align: center;
+  padding-block: var(--ds-6) var(--ds-3);
+}
+#app .hero > div:first-child {
+  max-width: 760px;
+  margin-inline: auto;
+}
+#app .hero .art {
+  display: none;
+}
+#app .hero p {
+  max-width: 58ch;
+  margin-inline: auto;
+}
+#app .hero .search.hero-search {
+  position: relative;
+  max-width: 640px;
+  margin: var(--ds-4) auto 0;
+}
+#app .hero .search.hero-search input {
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--ds-5) 0 52px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: 16px;
+  background: var(--ui-surface);
+  box-shadow: var(--ds-shadow);
+  font-size: 16px;
+}
+#app .hero .search.hero-search input:focus {
+  border-color: var(--ui-green);
+  box-shadow: 0 0 0 4px rgba(24, 100, 78, 0.14);
+}
+#app .hero .search.hero-search > svg {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  color: var(--ui-muted);
+  pointer-events: none;
+}
+#app .hero .search.hero-search .clear-search {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-height: 44px;
+  width: 44px;
+  padding: 0;
+}
+#app .hero .hero-checks,
+#app .hero .trust-badges {
+  justify-content: center;
+}
+@media (max-width: 650px) {
+  #app .hero .search.hero-search input {
+    height: 52px;
+    font-size: 16px; /* 16px stops iOS zooming into the field */
+  }
+  #app .hero .search.hero-search > svg {
+    top: 16px;
+  }
+}
+
+/* ---------- Phones: file, then settings, then preview ---------- */
+@media (max-width: 900px) {
+  #app .ui-side-workspace .merge-layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-gap);
+  }
+  #app .ui-side-workspace .merge-canvas,
+  #app .ui-side-workspace .merge-controls {
+    display: contents;
+  }
+  #app .ui-side-workspace .ui-options-card {
+    order: 2;
+  }
+  #app .ui-side-workspace .merge-page-editor {
+    order: 3;
+  }
+  #app .ui-side-workspace .ui-action-bar {
+    order: 4;
+  }
+  #app .ui-side-workspace .merge-controls > .status {
+    order: 5;
+  }
+  #app .ui-side-workspace .merge-controls > .outputs {
+    order: 6;
+  }
+}
+
+/* ---------- Visual refresh: rounder, softer, clearer main action ---------- */
+:root {
+  --ui-radius-card: 20px;
+  --ui-radius-control: 12px;
+  --ds-shadow: 0 1px 2px rgba(24, 59, 51, 0.05),
+    0 8px 24px rgba(24, 59, 51, 0.06);
+  --ds-primary-gradient: linear-gradient(180deg, #1f7a5f 0%, #18644e 100%);
+}
+#app .ui-button--primary {
+  background: var(--ds-primary-gradient);
+  border-color: #145241;
+  box-shadow: 0 2px 8px rgba(24, 100, 78, 0.28);
+}
+#app .ui-button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: linear-gradient(180deg, #1a6e56 0%, #12523f 100%);
+  box-shadow: 0 4px 14px rgba(24, 100, 78, 0.34);
+  transform: translateY(-1px);
+}
+#app .ui-button--primary:active:not(:disabled) {
+  transform: none;
+}
+#app .ui-button {
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+/* Upload areas invite a drop and react when you are over them. */
+#app .shared-dropzone {
+  border: 2px dashed #9ec4b2;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f8fcf9 0%, #eef6f1 100%);
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    box-shadow 0.15s;
+}
+#app .shared-dropzone:hover,
+#app .shared-dropzone:focus-within,
+#app .shared-dropzone[class*="dragging"] {
+  border-color: var(--ui-green);
+  background: #e6f3ec;
+  box-shadow: 0 0 0 4px rgba(24, 100, 78, 0.1);
+}
+#app .shared-dropzone > svg,
+#app .shared-dropzone [class*="icon"] {
+  color: var(--ui-green);
+}
+/* Tool tiles on the home page. */
+#app .grid .card {
+  border-radius: var(--ui-radius-card);
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s,
+    border-color 0.18s;
+}
+#app .grid .card:hover {
+  transform: translateY(-3px);
+  border-color: #b7d3c5;
+  box-shadow: 0 14px 30px rgba(24, 59, 51, 0.12);
+}
+#app .grid .card .tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+#app .grid .card h3 {
+  font-size: 16px;
+}
+#app .grid .card p {
+  font-size: var(--ds-text-sm);
+  line-height: 1.55;
+  color: var(--ui-muted);
+}
+#app h1 {
+  font-weight: 800;
+  text-wrap: balance;
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .ui-button,
+  #app .shared-dropzone,
+  #app .grid .card {
+    transition: none;
+  }
+  #app .ui-button--primary:hover:not(:disabled),
+  #app .grid .card:hover {
+    transform: none;
+  }
+}

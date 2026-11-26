@@ -41,6 +41,29 @@ export default function Home({ heading, cards, examLinks }) {
             Resize a photo. Tidy up a PDF. Get that form submitted.
             <br /> Free, simple tools that keep your files on your device.
           </p>
+          <div className="search hero-search" role="search">
+            <Icon name="search" />
+            <input
+              id="search"
+              aria-label="Search tools"
+              placeholder="Search: compress, merge, sign…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <Button
+                type="button"
+                className="clear-search"
+                aria-label="Clear search"
+                onClick={() => {
+                  setSearch("");
+                  document.getElementById("search")?.focus();
+                }}
+              >
+                ×
+              </Button>
+            )}
+          </div>
           <TrustBadges toolId="" />
         </div>
         <div className="art" aria-hidden="true">
@@ -108,29 +131,6 @@ export default function Home({ heading, cards, examLinks }) {
           <div>
             <h2>Your everyday toolkit</h2>
             <p>One less thing between you and “submitted”.</p>
-          </div>
-          <div className="search">
-            <Icon name="search" />
-            <input
-              id="search"
-              aria-label="Search tools"
-              placeholder="Find a tool…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            {search && (
-              <Button
-                type="button"
-                className="clear-search"
-                aria-label="Clear search"
-                onClick={() => {
-                  setSearch("");
-                  document.getElementById("search")?.focus();
-                }}
-              >
-                ×
-              </Button>
-            )}
           </div>
         </div>
         <div className="filters">

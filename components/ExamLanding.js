@@ -7,6 +7,7 @@ import {
 } from "../src/exam-requirements.js";
 import ExamDocumentTool from "./ExamDocumentTool.js";
 import ExamChecker from "./ExamChecker.js";
+import Disclosure from "./Disclosure.js";
 import SeoHead from "./SeoHead.js";
 import TrustBadges from "./TrustBadges.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
@@ -155,16 +156,22 @@ export default function ExamLanding({ exam, relatedExams }) {
               ))}
             </ol>
           </section>
-          <section>
-            <h2>Common rejection reasons</h2>
+          <Disclosure
+            title="Common rejection reasons"
+            hint="Avoid these mistakes"
+          >
             <ul>
               {exam.rejectionReasons.map((reason) => (
                 <li key={reason}>{reason}</li>
               ))}
             </ul>
-          </section>
-          <section id="faq" className={styles.faq}>
-            <h2>Frequently asked questions</h2>
+          </Disclosure>
+          <Disclosure
+            id="faq"
+            title="Frequently asked questions"
+            hint={`${exam.faqs.length} answers`}
+            className={styles.faq}
+          >
             <dl>
               {exam.faqs.map(({ question, answer }) => (
                 <Fragment key={question}>
@@ -173,9 +180,12 @@ export default function ExamLanding({ exam, relatedExams }) {
                 </Fragment>
               ))}
             </dl>
-          </section>
-          <section className={styles.sources} aria-labelledby="sources-title">
-            <h2 id="sources-title">Official requirements</h2>
+          </Disclosure>
+          <Disclosure
+            title="Official requirements"
+            hint="Sources and last-checked date"
+            className={styles.sources}
+          >
             <p>
               Requirements last checked:{" "}
               <time dateTime={exam.lastVerified}>
@@ -200,7 +210,7 @@ export default function ExamLanding({ exam, relatedExams }) {
                 ))}
               </ul>
             )}
-          </section>
+          </Disclosure>
           <section className={styles.related} aria-labelledby="related-title">
             <h2 id="related-title">Related exams and tools</h2>
             <ul>

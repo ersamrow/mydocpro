@@ -1,7 +1,7 @@
-export default function ResizeFaqs({ faqs }) {
+export default function ResizeFaqs({ faqs, showHeading = true }) {
   return (
     <section aria-label="Frequently asked questions">
-      <h2>Frequently asked questions</h2>
+      {showHeading && <h2>Frequently asked questions</h2>}
       {faqs.map(([question, answer]) => (
         <div key={question}>
           <h3>{question}</h3>

@@ -8,6 +8,7 @@ import {
   ToolSectionHeading,
 } from "./ui.js";
 import ExamLinks from "./ExamLinks.js";
+import Disclosure from "./Disclosure.js";
 import WhatsAppChannel from "./WhatsAppChannel.js";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
@@ -591,9 +592,9 @@ export default function Workspace({
           <div className="merge-canvas">
             {sideLayout && files.length > 0 && (
               <ToolSectionHeading
-                step="2"
-                title="Upload & preview"
-                description="Check your file before saving."
+                step="1"
+                title="Your file"
+                description="Check it before saving."
               />
             )}
             <Dropzone
@@ -804,8 +805,8 @@ export default function Workspace({
             >
               {sideLayout && files.length > 0 && (
                 <ToolSectionHeading
-                  step="1"
-                  title="Adjust settings"
+                  step="2"
+                  title="Choose settings"
                   description="Choose the size and format you need."
                 />
               )}
@@ -1146,15 +1147,18 @@ export default function Workspace({
             onSelect={selectResizePreset}
             disabled={busy || validating}
           />
-          {!metaOverride && <ToolGuide id={id} />}
+          {!metaOverride && (
+            <HelpContainer as="details" className="merge-help ui-help">
+              <summary>
+                Need a hand? <span>Guide, tips & related tools</span>
+              </summary>
+              <ToolGuide id={id} />
+            </HelpContainer>
+          )}
         </>
       )}
       {id !== "resize-image" && (
-        <HelpContainer
-          as="details"
-          open={!embedded}
-          className="merge-help ui-help"
-        >
+        <HelpContainer as="details" className="merge-help ui-help">
           <summary>
             Need a hand? <span>Instructions, tips & related tools</span>
           </summary>
@@ -1162,9 +1166,13 @@ export default function Workspace({
         </HelpContainer>
       )}
       {!embedded && id !== "resize-image" && (
-        <Card className="tool-guide">
-          <ResizeFaqs faqs={toolFaqs(id)} />
-        </Card>
+        <Disclosure
+          title="Frequently asked questions"
+          hint="Quick answers about this tool"
+          className="tool-guide"
+        >
+          <ResizeFaqs faqs={toolFaqs(id)} showHeading={false} />
+        </Disclosure>
       )}
     </Container>
   );

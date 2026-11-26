@@ -31,12 +31,17 @@ const path = require("node:path");
       await page.locator('link[rel="canonical"]').getAttribute("href"),
       "https://mydocpro.co.in/resize-image",
     );
-    await page
-      .getByRole("heading", {
-        name: "How to resize an image in cm",
-        exact: true,
-      })
-      .waitFor();
+    // The guide is collapsed by default to keep the page short; it stays in
+    // the HTML for search engines. Open it, as a reader would.
+    const heading = page.getByRole("heading", {
+      name: "How to resize an image in cm",
+      exact: true,
+      includeHidden: true,
+    });
+    await heading.waitFor({ state: "attached" });
+    assert.equal(await heading.isVisible(), false, "guide starts collapsed");
+    await page.getByText("Need a hand?").click();
+    await heading.waitFor();
 
     // Presets work before upload, without navigating or discarding the user's file.
     await page

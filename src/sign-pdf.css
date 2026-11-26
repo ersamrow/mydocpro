@@ -1,0 +1,228 @@
+.sign-pdf .sp-start,
+.sign-pdf .sp-toolbar {
+  margin-bottom: 16px;
+}
+.sp-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.sp-tools .ui-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sp-tools .ui-button[aria-pressed="true"] {
+  outline: 2px solid var(--ui-green);
+  outline-offset: 2px;
+}
+.sp-chip {
+  height: 22px;
+  max-width: 70px;
+  object-fit: contain;
+}
+.sp-status {
+  margin: 6px 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+}
+.sp-status.sp-error,
+.sp-error {
+  color: var(--ui-danger);
+  min-height: 1.4em;
+}
+.sp-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+.sp-pages {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  margin-bottom: 16px;
+}
+.sp-page {
+  position: relative;
+  width: min(100%, 820px);
+  background: #fff;
+  box-shadow: 0 1px 8px rgba(24, 59, 51, 0.18);
+  touch-action: pan-y;
+}
+.sp-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.sp-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.sp-armed .sp-layer {
+  cursor: crosshair;
+  touch-action: none;
+  outline: 2px dashed var(--ui-green);
+  outline-offset: -2px;
+}
+.sp-item {
+  position: absolute;
+  touch-action: none;
+}
+.sp-signature,
+.sp-check {
+  cursor: move;
+}
+.sp-item img,
+.sp-item svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.sp-text {
+  display: flex;
+  align-items: center;
+}
+#app .sign-pdf .sp-text input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 3ch;
+  min-height: 0;
+  height: auto;
+  line-height: 1.3;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #0d0d0d;
+}
+.sp-text input:focus-visible {
+  outline: none;
+}
+.sp-grip {
+  width: 10px;
+  align-self: stretch;
+  margin-right: 2px;
+  cursor: move;
+  background: repeating-linear-gradient(
+    0deg,
+    var(--ui-green) 0 2px,
+    transparent 2px 5px
+  );
+  opacity: 0;
+}
+.sp-text:hover .sp-grip,
+.sp-selected .sp-grip {
+  opacity: 0.6;
+}
+.sp-selected {
+  outline: 2px solid var(--ui-green);
+  outline-offset: 2px;
+}
+.sp-remove {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--ui-danger);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sp-resize {
+  position: absolute;
+  right: -9px;
+  bottom: -9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--ui-green);
+  cursor: nwse-resize;
+}
+.sp-dialog {
+  width: min(560px, calc(100vw - 32px));
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-card);
+  padding: 20px;
+  color: var(--ui-ink);
+}
+.sp-dialog::backdrop {
+  background: rgba(10, 30, 24, 0.5);
+}
+.sp-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0;
+}
+.sp-tabs button {
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  cursor: pointer;
+}
+.sp-tabs button[aria-selected="true"] {
+  background: var(--ui-green);
+  color: #fff;
+}
+.sp-pad {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  border: 1px dashed var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+  background: #fff;
+  touch-action: none;
+  cursor: crosshair;
+  margin-bottom: 8px;
+}
+.sp-type label,
+.sp-upload p {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+.sp-type input {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--ui-input-border);
+  border-radius: var(--ui-radius-control);
+}
+.sp-styles {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.sp-styles button {
+  text-align: left;
+  padding: 6px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-control);
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.sp-styles button[aria-pressed="true"] {
+  outline: 2px solid var(--ui-green);
+}
+.sp-preview {
+  max-width: 100%;
+  max-height: 120px;
+  margin-top: 10px;
+  background: repeating-conic-gradient(#e6ece8 0 25%, #fff 0 50%) 0 / 16px 16px;
+}
+.sp-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -263,6 +263,7 @@ export function fields(id) {
 export const defaults = (id) =>
   Object.fromEntries(fields(id).map((f) => [f.id, String(f.value)]));
 export const pdfTools = [
+  "sign-pdf",
   "merge-pdf",
   "split-pdf",
   "compress-pdf",

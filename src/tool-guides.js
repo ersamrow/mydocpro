@@ -137,6 +137,14 @@ export const guides = {
     "Use separate files when the form provides separate photo and signature fields. A combined image is useful only when the destination explicitly expects both items in a single file.",
     "signature",
   ],
+  "sign-pdf": [
+    "How to sign and fill a PDF online",
+    "Open your PDF, create a signature by drawing, typing your name or uploading a photo of your handwriting, then click the page to place it. You can also add text, today's date and check marks, drag items into position and resize them. The finished PDF is created in your browser; your document is not uploaded.",
+    "For a form that needs a signature and date, create your signature once, place it on the signature line, add the date beside it, and tick any boxes with check marks. Download the result and zoom in to confirm each item sits on its line. To sign several pages, reuse the same signature on each one.",
+    "Is this a legally certified digital signature?",
+    "No. It places an image or text on the page, like signing a printout and scanning it. It does not add a cryptographic certificate, and it does not fill interactive form fields. Check whether the receiving party accepts this kind of signature.",
+    "remove-background",
+  ],
   "remove-background": [
     "How to remove a photo background online",
     "Upload a portrait and the tool detects the person with an AI model that runs inside your browser, then replaces everything else with white, blue, red, grey or a transparent background. Nothing is uploaded; the model and its runtime are downloaded once from this site and the cutout is made on your device.",

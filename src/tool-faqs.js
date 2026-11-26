@@ -201,6 +201,24 @@ const extraFaqs = {
       "Join two to six images in a vertical, horizontal or grid layout. Arrange their order and adjust spacing before downloading. Use separate files instead when your destination has separate upload fields.",
     ],
   ],
+  "sign-pdf": [
+    [
+      "Is my PDF uploaded when I sign it?",
+      "No. The PDF is opened and edited in your browser, and the signed copy is created on your device.",
+    ],
+    [
+      "Can I fill the form fields inside a PDF?",
+      "This tool places text, dates, check marks and signatures on top of the page. It does not type into interactive form fields, but you can put text next to any field.",
+    ],
+    [
+      "Is the signature legally valid?",
+      "It is a visual signature, equivalent to signing a printout. It is not a certified digital signature. Confirm that the person or office receiving the document accepts it.",
+    ],
+    [
+      "Why can't I use some characters in the text?",
+      "Added text uses a standard PDF font that supports English and Western European letters. For other scripts, draw the text with the signature tool instead.",
+    ],
+  ],
   "remove-background": [
     [
       "Is my photo uploaded when I remove the background?",

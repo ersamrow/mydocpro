@@ -9,6 +9,7 @@ const InformationPage = dynamic(() => import("./InformationPage.js"));
 const Workspace = dynamic(() => import("./Workspace.jsx"));
 const CombinedWorkspace = dynamic(() => import("./CombinedWorkspace.js"));
 const ImageStudio = dynamic(() => import("./ImageStudio.js"));
+const SignPdf = dynamic(() => import("./SignPdf.js"));
 
 export default function ToolApplication({ id, cards, examLinks }) {
   const m = pageSeo(id),
@@ -21,6 +22,8 @@ export default function ToolApplication({ id, cards, examLinks }) {
       ) : tool ? (
         id === "image-editor" ? (
           <ImageStudio heading={m.name} />
+        ) : id === "sign-pdf" ? (
+          <SignPdf key={id} heading={m.name} />
         ) : id === "pdf-toolkit" ? (
           <CombinedWorkspace key={id} heading={m.name} />
         ) : (

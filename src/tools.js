@@ -5,6 +5,7 @@ export const tools = [
  ['resize-image','Resize image','The perfect fit. Resize in pixels, cm, mm or inches.','image','expand',''],
  ['convert-image','Convert image','Switch between JPG, PNG and WebP in seconds.','image','replace',''],
  ['crop-image','Crop & rotate','Keep what matters. Crop and rotate your photos.','image','crop',''],
+ ['sign-pdf','Sign & fill PDF','Add your signature, text, date and check marks to a PDF.','pdf','file-signature','NEW'],
  ['merge-pdf','Merge PDF','Combine PDFs and images in one document.','pdf','files',''],
  ['split-pdf','Split PDF','Extract exactly the pages you need from a PDF.','pdf','scissors',''],
  ['compress-pdf','Compress PDF','A smaller PDF, ready for that upload limit.','pdf','file-down',''],

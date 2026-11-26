@@ -153,6 +153,17 @@ export const guideDetails = {
       "Confirm that every image appears in the intended order with no cropped details. Check that the receiving form accepts a combined JPG or PDF rather than separate uploads.",
     related: ["signature", "crop-image", "resize-image"],
   },
+  "sign-pdf": {
+    steps: [
+      "Choose the PDF you need to sign. Unlock it first if it is password-protected.",
+      "Create a signature by drawing, typing or uploading a photo of your handwriting.",
+      "Choose Place signature, Add text, Add today's date or Add check mark, then click the page.",
+      "Drag items into position, resize them from the corner, then create and download the signed PDF.",
+    ],
+    checks:
+      "Open the download and zoom in on every page you edited. Confirm the signature sits on its line, text is readable, and nothing covers important content. Check that the receiving party accepts a placed signature image.",
+    related: ["merge-pdf", "compress-pdf", "split-pdf"],
+  },
   "remove-background": {
     steps: [
       "Choose a portrait with one clearly visible person and even lighting.",

@@ -6,6 +6,15 @@ import { tools } from "../src/tools.js";
 import ResizeImageGuide from "./ResizeImageGuide.js";
 import ResizeFaqs from "./ResizeFaqs.js";
 import { toolFaqs } from "../src/tool-faqs.js";
+const relatedLabels = {
+  "resize-image": "Resize photo width and height in cm or pixels",
+  "compress-image": "Compress an image to 20 KB or 50 KB",
+  "compress-pdf": "Reduce PDF size with a 100 KB or 200 KB target",
+  "jpg-to-pdf": "Convert JPG photos into one PDF",
+  "pdf-to-image": "Convert PDF pages to JPG images",
+  "split-pdf": "Split PDF pages or extract a page range",
+  "passport-sheet": "Make passport size photo sheets for printing",
+};
 export default function ToolGuide({ id }) {
   const g = guides[id],
     tool = tools.find((t) => t[0] === id),
@@ -131,6 +140,18 @@ export default function ToolGuide({ id }) {
           <Link href="/passport-sheet">passport photo sheet maker</Link>.
         </p>
       )}
+      {id === "signature" && (
+        <p>
+          Need a signature resizer for an application? First clean the scan
+          here, then{" "}
+          <Link href="/resize-image">
+            resize the signature in pixels or cm and set its maximum KB
+          </Link>
+          . Read the current form’s width, height and file-size requirements.
+          This cleaner does not set those final dimensions or create a digital
+          signature.
+        </p>
+      )}
       {["image-editor", "pdf-toolkit"].includes(id) && (
         <ResizeFaqs faqs={toolFaqs(id)} />
       )}
@@ -138,11 +159,7 @@ export default function ToolGuide({ id }) {
       <ul className="related-tools">
         {related.map((t) => (
           <li key={t[0]}>
-            <Link href={"/" + t[0]}>
-              {t[0] === "resize-image"
-                ? "Resize a photo in centimetres or millimetres"
-                : t[1]}
-            </Link>
+            <Link href={"/" + t[0]}>{relatedLabels[t[0]] || t[1]}</Link>
           </li>
         ))}
       </ul>

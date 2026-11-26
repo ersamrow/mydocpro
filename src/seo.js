@@ -16,36 +16,36 @@ export const toolSearch = {
     "Merge, split, compress or organize PDFs for free in your browser. Turn photos into PDFs or export pages as images, with no upload or sign-up.",
   ],
   "compress-image": [
-    "Free Image Compressor – 20 KB, 50 KB or 100 KB",
-    "Compress photos free to 20 KB, 50 KB, 100 KB or a custom target. Use JPG, PNG or WebP images and download the result as a JPG.",
+    "Image Compressor to 20 KB, 50 KB & 100 KB Free",
+    "Compress an image to 20 KB, 50 KB or 100 KB free. Preview JPG output and check its dimensions before submitting. No upload, account or watermark required.",
   ],
   "resize-image": [
-    "Resize Image in CM, MM & Pixels Online Free – Photo Size Changer",
-    "Resize images in cm, mm or pixels with an optional KB limit. Set 3.5 × 4.5 cm at 300 DPI, preview the crop and download free. Files stay on your device.",
+    "Resize Image in CM, MM & Pixels Online Free",
+    "Resize image width and height in cm, mm or pixels. Choose DPI and an optional KB limit, preview the result and download free. No upload or sign-up needed.",
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",
     "Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image.",
   ],
   "crop-image": [
-    "Crop & Rotate Images Online Free",
-    "Crop photos online free with square, passport or custom ratios. Rotate, drag the crop area and preview before downloading. No sign-up; files stay local.",
+    "Crop Image Online Free – Crop & Rotate Photos",
+    "Crop an image online free with square, passport or custom ratios. Rotate your photo, adjust the selection and preview before downloading. No upload needed.",
   ],
   "merge-pdf": [
-    "Merge PDF Free – Combine Files, No Upload",
-    "Merge PDF files and images into one document free, without uploading. Reorder page thumbnails, check the preview and download with no sign-up or watermark.",
+    "Merge PDF Online Free – No Upload",
+    "Merge PDF online free without uploading your files. Combine PDFs and images, reorder pages and download one document. No account or watermark on downloads.",
   ],
   "split-pdf": [
-    "Split PDF Online Free – Extract PDF Pages",
-    "Split PDFs free by selecting pages or page ranges. Download one document or save each page as a separate PDF without uploading your file.",
+    "Split PDF Online Free – Separate PDF Pages",
+    "Split PDF pages online free. Extract page ranges, separate each page or split every N pages. Download PDFs or a ZIP with no upload, sign-up or watermark.",
   ],
   "compress-pdf": [
-    "Compress PDF to 100 KB, 200 KB or 500 KB Free",
-    "Compress PDFs free with a size target or custom quality. Supported embedded images are recompressed while preserving text. Processing stays in your browser.",
+    "PDF Compressor to 100 KB, 200 KB & 500 KB Free",
+    "Try compressing PDF to 100 KB, 200 KB or 500 KB free. Reduce supported images locally and check readability. Targets depend on the file; no upload needed.",
   ],
   "jpg-to-pdf": [
     "JPG to PDF Converter Online Free",
-    "Convert JPG, PNG or WebP images to PDF free. Arrange photos, choose A4, Letter or image-sized pages, and download without an upload.",
+    "Convert JPG to PDF online free. Merge photos into one PDF, arrange their order and choose A4, Letter or image-sized pages. No upload, sign-up or watermark.",
   ],
   "exam-photo": [
     "Free Exam Photo Resizer for Application Forms",
@@ -53,15 +53,15 @@ export const toolSearch = {
   ],
   signature: [
     "Free Signature Cleaner for Online Forms",
-    "Clean a scanned signature free on white paper. Adjust the threshold to keep faint pen strokes, preview and download as JPG, PNG or WebP.",
+    "Clean a scanned signature on white paper free. Adjust the threshold, preview faint strokes and save JPG, PNG or WebP locally, without an upload or account.",
   ],
   "passport-sheet": [
-    "Free Passport Photo Maker – 4 × 6 Inch or A4 Sheet",
-    "Make a printable passport photo sheet on 4 × 6 inch or A4 paper. Choose photo size, DPI, copy count and optional cut guides, free in your browser.",
+    "Passport Size Photo Maker Free – A4 Print Sheet",
+    "Make passport size photo sheets free on A4 or 4 × 6 inch paper. Choose dimensions, DPI, copies and cut guides. Print at 100% and check the form’s rules.",
   ],
   "pdf-to-image": [
     "PDF to JPG Converter Online Free",
-    "Convert PDF pages to JPG, PNG or WebP free. Choose pages and resolution, then download one image per page in your browser.",
+    "Convert PDF to JPG online free. Select pages and DPI, preview the results and download separate images or a ZIP. PNG and WebP available; no upload needed.",
   ],
   "organize-pdf": [
     "Organize PDF Free – Reorder, Rotate, Delete",
@@ -73,11 +73,11 @@ export const toolSearch = {
   ],
   "join-images": [
     "Join Images Online Free – JPG or A4 PDF",
-    "Join 2–6 images in a row, column or grid. Combine Aadhaar front and back on one page, adjust spacing and download a JPG or A4 PDF locally.",
+    "Join 2–6 images free in a row, column or grid. Arrange Aadhaar front and back with white space for A4 printing. Download JPG or PDF without uploading.",
   ],
   "white-background": [
     "Whiten a Light Photo Background Online Free",
-    "Whiten a plain photo background online free. Adjust edge-connected colour matching, preview and download an image or A4 PDF. Files stay on your device.",
+    "Make a plain photo background white free using edge-connected colour matching. Adjust tolerance and preview before downloading. Files stay on your device.",
   ],
 };
 export function pageSeo(id = "") {

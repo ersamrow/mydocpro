@@ -50,7 +50,7 @@ export const guides = {
     "resize-image",
   ],
   "merge-pdf": [
-    "How to merge PDFs and images into one document",
+    "How to merge PDF files online free",
     "Add at least two PDFs or images, inspect the page thumbnails and arrange them in reading order before merging. Images become A4 pages with automatic orientation; existing PDF pages keep their page sizes. Use up to 50 input files, with each image under 25 MB, total input under 100 MB and at most 300 pages.",
     "For a three-page application and a two-page supporting document, place the application first to create a five-page PDF. Add a photograph only if the destination permits an extra A4 image page. Open the merged download and check the page count, every document boundary and small text. Merging copies PDF pages; it does not promise a smaller file.",
     "Will signatures and interactive features survive?",

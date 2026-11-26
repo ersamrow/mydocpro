@@ -21,7 +21,7 @@ const path = require("node:path");
     assert.match(html, /Max size \(KB, optional\)/);
     assert.equal(
       await page.title(),
-      "Resize Image in CM, MM & Pixels Online Free – Photo Size Changer",
+      "Resize Image in CM, MM & Pixels Online Free",
     );
     assert.ok(
       (await page.locator('meta[name="description"]').getAttribute("content"))
@@ -33,7 +33,7 @@ const path = require("node:path");
     );
     await page
       .getByRole("heading", {
-        name: "How to resize a photo in cm",
+        name: "How to resize an image in cm",
         exact: true,
       })
       .waitFor();

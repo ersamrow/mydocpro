@@ -89,6 +89,10 @@ const extraFaqs = {
   ],
   "merge-pdf": [
     [
+      "How do I combine two PDF files for free?",
+      "Choose both PDFs, check their page thumbnails and arrange the pages in the required order. Merge them and download the combined PDF without an account. For example, a two-page PDF and a three-page PDF should produce five pages if you keep every page. Open the download to confirm the order and page count.",
+    ],
+    [
       "Can I combine photos and PDFs in the same document?",
       "Yes. Add PDFs and supported images, then arrange their page thumbnails before merging. Each image becomes an A4 page with automatic orientation; existing PDF pages retain their page sizes.",
     ],
@@ -119,8 +123,8 @@ const extraFaqs = {
   ],
   "jpg-to-pdf": [
     [
-      "Can I arrange multiple photos in one PDF?",
-      "Yes. Add your images in the desired reading order and choose A4, Letter or Fit to image. Each image becomes one PDF page. Set margins and automatic or fixed orientation, then inspect the downloaded document.",
+      "How do I merge JPG images into one PDF?",
+      "Add your JPG images, arrange them in reading order and choose A4, Letter or Fit to image. Each image becomes one PDF page, so four JPGs produce four pages. Set margins and automatic or fixed orientation, then check the downloaded document before submitting it.",
     ],
     [
       "Will a photo converted to PDF have searchable text?",
@@ -143,13 +147,13 @@ const extraFaqs = {
       "Start with a clear scan on plain white paper and adjust the White threshold gradually. Lower thresholds whiten more pixels and may erase faint ink. Compare thin strokes, dots and pen marks with the original at full size.",
     ],
     [
-      "Does signature cleanup make the background transparent?",
-      "No. This tool cleans the paper background to white. Check the receiving form’s image-format and background requirements, and crop or resize the cleaned signature if needed.",
+      "Can I resize a signature to the dimensions and KB limit on my form?",
+      "Clean the scan here first, then use Crop image to remove excess paper and Resize image to set the required dimensions, DPI and optional maximum KB. This cleaner whitens the paper background; it does not make it transparent or set a fixed signature size. Check faint strokes after resizing.",
     ],
   ],
   "passport-sheet": [
     [
-      "How do I print passport photos at the selected size?",
+      "How do I make passport size photos for printing?",
       "Choose the intended photo size and paper size, then print at Actual size or 100%. Disable automatic fit or enlargement. Print a trial and measure one photo with a ruler before cutting the sheet.",
     ],
     [
@@ -159,7 +163,7 @@ const extraFaqs = {
   ],
   "pdf-to-image": [
     [
-      "Which resolution should I choose when exporting PDF pages?",
+      "Which resolution should I choose to convert PDF to JPG?",
       "Start at 150 DPI for general viewing. Use 300 DPI when you need more detail and your device has enough memory. Higher DPI creates more pixels and can increase processing time and output size.",
     ],
     [
@@ -199,8 +203,8 @@ const extraFaqs = {
   ],
   "white-background": [
     [
-      "Which photo backgrounds work best for whitening?",
-      "Use a plain, light background that reaches the image edges. Similar colours connected to the border are whitened. Patterned backgrounds and uneven shadows may not clean evenly because this is colour matching, not person segmentation.",
+      "How can I make a photo background white?",
+      "Choose a photo with a plain, light background reaching the image edges, then adjust Background tolerance and inspect the preview. Similar colours connected to the border are whitened. Patterned backgrounds and uneven shadows may not clean evenly because this is colour matching, not person segmentation.",
     ],
     [
       "Can I put the whitened photo on A4 with white space?",

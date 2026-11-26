@@ -5,10 +5,11 @@ import { resizeFaqs } from "../src/photo-sizes.js";
 export default function ResizeImageGuide() {
   return (
     <>
-      <h2>How to resize a photo in cm</h2>
+      <h2>How to resize an image in cm</h2>
       <p>
-        Set exact photo dimensions in centimetres, millimetres, inches or
-        pixels. Resize JPG, PNG and WebP images locally in your browser without
+        Use this image resizer in cm to set photo width and height for printing
+        or an application form. You can also choose millimetres, inches or
+        pixels. JPG, PNG and WebP images are resized in your browser without
         uploading your photo to a server.
       </p>
       <ol>
@@ -56,7 +57,12 @@ export default function ResizeImageGuide() {
         </Link>
         .
       </p>
-      <h3>Should I crop or add white padding?</h3>
+      <h3>Resize image width and height without stretching</h3>
+      <p>
+        Check the source image’s shape before setting two dimensions. A square
+        photo cannot fill a portrait rectangle without cropping, padding or
+        distortion. Choose the option that matches your destination’s rules.
+      </p>
       <ul>
         <li>
           <strong>Fit inside (white padding):</strong> keeps the whole image in

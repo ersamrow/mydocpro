@@ -3,7 +3,7 @@ export const guideDetails = {
   "compress-image": {
     steps: [
       "Add the JPG, PNG, WebP or HEIC photo you want to make smaller.",
-      "Use a 20, 50, 100 or 200 KB quick preset, or enter Maximum size (KB). Set a Maximum width (px) that meets the form’s minimum dimensions.",
+      "To compress an image to 20 KB, select the 20 KB preset. For another limit, choose 50, 100 or 200 KB, or enter Maximum size (KB). Keep Maximum width (px) above any minimum width required by your form.",
       "Process the image, then download the JPG. For a batch, use Download all (ZIP) or an individual download and check each output separately.",
     ],
     checks:
@@ -24,7 +24,7 @@ export const guideDetails = {
   "crop-image": {
     steps: [
       "Choose your photo and rotate it upright before setting the final crop.",
-      "Select a fixed Crop ratio for a required shape, or Freeform for an unconstrained selection.",
+      "To crop an image to a required shape, select a fixed Crop ratio. Choose Freeform when you need independent width and height rather than a locked shape.",
       "Move or resize the crop selection in the preview. Keep essential details away from the edges and use zoom carefully.",
       "Process the crop and download it. Use Resize image next if you also need exact centimetres or pixel dimensions.",
     ],
@@ -47,7 +47,7 @@ export const guideDetails = {
     steps: [
       "Add one PDF and identify the positions of the pages you want to keep.",
       "Enter Pages to extract with commas and ranges, such as 1-3, 8. A reversed range such as 5-2 keeps that reverse order.",
-      "Choose One PDF, Separate PDF per page, or Split every N pages and set the number of pages per file.",
+      "To split PDF pages into individual files, choose Separate PDF per page. Choose One PDF for one selected-page document, or Split every N pages for equal-sized groups and a shorter final group if needed.",
       "Check the selected page range, process it, then download all files as ZIP or choose individual outputs.",
     ],
     checks:
@@ -57,7 +57,7 @@ export const guideDetails = {
   "compress-pdf": {
     steps: [
       "Choose a PDF and keep an untouched original.",
-      "Choose a 100 KB, 200 KB, 500 KB or 1 MB target for automatic quality and resolution search, or leave the target blank and set DPI and quality manually.",
+      "To try compressing a PDF to 100 KB, select the 100 KB target. Other presets cover 200 KB, 500 KB and 1 MB. A target searches quality and resolution automatically; leave it blank to set DPI and quality manually.",
       "Process the file. Supported embedded images are recompressed while retaining real text; image-only documents may use a rendered-page fallback.",
       "Download the smaller result and inspect it. If no smaller file can be produced, keep the original; if the target is missed, check the reported output size.",
     ],
@@ -68,7 +68,7 @@ export const guideDetails = {
   "jpg-to-pdf": {
     steps: [
       "Add the JPG, PNG, WebP or HEIC images that belong in the document.",
-      "Arrange the images in reading order; each image becomes one PDF page.",
+      "To merge JPG images into one PDF, arrange them in reading order. Each image becomes one PDF page; for example, three JPGs produce three pages.",
       "Choose A4, Letter or Fit to image, set margins, and use Auto orientation per image or force portrait or landscape.",
       "Set image quality and optionally a maximum PDF size, then create the PDF and check any size warning before downloading.",
     ],
@@ -92,7 +92,7 @@ export const guideDetails = {
       "Choose a clear scan or photo of a signature on white paper, with as little shadow as possible.",
       "Adjust White threshold while watching the preview; start around 170 and change it gradually.",
       "Choose the output format accepted by the receiving form.",
-      "Process and download the cleaned image, then crop or resize it if the destination requires a smaller signature area.",
+      "Download the cleaned signature. Use Crop image to remove excess paper, then Resize image for required pixel dimensions, cm or mm and an optional KB limit. This cleaner does not set those dimensions itself.",
     ],
     checks:
       "Compare the download with the original at full size. Check thin strokes, dots and faint ink for accidental removal; the cleaned background is white, not transparent.",
@@ -100,7 +100,7 @@ export const guideDetails = {
   },
   "passport-sheet": {
     steps: [
-      "Choose a photo with suitable framing and check the receiving authority’s photo requirements.",
+      "To make passport size photos for printing, start with a clear photo and check the receiving authority’s current size and framing requirements. This sheet maker arranges copies; it does not certify passport compliance.",
       "Choose the required photo size: 35 × 45 mm, 2 × 2 inches, 25 × 35 mm or 20 × 25 mm stamp.",
       "Select 4 × 6 inch or A4 paper, DPI, copy count and optional cut guides. Choose fewer copies if they do not fit.",
       "Download and print on the selected paper at actual size, with automatic fit or enlargement disabled.",
@@ -111,7 +111,7 @@ export const guideDetails = {
   },
   "pdf-to-image": {
     steps: [
-      "Add one PDF and select JPG, PNG or WebP as the output format.",
+      "To convert PDF to JPG, add one PDF and select JPG as the output format. Choose PNG or WebP instead only when the receiving site accepts that format.",
       "Enter all or a page selection such as 1-3, 5, using positions in the PDF.",
       "Start at 150 DPI for general viewing. Optionally set Max size per image (KB); this can reduce quality or dimensions to fit.",
       "Render the selection and download all images as ZIP, or choose the individual page downloads.",

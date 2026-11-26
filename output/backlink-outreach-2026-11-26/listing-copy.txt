@@ -1,0 +1,22 @@
+MyDocPro Alternative.me listing
+
+Status: draft saved; content licence and submission approved by user. Waiting for Alternative.me account email verification. Submission is not yet confirmed.
+
+Website: https://mydocpro.co.in/
+Category: Web > Tools
+Type: Online / SaaS
+Monetization: Free
+Status: Released
+Platform: Browser
+Assets: MyDocPro logo and two user-uploaded screenshots
+
+Short description:
+Free browser-based tools to resize and compress images, prepare application photos, and merge, split, organize or convert PDFs. No account required.
+
+Full description:
+MyDocPro is a free browser-based toolkit for preparing images, PDFs and application photos. Resize images in pixels, centimetres, millimetres or inches; compress photos toward a target file size; crop and convert images; and use photo-size guides and a CM-to-pixels calculator.
+
+The PDF tools support merging, splitting, organizing and compressing PDFs, as well as image-to-PDF and PDF-to-image conversion. Selected files are processed on the user's device. No account is required, and the tools do not add a watermark.
+
+MyDocPro is designed for everyday paperwork, such as preparing form attachments, arranging scanned documents and sizing photos. Users should check downloaded files against the receiving organization's requirements.
+

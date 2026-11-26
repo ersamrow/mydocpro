@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-26",
+  "website": "https://mydocpro.co.in/",
+  "authorization": "User authorized sending personalized outreach and submitting free listings.",
+  "sender": null,
+  "status": "Alternative.me draft saved. User approved its content licence and submission. Submission attempt did not enter the pending queue; account shows Unverified Email-Address. Waiting for user verification. Outreach remains unsent.",
+  "outreach": [
+    {
+      "site": "ClearIAS",
+      "channel": "email",
+      "recipient": "contactus@clearias.com",
+      "contactSource": "https://www.clearias.com/about/contact/",
+      "relevantPage": "https://www.clearias.com/upsc-online/",
+      "subject": "Photo-preparation resource for your UPSC application guide",
+      "body": "Hello ClearIAS team,\n\nYour UPSC online-application guide explains the photograph, live-photo and signature steps. I am writing from MyDocPro, a free browser-based image and PDF toolkit, with a practical resource your readers may find useful.\n\nOur image resizer lets applicants set dimensions in pixels or physical units and prepare a downloadable image: https://mydocpro.co.in/resize-image. Selected files are processed on the user's device, and no account is required.\n\nThe tool does not replace the official upload specifications or live-photo process. If it proves useful after your review, would you consider mentioning it as an optional preparation resource in your guide?\n\nThank you,\nMyDocPro\nhttps://mydocpro.co.in/",
+      "status": "ready_pending_sender"
+    },
+    {
+      "site": "Shotkit",
+      "channel": "email",
+      "recipient": "india@shotkit.com",
+      "contactSource": "https://shotkit.com/contact/",
+      "relevantPage": "https://shotkit.com/photo-resolution/",
+      "subject": "Calculator resource for Shotkit's photo-resolution guide",
+      "body": "Hello Shotkit team,\n\nYour photo-resolution guide explains how pixel dimensions relate to physical print size. I am writing from MyDocPro to suggest a small companion resource for readers who want to apply those calculations.\n\nOur free calculator converts centimetres, millimetres or inches to pixels at a chosen DPI, and converts pixels back to physical dimensions: https://mydocpro.co.in/cm-to-pixels. It also provides photo-size tables and links to a pre-filled image resizer.\n\nWould you consider reviewing it as an optional resource alongside the guide? Any mention or link would be entirely at your editorial discretion.\n\nThank you,\nMyDocPro\nhttps://mydocpro.co.in/",
+      "status": "ready_pending_sender"
+    },
+    {
+      "site": "Hongkiat",
+      "channel": "tips_form",
+      "recipient": "https://www.hongkiat.com/blog/submit-news-tips/",
+      "contactSource": "https://www.hongkiat.com/blog/submit-news-tips/",
+      "relevantPage": "https://www.hongkiat.com/blog/designers-developers-monthly-06-2026/",
+      "subject": "MyDocPro: free image and PDF tools with on-device file processing",
+      "body": "Hello Hongkiat team,\n\nI am submitting MyDocPro for consideration in your web-tool coverage or Fresh Resources series.\n\nMyDocPro combines image resizing, compression, cropping and conversion with PDF merging, splitting, page organization and image-to-PDF tools. It also includes photo-size guides and a centimetres-to-pixels calculator. Selected files are processed in the browser on the user's device; the tools do not require an account.\n\nWebsite: https://mydocpro.co.in/\nImage workspace: https://mydocpro.co.in/image-editor\n\nIt may be useful for readers preparing images, documents and application photos without installing desktop software. Please try it and consider it only if it fits your editorial coverage.\n\nThank you,\nMyDocPro",
+      "status": "ready_pending_sender_and_form_captcha_confirmation"
+    },
+    {
+      "site": "iLovePhD",
+      "channel": "email",
+      "recipient": "ilovephdyt@gmail.com",
+      "contactSource": "https://ilovephd.com/",
+      "relevantPage": "https://ilovephd.com/",
+      "subject": "Free document-preparation resource for iLovePhD readers",
+      "body": "Hello iLovePhD team,\n\nYour site shares practical tools and research resources for PhD scholars. I am writing from MyDocPro with a free document-preparation resource that may be relevant to those readers.\n\nOur PDF Toolkit can merge, split and organize PDFs, compress supported PDF content, and convert between images and PDFs: https://mydocpro.co.in/pdf-toolkit. Selected files are processed on the user's device, and the tools do not require an account.\n\nIt can help with everyday tasks such as assembling application attachments or organizing scanned documents. Would you consider reviewing it for a suitable research-productivity resource page? Any inclusion would be your editorial decision.\n\nThank you,\nMyDocPro\nhttps://mydocpro.co.in/",
+      "status": "ready_pending_sender"
+    },
+    {
+      "site": "TheWindowsClub",
+      "channel": "email",
+      "recipient": "admin@thewindowsclub.com",
+      "contactSource": "https://www.thewindowsclub.com/privacy-policy",
+      "relevantPage": "https://www.thewindowsclub.com/best-ways-to-compress-images-on-windows-11-10",
+      "subject": "Browser-based option for your Windows image-compression guide",
+      "body": "Hello TheWindowsClub team,\n\nYour guide to compressing images on Windows includes a section on online compression tools. I am writing from MyDocPro to suggest another option for your editorial review.\n\nOur free image compressor processes selected files on the user's device and lets readers work toward a target file size: https://mydocpro.co.in/compress-image. It requires no account or desktop installation. Readers can inspect the result and check dimensions and readability before using the download.\n\nWould you consider trying it when you next review the guide's online-tool recommendations? Please include it only if it is useful to your readers.\n\nThank you,\nMyDocPro\nhttps://mydocpro.co.in/",
+      "status": "ready_pending_sender"
+    }
+  ],
+  "listing": {
+    "name": "MyDocPro",
+    "website": "https://mydocpro.co.in/",
+    "tagline": "Free image and PDF tools that process files in your browser",
+    "pricing": "Free",
+    "platform": "Web",
+    "categories": [
+      "Productivity",
+      "PDF Tools",
+      "Image Editing"
+    ],
+    "description": "MyDocPro is a free browser-based toolkit for preparing images, PDFs and application photos. Resize images in pixels, centimetres, millimetres or inches; compress photos toward a target file size; crop and convert images; and use photo-size guides and a CM-to-pixels calculator.\n\nThe PDF tools support merging, splitting, organizing and compressing PDFs, as well as image-to-PDF and PDF-to-image conversion. Selected files are processed on the user's device. No account is required, and the tools do not add a watermark.\n\nMyDocPro is designed for everyday paperwork, such as preparing form attachments, arranging scanned documents and sizing photos. Users should check downloaded files against the receiving organization's requirements.",
+    "logoPath": "D:/Others/mydocpro/public/brand/mydocpro-500.png",
+    "candidates": [
+      {
+        "site": "Product Hunt",
+        "url": "https://www.producthunt.com/products/mydocpro",
+        "status": "Existing launch discovered through Hunted.Space; do not create a duplicate."
+      },
+      {
+        "site": "Alternative.me",
+        "url": "https://alternative.me/how-to/submit-software/",
+        "status": "Alternative.me draft saved. User approved its content licence and submission. Submission attempt did not enter the pending queue; account shows Unverified Email-Address. Waiting for user verification. Outreach remains unsent."
+      },
+      {
+        "site": "Fazier",
+        "url": "https://fazier.com/submit",
+        "status": "Not selected: free plan requires a homepage/footer backlink; no website changes authorized specifically for a badge."
+      },
+      {
+        "site": "AlternativeTo",
+        "url": "https://alternativeto.net/faq/",
+        "status": "Not selected: current approval criteria exclude many commodity PDF/image utility sites."
+      }
+    ],
+    "shortDescription": "Free browser-based tools to resize and compress images, prepare application photos, and merge, split, organize or convert PDFs. No account required.",
+    "alternativeMeCategory": "Web > Tools",
+    "alternativeMeType": "Online / SaaS",
+    "contentLicenceApproved": true,
+    "accountStatus": "Unverified Email-Address"
+  }
+}

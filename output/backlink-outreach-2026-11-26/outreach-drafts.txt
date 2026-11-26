@@ -1,0 +1,113 @@
+MyDocPro backlink outreach — 2026-11-26
+Status: Prepared; no messages sent and no new listings submitted.
+Sender: awaiting your email-address choice
+
+1. ClearIAS
+Channel: email
+Recipient: contactus@clearias.com
+Contact source: https://www.clearias.com/about/contact/
+Relevant page: https://www.clearias.com/upsc-online/
+Status: ready_pending_sender
+Subject: Photo-preparation resource for your UPSC application guide
+
+Hello ClearIAS team,
+
+Your UPSC online-application guide explains the photograph, live-photo and signature steps. I am writing from MyDocPro, a free browser-based image and PDF toolkit, with a practical resource your readers may find useful.
+
+Our image resizer lets applicants set dimensions in pixels or physical units and prepare a downloadable image: https://mydocpro.co.in/resize-image. Selected files are processed on the user's device, and no account is required.
+
+The tool does not replace the official upload specifications or live-photo process. If it proves useful after your review, would you consider mentioning it as an optional preparation resource in your guide?
+
+Thank you,
+MyDocPro
+https://mydocpro.co.in/
+
+============================
+
+2. Shotkit
+Channel: email
+Recipient: india@shotkit.com
+Contact source: https://shotkit.com/contact/
+Relevant page: https://shotkit.com/photo-resolution/
+Status: ready_pending_sender
+Subject: Calculator resource for Shotkit's photo-resolution guide
+
+Hello Shotkit team,
+
+Your photo-resolution guide explains how pixel dimensions relate to physical print size. I am writing from MyDocPro to suggest a small companion resource for readers who want to apply those calculations.
+
+Our free calculator converts centimetres, millimetres or inches to pixels at a chosen DPI, and converts pixels back to physical dimensions: https://mydocpro.co.in/cm-to-pixels. It also provides photo-size tables and links to a pre-filled image resizer.
+
+Would you consider reviewing it as an optional resource alongside the guide? Any mention or link would be entirely at your editorial discretion.
+
+Thank you,
+MyDocPro
+https://mydocpro.co.in/
+
+============================
+
+3. Hongkiat
+Channel: tips_form
+Recipient: https://www.hongkiat.com/blog/submit-news-tips/
+Contact source: https://www.hongkiat.com/blog/submit-news-tips/
+Relevant page: https://www.hongkiat.com/blog/designers-developers-monthly-06-2026/
+Status: ready_pending_sender_and_form_captcha_confirmation
+Subject: MyDocPro: free image and PDF tools with on-device file processing
+
+Hello Hongkiat team,
+
+I am submitting MyDocPro for consideration in your web-tool coverage or Fresh Resources series.
+
+MyDocPro combines image resizing, compression, cropping and conversion with PDF merging, splitting, page organization and image-to-PDF tools. It also includes photo-size guides and a centimetres-to-pixels calculator. Selected files are processed in the browser on the user's device; the tools do not require an account.
+
+Website: https://mydocpro.co.in/
+Image workspace: https://mydocpro.co.in/image-editor
+
+It may be useful for readers preparing images, documents and application photos without installing desktop software. Please try it and consider it only if it fits your editorial coverage.
+
+Thank you,
+MyDocPro
+
+============================
+
+4. iLovePhD
+Channel: email
+Recipient: ilovephdyt@gmail.com
+Contact source: https://ilovephd.com/
+Relevant page: https://ilovephd.com/
+Status: ready_pending_sender
+Subject: Free document-preparation resource for iLovePhD readers
+
+Hello iLovePhD team,
+
+Your site shares practical tools and research resources for PhD scholars. I am writing from MyDocPro with a free document-preparation resource that may be relevant to those readers.
+
+Our PDF Toolkit can merge, split and organize PDFs, compress supported PDF content, and convert between images and PDFs: https://mydocpro.co.in/pdf-toolkit. Selected files are processed on the user's device, and the tools do not require an account.
+
+It can help with everyday tasks such as assembling application attachments or organizing scanned documents. Would you consider reviewing it for a suitable research-productivity resource page? Any inclusion would be your editorial decision.
+
+Thank you,
+MyDocPro
+https://mydocpro.co.in/
+
+============================
+
+5. TheWindowsClub
+Channel: email
+Recipient: admin@thewindowsclub.com
+Contact source: https://www.thewindowsclub.com/privacy-policy
+Relevant page: https://www.thewindowsclub.com/best-ways-to-compress-images-on-windows-11-10
+Status: ready_pending_sender
+Subject: Browser-based option for your Windows image-compression guide
+
+Hello TheWindowsClub team,
+
+Your guide to compressing images on Windows includes a section on online compression tools. I am writing from MyDocPro to suggest another option for your editorial review.
+
+Our free image compressor processes selected files on the user's device and lets readers work toward a target file size: https://mydocpro.co.in/compress-image. It requires no account or desktop installation. Readers can inspect the result and check dimensions and readability before using the download.
+
+Would you consider trying it when you next review the guide's online-tool recommendations? Please include it only if it is useful to your readers.
+
+Thank you,
+MyDocPro
+https://mydocpro.co.in/

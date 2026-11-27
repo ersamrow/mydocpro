@@ -48,7 +48,7 @@ export const pageBodies = {
       <>
         <p>
           {
-            "Updated 25 November 2026. This notice describes the application included in this release."
+            "Updated 27 November 2026. This notice describes the application included in this release."
           }
         </p>
         <h2>{"Your selected files"}</h2>
@@ -113,6 +113,23 @@ export const pageBodies = {
             the Digital Advertising Alliance’s consumer choice page
           </a>
           . Opting out of personalisation does not remove all advertisements.
+        </p>
+        <p>
+          We also use Microsoft Clarity to understand page interactions through
+          heatmaps and session recordings. Clarity receives page activity and
+          browser and device information. We mark the application content,
+          including file previews, filenames and contact fields, for masking in
+          recordings. Clarity is configured to deny advertising and analytics
+          cookie storage and use limited tracking without Clarity cookies. Learn
+          more in the{" "}
+          <a
+            href="https://privacy.microsoft.com/privacystatement"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Microsoft Privacy Statement
+          </a>
+          .
         </p>
         <h2>{"Contact form and support email"}</h2>
         <p>

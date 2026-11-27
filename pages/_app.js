@@ -49,7 +49,7 @@ export default function App({ Component, pageProps }) {
     return () => controller.abort();
   }, []);
   return (
-    <div id="app">
+    <div id="app" data-clarity-mask="true">
       {!pageProps.exam && <SiteScripts />}
       <Header id={pageProps.exam ? "exam-photo" : pageProps.id} />
       <Component {...pageProps} />

@@ -114,6 +114,8 @@ Google Analytics uses Measurement ID `G-YZZFKYVDF4` through `components/SiteScri
 
 In the Analytics web stream, keep Enhanced measurement → Page views → Page changes based on browser history events enabled to measure Next.js navigation. The app relies on that automatic tracking and does not send additional route-change events. Do not install the `GTM-KBDMDM48` snippet alongside this direct integration if that container also sends Analytics events to the same property, as that can duplicate visits. Review Realtime after deployment to confirm receipt in your account.
 
+Microsoft Clarity uses project `zk587fqpuf` in the same production-only, online, post-load scheduler. It loads once on the main thread because it needs access to the page DOM. The existing exclusion for direct visits to exam pages still applies. The app root has `data-clarity-mask="true"` so page text, filenames and document previews are masked from recordings. Keep sensitive content inside that root and out of CSS, which Clarity masking does not cover. The loader queues Consent V2 with both `ad_Storage` and `analytics_Storage` denied before loading Clarity, enabling limited tracking without Clarity cookies. Full tracking across sessions is not enabled; any future consent integration must pass the visitor's actual choice. See Microsoft's [masking guide](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-masking) and [Consent V2 documentation](https://learn.microsoft.com/en-us/clarity/setup-and-installation/clarity-consent-api-v2). The privacy page discloses this integration. After deployment, confirm incoming visits in the Clarity dashboard.
+
 ## Verification
 
 ```sh

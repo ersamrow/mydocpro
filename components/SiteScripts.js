@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { loadAnalyticsWorker } from "./analytics-worker.js";
 
 const measurementId = "G-YZZFKYVDF4";
+const clarityProjectId = "zk587fqpuf";
 
 function loadAds() {
   if (document.getElementById("mydocpro-ads")) return;
@@ -35,6 +36,24 @@ function loadAnalytics() {
   loadAnalyticsWorker(tag);
 }
 
+function loadClarity() {
+  if (document.getElementById("mydocpro-clarity-loader")) return;
+  window.clarity ??= function () {
+    (window.clarity.q ??= []).push(arguments);
+  };
+  // No visitor cookie consent is collected yet; keep Clarity in limited mode.
+  window.clarity("consentv2", {
+    ad_Storage: "denied",
+    analytics_Storage: "denied",
+  });
+
+  const script = document.createElement("script");
+  script.id = "mydocpro-clarity-loader";
+  script.async = true;
+  script.src = `https://www.clarity.ms/tag/${clarityProjectId}?ref=bwt`;
+  document.head.appendChild(script);
+}
+
 export default function SiteScripts() {
   useEffect(() => {
     const production = ["mydocpro.co.in", "www.mydocpro.co.in"].includes(
@@ -56,7 +75,7 @@ export default function SiteScripts() {
         document.readyState !== "complete"
       )
         return;
-      for (const task of [loadAds, loadAnalytics]) {
+      for (const task of [loadAds, loadAnalytics, loadClarity]) {
         pending.push(
           window.requestIdleCallback
             ? window.requestIdleCallback(task, { timeout: 1500 })

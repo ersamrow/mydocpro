@@ -13,7 +13,7 @@ export const toolSearch = {
   ],
   "pdf-toolkit": [
     "Free PDF Tools Online – Merge, Split, Compress",
-    "Merge, split, compress or organize PDFs for free in your browser. Turn photos into PDFs or export pages as images, with no upload or sign-up.",
+    "Merge, split, compress and organize PDFs free in your browser. Convert photos to PDFs or export pages as images, without uploads, sign-ups or watermarks.",
   ],
   "compress-image": [
     "Image Compressor to 20 KB, 50 KB & 100 KB Free",
@@ -25,7 +25,7 @@ export const toolSearch = {
   ],
   "convert-image": [
     "Convert JPG, PNG and WebP Images Online Free",
-    "Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image.",
+    "Convert JPG to PNG, PNG to JPG, or images to and from WebP for free. Choose your output format and download without uploading your image. No sign-up needed.",
   ],
   "crop-image": [
     "Crop Image Online Free – Crop & Rotate Photos",
@@ -49,7 +49,7 @@ export const toolSearch = {
   ],
   "exam-photo": [
     "Free Exam Photo Resizer for Application Forms",
-    "Resize application photos to standard sizes for free. Choose DPI and maximum KB, then check your form’s requirements before downloading.",
+    "Resize application photos to standard sizes for free in your browser. Choose DPI and maximum KB, then check your form’s requirements before downloading.",
   ],
   signature: [
     "Free Signature Cleaner for Online Forms",
@@ -65,11 +65,11 @@ export const toolSearch = {
   ],
   "organize-pdf": [
     "Organize PDF Free – Reorder, Rotate, Delete",
-    "Rearrange, rotate or remove pages from a PDF online for free. Check the new page order in the preview and download the document without an upload.",
+    "Rearrange, rotate or remove pages from a PDF online for free. Check the new page order in the preview and download the document without an upload or account.",
   ],
   "name-date": [
     "Add Name and Date on Photo Free for Exam Forms",
-    "Add a name and date below your photo free for application forms. Preview the text strip and download the finished photo without an upload.",
+    "Add your name and date below a photo for application forms. Preview the text strip and download the finished image for free, without uploads or an account.",
   ],
   "join-images": [
     "Join Images Online Free – JPG or A4 PDF",
@@ -81,11 +81,11 @@ export const toolSearch = {
   ],
   "sign-pdf": [
     "Sign PDF Online Free – Add Signature, Text & Date",
-    "Sign and fill a PDF free: draw, type or upload your signature, add text, today's date and check marks, then download. Files stay on your device.",
+    "Sign and fill a PDF free: draw, type or upload your signature, add text, today's date and check marks, then download the result. Files stay on your device.",
   ],
   "remove-background": [
     "Remove Photo Background Online Free – On Device",
-    "Remove the background from a portrait free and replace it with white, blue or transparent. AI runs in your browser, so your photo is never uploaded.",
+    "Remove the background from a portrait free online and replace it with white, blue or transparent. AI runs in your browser, so your photo is never uploaded.",
   ],
   "white-background": [
     "Whiten a Light Photo Background Online Free",
@@ -99,7 +99,7 @@ export function pageSeo(id = "") {
       ? {
           title: "CM to Pixels Converter – Free",
           description:
-            "Convert cm, mm or inches to pixels and pixels to physical sizes at your chosen DPI. Check photo size tables and open a pre-filled image resizer free.",
+            "Convert cm, mm or inches to pixels and pixels to physical sizes at your chosen DPI. Check common photo size tables and open a pre-filled image resizer free.",
         }
       : Object.hasOwn(sitePages, id)
         ? sitePages[id]

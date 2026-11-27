@@ -5,7 +5,7 @@ export function photoSizeSeo(size) {
   const pixels = sizePixels(size).join(" × ");
   const name = `Resize Photo to ${size.label} (${pixels} px) – Free`;
   const url = `${siteOrigin}/resize-image/${size.slug}`;
-  const description = `Resize a photo to ${size.label}: ${pixels} pixels at 300 DPI. Centre-crop, set an optional KB limit and download free. Files stay on your device.`;
+  const description = `Resize a photo to ${size.label}: ${pixels} pixels at 300 DPI. Centre-crop, preview, set an optional KB limit and download for free. Files stay on your device.`;
   const graph = base.schema["@graph"]
     .map((item) => {
       if (item["@type"] === "WebPage")

@@ -2,7 +2,7 @@ export const sitePages = {
   about: {
     title: "About MyDocPro – Free, Private Document Tools",
     description:
-      "Learn how MyDocPro’s free image and PDF tools process your files in your browser and what to check before submitting a document.",
+      "Learn how MyDocPro's free image and PDF tools work, how files are processed in your browser, which limits apply and where to get help with your documents.",
   },
   privacy: {
     title: "Privacy Policy",
@@ -15,13 +15,13 @@ export const sitePages = {
       "Contact MyDocPro with questions, feedback, bug reports or tool requests. Find our support details and send a message about our free image and PDF tools.",
   },
   help: {
-    title: "Help & FAQ – How to Use MyDocPro Tools",
+    title: "Image & PDF Tools Help and Troubleshooting",
     description:
-      "Get help with MyDocPro's free image and PDF tools. Learn about photo dimensions, KB limits, PDF processing, downloads, offline use and common problems.",
+      "Find answers to common MyDocPro problems with photo dimensions, file size limits, PDF compression, missing downloads and offline access to image and PDF tools.",
   },
   updates: {
-    title: "What’s New",
+    title: "MyDocPro Updates – Image and PDF Tool Improvements",
     description:
-      "Read MyDocPro's update log for image and PDF tool guidance, photo sizing, troubleshooting and site navigation changes. Learn how to report tool issues.",
+      "Explore MyDocPro updates for free image and PDF tools, including photo size presets, DPI conversion, download improvements, clearer guidance and navigation.",
   },
 };

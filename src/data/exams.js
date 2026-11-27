@@ -30,7 +30,7 @@ export const exams = [
     lastVerified,
     title: "NEET UG 2026 Photo & Signature Size – Resize Free | MyDocPro",
     metaDescription:
-      "Prepare JPGs of your passport photo, signature and hand impressions for NEET UG 2026. Check the file sizes privately before uploading them to NTA.",
+      "Prepare photo, signature and hand impression JPGs for NEET UG 2026. Check file size guidance and preview your images locally before submitting the form.",
     h1: "NEET UG Photo, Signature & Thumb Resizer",
     intro:
       "Prepare the three scanned images for the 2026 form. NTA also takes a separate live photograph during registration.",
@@ -119,7 +119,7 @@ export const exams = [
     lastVerified,
     title: "JEE Main 2027 Photo & Signature Size – Resize Free | MyDocPro",
     metaDescription:
-      "Resize your photo (10–200 KB) and signature (10–100 KB) for JEE Main 2027 in JPG format. Free, no sign-up, and files stay on your device.",
+      "Resize photo and signature JPGs for JEE Main 2027 in your browser. Review file size guidance, preview the results and download free without uploading files.",
     h1: "JEE Main Photo & Signature Resizer",
     intro:
       "Prepare your scanned passport photo and signature for JEE Main 2027, then complete the live camera step in the NTA form.",
@@ -187,7 +187,7 @@ export const exams = [
     lastVerified,
     title: "UPSC Photo & 3-Signature Size 2026 – Resize Free | MyDocPro",
     metaDescription:
-      "Resize your UPSC photo (20–200KB) and triple signature (20–100KB) in JPG. Free, private, works on mobile. Files never leave your device.",
+      "Prepare your UPSC photo and triple signature scan as JPG files for free. Review sizing guidance, preview the results and download locally with no sign-up.",
     h1: "UPSC Photo & Signature Resizer",
     intro:
       "Prepare the two image files for the 2026 Civil Services Common Application Form, including a single scan of three handwritten signatures.",
@@ -287,7 +287,7 @@ export const exams = [
     lastVerified,
     title: "SSC Signature Size 2026 (10–20KB) – Resize Free | MyDocPro",
     metaDescription:
-      "Prepare a 10–20 KB JPG signature for SSC forms. Check your scan, read live photo tips and resize privately in your browser.",
+      "Prepare a JPG signature for SSC forms in your browser. Resize your scan, preview the result and check file size guidance and live photo tips before applying.",
     h1: "SSC Signature Resizer (CGL, CHSL, MTS, GD)",
     intro:
       "Prepare the signature you upload to SSC. The photograph for the application is taken in the SSC portal or app.",
@@ -508,7 +508,7 @@ export const exams = [
     lastVerified,
     title: "RRB NTPC 2026 Signature Size (30–49KB) – Resize Free | MyDocPro",
     metaDescription:
-      "Resize your signature for RRB NTPC 2026 to a 30–49 KB JPG of at least 140×60 px. The photo is captured live. Free, and files never leave your device.",
+      "Prepare a JPG signature for RRB NTPC 2026 in your browser. Check size guidance, preview your scan and read live photo and travel certificate instructions.",
     h1: "RRB NTPC Signature Resizer",
     intro:
       "Prepare your signature for RRB NTPC Graduate CEN 06/2026. The portal captures your photo live and has a separate PDF field for eligible travel-pass applicants.",
